@@ -29,15 +29,15 @@
 
 ## C++ 知识点
 
-### [C++ 的四种类型转换](./C++知识点/C++ 的四种类型转换.md) 
+- [C++的四种类型转换](./C++知识点/C++的四种类型转换.md) 
 
-- static_cast
-
-- dynamic_cast
-
-- const_cast
-
-- reinterpret_cast
+  > static_cast
+  >
+  > dynamic_cast
+  >
+  > const_cast
+  >
+  > reinterpret_cast
 
 ## Linux杂谈
 
