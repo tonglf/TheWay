@@ -34,6 +34,11 @@
 
 - [C++的四种类型转换](./C++知识点/C++的四种类型转换.md) 
 
+## 手撕代码
+
+- [strcpy函数](./手撕代码/完整版的 strcpy 函数.md)
+- [string函数](./手撕代码/手写 string 类.md)
+
 ## Linux杂谈
 
 - [clang-tidy](./Linux杂谈/clang-tidy.md)
