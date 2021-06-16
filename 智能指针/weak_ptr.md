@@ -50,7 +50,7 @@ void observe()
 int main()
 {
     {
-         auto sp = std::make_shared<int>(42);
+        auto sp = std::make_shared<int>(42);
 		gw = sp;
  
 		observe();
@@ -64,3 +64,88 @@ int main()
 // use_count == 0: gw is expired
 ```
 
+## 使用 weak_ptr 消除循环引用
+
+```cpp
+#include <iostream>
+#include <memory>
+
+class B;
+
+class A {
+public:
+	std::shared_ptr<B> m_pb;
+};
+
+class B {
+public:
+	std::shared_ptr<A> m_pa;
+};
+
+int main()
+{
+	std::weak_ptr<A> w_pa;
+	std::weak_ptr<B> w_pb;
+	{
+		std::shared_ptr<A> pa(new A);
+		std::shared_ptr<B> pb(new B);
+
+		pa->m_pb = pb;
+		pb->m_pa = pa;
+
+		w_pa = pa;
+		w_pb = pb;
+
+		std::cout << pa.use_count() << std::endl;		// 2
+		std::cout << pb.use_count() << std::endl;		// 2
+	}
+	std::cout << w_pa.use_count() << std::endl;			// 1
+	std::cout << w_pa.use_count() << std::endl;			// 1
+}
+```
+
+上述代码中，pa 和 pb 之间相互引用，两个资源的引用计数为2，当调出作用域时，两个资源的引用数会减一，但两者的引用数还是1，致使资源并未被释放。
+
+**解决方法：**
+
+在类中定义的对方类指针，把其中一个改为 weak_ptr 就可以了，如下：
+
+```cpp
+#include <iostream>
+#include <memory>
+
+class B;
+
+class A {
+public:
+	std::weak_ptr<B> m_pb;		// 改变处！！！
+};
+
+class B {
+public:
+	std::shared_ptr<A> m_pa;
+};
+
+int main()
+{
+	std::weak_ptr<A> w_pa;
+	std::weak_ptr<B> w_pb;
+	{
+		std::shared_ptr<A> pa(new A);
+		std::shared_ptr<B> pb(new B);
+
+		pa->m_pb = pb;
+		pb->m_pa = pa;
+
+		w_pa = pa;
+		w_pb = pb;
+
+		std::cout << pa.use_count() << std::endl;		// 2
+		std::cout << pb.use_count() << std::endl;		// 1
+	}
+	std::cout << w_pa.use_count() << std::endl;			// 0
+	std::cout << w_pa.use_count() << std::endl;			// 0
+}
+```
+
+如上所示，pb 的引用开始就是 1 ，当 pb 析构时，pb 的引用计数变为 0，B 得到释放，B 释放的同时也会使 A 的计数减一，同时 pa 析构时使 A 的计数减一，那么 A 的计数为 0，A 得到释放。
