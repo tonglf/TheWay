@@ -78,49 +78,5 @@ int main()
 
 ## 实现shared_ptr
 
-```cpp
-template <typename T>
-class SmartPtr {
-public:
-    SmartPtr(T *p);								// SmartPtr<int> p(new int(2));
-    SmartPtr(const SmartPtr<T>& orig);			// SmartPtr<int> q(p);
-    SmartPtr& operator=(const SmartPtr<T>& rhs);// q = p;
-    ~SmartPtr();
-    
-    T operator*();
-    T operator->();
-    T operator+(int i);
-    int operator-(SmartPtr<T>& t1, SmartPtr<T>& t2);
-    void use_count()
-    {
-        return *count;
-    }
-    
-private:
-    T *ptr;			// 底层真实的指针
-    int *count;		// 保存当前对象被多少指针引用计数
-};
-
-template <typename T>
-SmartPtr<T>::SmartPtr(T *p)
-{
-	ptr = p;
-    try {
-        count = new int(1);
-    }
-    catch (...)
-    {
-        delete ptr;
-        ptr = nullptr;
-        delete count;
-        count = nullptr;
-    }
-}
-
-template <typename T>
-SmartPtr<T>::SmartPtr(const SmartPtr<T>& orig)
-{
-    count = orig.count;
-}
-```
+参考`shared_ptr代码实现`
 
