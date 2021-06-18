@@ -44,9 +44,10 @@
 
 ## 手撕代码
 
-- [strcpy函数](./手撕代码/完整版的strcpy函数.md)
-- [string函数](./手撕代码/手写string类.md)
+- [strcpy 函数](./手撕代码/完整版的strcpy函数.md)
+- [string 函数](./手撕代码/手写string类.md)
 - [shared_ptr](./手撕代码/shared_ptr代码实现.md)
+- [vector 简单实现](./手撕代码/vector简单实现.md)
 
 ## Linux杂谈
 
