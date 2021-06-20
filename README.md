@@ -15,6 +15,7 @@
 ### 引用计数基础理论和实战
 
 - [第一节 shared_ptr 实现及 string 存储简单说明](./C++编程技巧与规范/2.1引用计数基础理论和实战.md)
+- [第二节 写时复制的 string 类 （copy-on-write）](./C++编程技巧与规范/2.2写时复制的string类.md)
 
 ## 设计模式
 
@@ -52,6 +53,7 @@
 
 - [strcpy 函数](./手撕代码/完整版的strcpy函数.md)
 - [string 函数](./手撕代码/手写string类.md)
+- [写时复制的 string 类 （copy-on-write）](./C++编程技巧与规范/2.2写时复制的string类.md)
 - [shared_ptr](./手撕代码/shared_ptr代码实现.md)
 - [vector 简单实现](./手撕代码/vector简单实现.md)
 
