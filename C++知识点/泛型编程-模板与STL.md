@@ -4025,3 +4025,160 @@ void test01()
 - 求差集的两个集合必须的有序序列
 - 目标容器开辟空间需要从**两个容器取较大值**
 - set_difference返回值既是差集中最后一个元素的位置
+
+## 6 迭代器操作
+
+定义于头文件 `<iterator>`
+
+### advance
+
+**令迭代器前进给定的距离**
+
+```cpp
+template< class InputIt, class Distance >
+void advance( InputIt& it, Distance n );
+```
+
+增加给定的迭代器 `it` 以 `n` 个元素的步长。若 `n` 为负，则迭代器自减。
+
+**示例：**
+
+```c++
+#include <iostream>
+#include <iterator>
+#include <vector>
+ 
+int main() 
+{
+    std::vector<int> v{ 3, 1, 4 };
+ 
+    auto vi = v.begin();
+ 
+    std::advance(vi, 2);
+ 
+    std::cout << *vi << '\n';		// 4
+}
+```
+
+### distance
+
+**返回两个迭代器间的距离**
+
+```cpp
+template< class InputIt >
+typename std::iterator_traits<InputIt>::difference_type
+    distance( InputIt first, InputIt last );
+```
+
+**参数：**
+
+- `first` - 指向首元素的迭代器
+- `last` - 指向范围尾的迭代器
+
+**返回值：**
+
+- 从 `first` 走到 `last` 所需的自增数。
+
+**示例：**
+
+```cpp
+#include <iostream>
+#include <iterator>
+#include <vector>
+ 
+int main() 
+{
+    std::vector<int> v{ 3, 1, 4 };
+    std::cout << "distance(first, last) = "
+              << std::distance(v.begin(), v.end()) << '\n'		// distance(first, last) = 3
+              << "distance(last, first) = "
+              << std::distance(v.end(), v.begin()) << '\n';		// distance(last, first) = -3
+}
+```
+
+### next
+
+**令迭代器自增**
+
+```cpp
+template< class InputIt >
+InputIt next(
+  InputIt it,
+  typename std::iterator_traits<InputIt>::difference_type n = 1 );
+```
+
+**参数：**
+
+- `it` - 迭代器
+- `n` - 要前进的元素
+
+**返回值：**
+
+- 迭代器 `it` 的第 `n` 个后继。
+
+**示例：**
+
+```cpp
+#include <iostream>
+#include <iterator>
+#include <vector>
+ 
+int main() 
+{
+    std::vector<int> v{ 3, 1, 4 };
+ 
+    auto it = v.begin();
+    
+    auto nx = std::next(it);
+ 
+    std::cout << *it << ' ' << *nx << '\n';		// 3 1
+ 
+    auto nx = std::next(it, 2);
+ 
+    std::cout << *it << ' ' << *nx << '\n';		// 3 4
+}
+```
+
+### prev
+
+**令迭代器自减**
+
+```cpp
+template< class BidirIt >
+BidirIt prev(
+  BidirIt it,
+  typename std::iterator_traits<BidirIt>::difference_type n = 1 );
+```
+
+**参数：**
+
+- `it` - 迭代器
+- `n` - `it` 要被减少的次数
+
+**返回值：**
+
+- 迭代器 `it` 的第 `n` 个前驱。
+
+**示例：**
+
+```cpp
+#include <iostream>
+#include <iterator>
+#include <vector>
+ 
+int main() 
+{
+    std::vector<int> v{ 3, 1, 4 };
+ 
+    auto it = v.end();
+    
+    auto pv = std::prev(it);
+ 
+    std::cout << *pv << '\n';		// 4
+ 
+    auto pv = std::prev(it, 2);
+ 
+    std::cout << *pv << '\n';		// 1
+}
+```
+
