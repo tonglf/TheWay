@@ -35,6 +35,7 @@
 - [工厂方法 Factory Method](./设计模式/02工厂方法.md)
 - [抽象工厂 Abstract Factory](./设计模式/03抽象工厂.md)
 - [原型模式 Prototype](./设计模式/04原型模式.md)
+- [模板方法 Template Method](./设计模式/05模板方法.md)
 
 ## 智能指针
 
@@ -63,6 +64,12 @@
 ## Linux杂谈
 
 - [clang-tidy](./Linux杂谈/clang-tidy.md)
+
+### Linux系统编程
+
+- [Linux基本命令](./Linux杂谈/Linux系统编程/01_Linux基本命令.md)
+- [Linux常用工具](./Linux杂谈/Linux系统编程/02_Linux常用工具.md)
+- [GDB与Makefile](./Linux杂谈/Linux系统编程/03_GDB与Makefile.md)
 
 ## 算法
 - [二叉树前中后遍历--统一的递归、迭代写法](./算法/二叉树前中后遍历--统一的递归、迭代写法.md)
