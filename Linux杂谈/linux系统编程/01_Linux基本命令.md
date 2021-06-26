@@ -49,6 +49,7 @@ Backspace     Backspace   delete光标前面的单个字符
 - cd ..	返回上一级目录
 - cd ~    返回家目录
 - cd /     返回主目录
+- cd -     切换到上次的目录
 
 ### pwd  返回当前目录路径
 

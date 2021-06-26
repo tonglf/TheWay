@@ -70,6 +70,7 @@
 - [Linux基本命令](./Linux杂谈/Linux系统编程/01_Linux基本命令.md)
 - [Linux常用工具](./Linux杂谈/Linux系统编程/02_Linux常用工具.md)
 - [GDB与Makefile](./Linux杂谈/Linux系统编程/03_GDB与Makefile.md)
+- [系统函数：open、close、read、write](./Linux杂谈/Linux系统编程/04_系统函数.md)
 
 ## 算法
 - [二叉树前中后遍历--统一的递归、迭代写法](./算法/二叉树前中后遍历--统一的递归、迭代写法.md)
