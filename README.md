@@ -63,6 +63,7 @@
 
 ## Linux杂谈
 
+- [top、ps 命令](./Linux杂谈/top、ps.md)
 - [clang-tidy](./Linux杂谈/clang-tidy.md)
 
 ### Linux系统编程
