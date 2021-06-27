@@ -36,6 +36,7 @@
 - [抽象工厂 Abstract Factory](./设计模式/03抽象工厂.md)
 - [原型模式 Prototype](./设计模式/04原型模式.md)
 - [模板方法 Template Method](./设计模式/05模板方法.md)
+- [策略模式 Strategy](./设计模式/06策略模式.md)
 
 ## 智能指针
 
