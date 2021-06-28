@@ -39,7 +39,7 @@
 
 #define SERV_PORT 9527
 
-void sys_err(const char *str)
+void sys_err(const char *str)		// 错误处理函数
 {
     perror(str);
     exit(1);
@@ -64,14 +64,14 @@ int main(int argc, char *argv[])
         sys_err("socket error");
     }
 
-    //给服务器socket绑定地址结构（IP+port)
+    // 给服务器socket绑定地址结构（IP+port)
     ret = bind(lfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     if (ret == -1) 
     {
         sys_err("bind error");
     }
     
-    ret = listen(lfd, 128);					//	设置监听上限
+    ret = listen(lfd, 128);					// 设置监听上限
     if (ret == -1) 
     {
         sys_err("listen error");
@@ -182,8 +182,6 @@ int main(int argc, char *argv[])
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210627202732662.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTg2NzM4Mg==,size_16,color_FFFFFF,t_70)
 
-
-
 ## 函数解析
 
 ### 网络字节序：
@@ -208,19 +206,19 @@ int main(int argc, char *argv[])
 
 - **参数**：
 
-  ​    af：AF_INET、AF_INET6
+  ​    `af`：AF_INET、AF_INET6
 
-  ​    src：传入，IP地址（点分十进制）
+  ​    `src`：传入，IP地址（点分十进制）
 
-  ​    dst：传出，转换后的 网络字节序的 IP地址。 
+  ​    `dst`：传出，转换后的 网络字节序的 IP地址。 
 
 - **返回值**：
 
-     成功： 1
+  成功： 1
 
-     异常： 0， 说明src指向的不是一个有效的ip地址。
+  异常： 0， 说明src指向的不是一个有效的ip地址。
 
-     失败：-1
+  失败：-1
 
   ```cpp
   // 网络字节序 ---> 本地字节序（string IP） 
@@ -229,13 +227,13 @@ int main(int argc, char *argv[])
 
 - **参数**：
 
-  ​    af：AF_INET、AF_INET6
+  ​    `af`：AF_INET、AF_INET6
 
-  ​    src: 网络字节序IP地址
+  ​    `src`: 网络字节序IP地址
 
-  ​    dst：本地字节序（string IP）
+  ​    `dst`：本地字节序（string IP）
 
-  ​    size： dst 的大小。
+  ​    `size`： dst 的大小。
 
 - **返回值**： 
 
@@ -243,55 +241,27 @@ int main(int argc, char *argv[])
 
   ​    失败：NULL
 
- 
-
- 
-
 ### sockaddr地址结构： 
 
 **IP + port --> 在网络环境中唯一标识一个进程**。
 
- 
+```cpp
+struct sockaddr_in addr;
 
-  struct sockaddr_in addr;
+addr.sin_family = AF_INET/AF_INET6      man 7 ip
 
- 
+addr.sin_port = htons(9527);  
 
-  addr.sin_family = AF_INET/AF_INET6      man 7 ip
+int dst;
 
- 
+inet_pton(AF_INET, "192.157.22.45", (void *)&dst);
 
-  addr.sin_port = htons(9527);
-
-​      
-
-​    int dst;
-
- 
-
-​    inet_pton(AF_INET, "192.157.22.45", (void *)&dst);
-
- 
-
-  addr.sin_addr.s_addr = dst;
-
- 
-
-  【*】addr.sin_addr.s_addr = htonl(INADDR_ANY);    取出系统中有效的任意IP地址。二进制类型。
-
- 
-
-  bind(fd, (struct sockaddr *)&addr, size);
-
- 
-
- 
+addr.sin_addr.s_addr = dst;
+// 另一种方式（常用）
+addr.sin_addr.s_addr = htonl(INADDR_ANY);   // 【*】 取出系统中有效的任意IP地址。二进制类型。
+```
 
 ### socket函数：
-
- 
-
-  
 
 ####  socket
 
@@ -299,33 +269,22 @@ int main(int argc, char *argv[])
 #include <sys/socket.h>
 
 int socket(int domain, int type, int protocol);  // 创建一个 套接字
+// socket(AF_INET, SOCK_STREAM, 0);
 ```
 
- 
+-  **参数：**
 
-​    domain：AF_INET、AF_INET6、AF_UNIX
+  ​    `domain`：AF_INET、AF_INET6、AF_UNIX
 
- 
+  ​    `type`：SOCK_STREAM、SOCK_DGRAM	// 数据流（TCP）、数据报（UDP）
 
-​    type：SOCK_STREAM、SOCK_DGRAM
+  ​    `protocol`: 0 		// 使用协议：SOCK_STREAM 使用 TCP，SOCK_DGRAM 使用 UDP，0 为默认与 type 匹配
 
- 
+- **返回值：**
 
-​    protocol: 0 
+  ​    成功： 新套接字所对应文件描述符
 
- 
-
-​    返回值：
-
-  
-
-​      成功： 新套接字所对应文件描述符
-
- 
-
-​      失败: -1 errno
-
- 
+  ​    失败: -1 errno
 
 ####  bind
 
@@ -333,73 +292,49 @@ int socket(int domain, int type, int protocol);  // 创建一个 套接字
  #include <arpa/inet.h>
  
  // 给socket绑定一个 地址结构 (IP+port)
- int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);   
+ int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+ 
+ // 示例
+ struct sockaddr_in addr;
+ addr.sin_family = AF_INET;
+ addr.sin_port = htons(8888);
+ addr.sin_addr.s_addr = htonl(INADDR_ANY);
+ bind(fd, (struct sockaddr *)&addr, sizeof(addr)); 
  ```
 
-  
+- **参数：**
 
-​    sockfd: socket 函数返回值
+​    `sockfd`: socket 函数返回值
 
- 
+​    `addr`: 传入参数(struct sockaddr *)&addr
 
-​      struct sockaddr_in addr;
+​    `addrlen`: sizeof(addr) 地址结构的大小。
 
- 
+- **返回值：**
 
-​      addr.sin_family = AF_INET;
+     成功：0
 
- 
-
-​      addr.sin_port = htons(8888);
-
- 
-
-​      addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
- 
-
-​    addr: 传入参数(struct sockaddr *)&addr
-
- 
-
-​    addrlen: sizeof(addr) 地址结构的大小。
-
- 
-
-​    返回值：
-
-​      成功：0
-
- 
-
-​      失败：-1 errno
+     失败：-1 errno
 
 ####  listen
 
 ```c++
 // 设置同时与服务器建立连接的上限数。（同时进行3次握手的客户端数量）
-int listen(int sockfd, int backlog);  
+int listen(int sockfd, int backlog); 
+// listen(fd. 5);
 ```
 
-  
+- **参数：**
 
- 
+  `sockfd`: socket 函数返回值
 
-​    sockfd: socket 函数返回值
+  `backlog`：上限数值。最大值 128.
 
- 
+- **返回值：**
 
-​    backlog：上限数值。最大值 128.
+     成功：0
 
-​    返回值：
-
- 
-
-​      成功：0
-
- 
-
-​      失败：-1 errno  
+     失败：-1 errno  
 
 #### accept
 
@@ -408,83 +343,50 @@ int listen(int sockfd, int backlog);
  int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen); 
  ```
 
- 
+- **参数：**
 
-​    sockfd: socket 函数返回值
+  `sockfd`: socket 函数返回值
 
- 
+  `addr`：传出参数。成功与服务器建立连接的那个客户端的地址结构（IP+port）
 
-​    addr：传出参数。成功与服务器建立连接的那个客户端的地址结构（IP+port）
+  ​      socklen_t clit_addr_len = sizeof(addr);
 
- 
+​      `addrlen`：传入传出。 &clit_addr_len
 
-​      socklen_t clit_addr_len = sizeof(addr);
+​       **入：addr的大小。 出：客户端addr实际大小。**
 
- 
+- **返回值：**
 
-​    addrlen：传入传出。 &clit_addr_len
+    成功：能与客户端进行数据通信的 socket 对应的文件描述。
 
- 
-
-​       入：addr的大小。 出：客户端addr实际大小。
-
- 
-
-​    返回值：
-
- 
-
-​      成功：能与客户端进行数据通信的 socket 对应的文件描述。
-
- 
-
-​      失败： -1 ， errno
+    失败： -1 ， errno
 
 #### connect
 
 ```c++
 // 使用现有的 socket 与服务器建立连接
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);  
+
+// 示例
+struct sockaddr_in srv_addr;    // 服务器地址结构
+srv_addr.sin_family = AF_INET;
+srv_addr.sin_port = 9527   		// 跟服务器bind时设定的 port 完全一致。
+inet_pton(AF_INET, "服务器的IP地址"，&srv_adrr.sin_addr.s_addr);
+connect(fd, (struct sockaddr*)&addr, sizeof(addr));
 ```
 
-​    sockfd： socket 函数返回值
+- **参数：**
 
- 
+  `sockfd`： socket 函数返回值
 
-​      struct sockaddr_in srv_addr;    // 服务器地址结构
+  `addr`：传入参数。服务器的地址结构
 
- 
+​      `addrlen`：服务器的地址结构的大小
 
-​      srv_addr.sin_family = AF_INET;
+- **返回值：**
 
- 
+    成功：0
 
-​      srv_addr.sin_port = 9527   跟服务器bind时设定的 port 完全一致。
-
- 
-
-​      inet_pton(AF_INET, "服务器的IP地址"，&srv_adrr.sin_addr.s_addr);
-
- 
-
-​    addr：传入参数。服务器的地址结构
-
-  
-
-​    addrlen：服务器的地址结构的大小
-
- 
-
-​    返回值：
-
- 
-
-​      成功：0
-
- 
-
-​      失败：-1 errno
-
- 
+    失败：-1 errno
 
 ​    如果不使用bind绑定客户端地址结构, 采用"隐式绑定".
