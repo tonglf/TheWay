@@ -84,7 +84,7 @@
 
 ### MySQL
 
-
+- [MySQL基础知识](./数据库/MySQL/MySQL基础知识.md)
 
 ### Redis
 
