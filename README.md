@@ -85,6 +85,7 @@
 ### MySQL
 
 - [MySQL基础知识](./数据库/MySQL/MySQL基础知识.md)
+- [MySQL练习题](./数据库/MySQL/MySQL练习题.md)
 
 ### Redis
 
