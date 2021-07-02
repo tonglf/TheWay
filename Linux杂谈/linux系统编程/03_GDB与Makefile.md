@@ -89,7 +89,7 @@ int main()
 
 使用g++进行编译：
 
-```cpp
+```shell
 g++ test.cpp -o test -g
 ```
 
@@ -181,7 +181,7 @@ makefile： 管理项目。
 
 `makefile`内容如下：
 
-```bash
+```makefile
 src = $(wildcard *.cpp)		# 获取文件夹下后缀名为 .cpp 的文件，存储到变量 src 中
 
 obj = $(patsubst %.cpp, %.o, $(src)) # 在变量 src 中寻找后缀名为.cpp的文件，将其后缀名替换为.o存储到变量 obj 中
@@ -229,7 +229,7 @@ PHONY: clean ALL		# 伪声明
 
 `makefile`内容如下：
 
-```bash
+```makefile
 src=$(wildcard ./src/*.cpp)
 
 obj=$(patsubst ./src/%.cpp, ./obj/%.o,$(src))
