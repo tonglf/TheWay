@@ -459,7 +459,7 @@ int rectCover(int number)
 
 **题目描述**
 
-输入一个整数，输出该数32位二进制表示中1的个数。其中负数用补码表示。
+输入一个整数，输出该数 32 位二进制表示中1的个数。其中负数用补码表示。
 
 **示例1**
 
@@ -475,142 +475,33 @@ int rectCover(int number)
 2
 ```
 
-**1、自己写的，错误的想法**
+**1、bitset的运用**
 
 ```cpp
-int  NumberOf1(int n) {
-
-    if (n == 0) return 0;
-    if (n > 0) {//正数
-        int count = 0;
-        while (n!=0) {
-            if (n == 1) {
-                return ++count;
-            }
-            if (n % 2 == 1) { 
-                count++; 
-                n = n / 2;
-            }
-            else
-                n = n / 2;            
-        }
-        return count;
-    }
-    else {//负数
-        n = n * (-1) -1;//负数的补码等于它的正数部分减一，取反即可
-        int count = 0;
-        while (n != 0) {
-            if (n == 1) {
-                ++count;
-                break;
-            }
-            if (n % 2 == 0) {
-                count++;
-                n = n / 2;
-            }
-            else
-                n = n / 2;
-        }
-        return count;
-
-
-    }
-}Copy to clipboardErrorCopied
-```
-
--9的补码是32位的，而不是6位 （1 0111），所以有1的个数也不是四位，int是32位的
-
-**2、bitset的运用**
-
-```cpp
-int  NumberOf1(int n) {
-    return bitset<32>(n).count();
-    }Copy to clipboardErrorCopied
-```
-
-**3、牛客大神的做法**
-
-```cpp
- int NumberOf1(int n) {
-        int count = 0;
-        while(n!= 0){
-            count++;
-            n = n & (n - 1);
-         }
-        return count;
-    }Copy to clipboardErrorCopied
-```
-
-如果一个整数不为0，那么这个整数至少有一位是1。如果我们把这个整数减1，那么原来处在整数最右边的1就会变为0，原来在1后面的所有的0都会变成1(如果最右边的1后面还有0的话)。其余所有位将不会受到影响。
-
-**举个例子**：一个二进制数1100，从右边数起第三位是处于最右边的一个1。减去1后，第三位变成0，它后面的两位0变成了1，而前面的1保持不变，因此得到的结果是1011.我们发现减1的结果是把最右边的一个1开始的所有位都取反了。
-
-这个时候如果我们再把原来的整数和减去1之后的结果做与运算，从原来整数最右边一个1那一位开始所有位都会变成0。如1100&1011=1000.也就是说，把一个整数减去1，再和原整数做与运算，会把该整数最右边一个1变成0.那么一个整数的二进制有多少个1，就可以进行多少次这样的操作。
-
-**二刷：1、bitset用法：**
-
-主要是将 n 转化为 32位表示，int 最大也就是 2^32次方，然后利用bitset。count（）函数，返回 其中 1 的数量
-
-bitset<4> bitset1;　　//无参构造，长度为４，默认每一位为０
-
-```cpp
-bitset<8> bitset2(12);　　//长度为８，二进制保存，前面用０补充
-
-string s = "100101";
-bitset<10> bitset3(s);　　//长度为10，前面用０补充
-
-char s2[] = "10101";
-bitset<13> bitset4(s2);　　//长度为13，前面用０补充
-
-cout << bitset1 << endl;　　//0000
-cout << bitset2 << endl;　　//00001100
-cout << bitset3 << endl;　　//0000100101
-cout << bitset4 << endl;　　//0000000010101
-
-bitset<8> foo ("10011011");
-
-cout << foo.count() << endl;　　//5　　（count函数用来求bitset中1的位数，foo中共有５个１
-cout << foo.size() << endl;　　 //8　　（size函数用来求bitset的大小，一共有８位
-
-cout << foo.test(0) << endl;　　//true　　（test函数用来查下标处的元素是０还是１，并返回false或true，此处foo[0]为１，返回true
-cout << foo.test(2) << endl;　　//false　　（同理，foo[2]为０，返回false
-
-cout << foo.any() << endl;　　//true　　（any函数检查bitset中是否有１
-cout << foo.none() << endl;　　//false　　（none函数检查bitset中是否没有１
-cout << foo.all() << endl;　　//false　　（all函数检查bitset中是全部为１Copy to clipboardErrorCopied
-```
-
-运行时间：2ms 占用内存：496k
-
-```cpp
-int  NumberOf1(int n) {
-
+int  NumberOf1(int n) 
+{
     bitset<32> bit(n);//将其初始化为 32 位，不足 32 位的前面补齐即可
     return bit.count();// 返回其中为 1 的个数
-}Copy to clipboardErrorCopied
+}
 ```
 
-**2、温习一下牛客大神的做法**
-
-如果一个整数不为0，那么这个整数至少有一位是1。如果我们把这个整数减1，那么原来处在整数最右边的1就会变为0，原来在1后面的所有的0都会变成1(如果最右边的1后面还有0的话)。其余所有位将不会受到影响。
-
-**举个例子**：一个二进制数1100，从右边数起第三位是处于最右边的一个1。减去1后，第三位变成0，它后面的两位0变成了1，而前面的1保持不变，因此得到的结果是1011.我们发现减1的结果是把最右边的一个1开始的所有位都取反了。
-
-这个时候如果我们再把原来的整数和减去1之后的结果做与运算，从原来整数最右边一个1那一位开始所有位都会变成0。如1100&1011=1000.也就是说，把一个整数减去1，再和原整数做与运算，会把该整数最右边一个1变成0.那么一个整数的二进制有多少个1，就可以进行多少次这样的操作。
-
-运行时间：3ms 占用内存：376k
+**2、位运算**
 
 ```cpp
-int  NumberOf1(int n) {
-
-    int res = 0;
-    while(n != 0){
-        n = n&(n-1);
-        res++;
-    }
-    return res;
-}Copy to clipboardErrorCopied
+ int NumberOf1(int n) 
+ {
+     int count = 0;
+     while(n != 0){
+         count++;
+         n = n & (n - 1);
+     }
+     return count;
+}
 ```
+
+如果一个整数不为 0，那么这个整数至少有一位是 1。如果我们把这个整数减 1，那么原来处在整数最右边的 1 就会变为 0，原来在 1后面的所有的 0 都会变成 1 (如果最右边的 1 后面还有0的话)。其余所有位将不会受到影响。
+
+**举例**：以一个二进制数 1100 为例，手写一下。
 
 ## No12、数值的整数次方
 
@@ -618,22 +509,22 @@ int  NumberOf1(int n) {
 
 **题目描述**
 
-给定一个double类型的浮点数base和int类型的整数exponent。求base的exponent次方。
+给定一个 double 类型的浮点数 base 和 int 类型的整数 exponent。求 base 的 exponent 次方。
 
-保证base和exponent不同时为0。不得使用库函数，同时不需要考虑大数问题，也不用考虑小数点后面0的位数。
+保证 base 和 exponent 不同时为 0。不得使用库函数，同时不需要考虑大数问题，也不用考虑小数点后面 0 的位数。
 
 **示例1**
 
 **输入**
 
 ```
-2.00000,3Copy to clipboardErrorCopied
+2.00000,3
 ```
 
 **返回值**
 
 ```
-8.00000Copy to clipboardErrorCopied
+8.00000
 ```
 
 **示例2**
@@ -641,13 +532,13 @@ int  NumberOf1(int n) {
 **输入**
 
 ```
-2.10000,3Copy to clipboardErrorCopied
+2.10000,3
 ```
 
 **返回值**
 
 ```
-9.26100Copy to clipboardErrorCopied
+9.26100
 ```
 
 **示例3**
@@ -655,75 +546,37 @@ int  NumberOf1(int n) {
 **输入**
 
 ```
-2.00000,-2Copy to clipboardErrorCopied
+2.00000,-2
 ```
 
 **返回值**
 
-```
-0.25000Copy to clipboardErrorCopied
-```
-
-**说明**
-
-```
-2的-2次方等于1/4=0.25Copy to clipboardErrorCopied
+```cpp
+0.25000		// 2 的 -2 次方等于 1/4 = 0.25
 ```
 
-**1、主要要注意正负数的情况，要注意分开**
-
-运行时间：3ms 占用内存：520k
+**注意正负数的情况，要分开**
 
 ```cpp
     double Power(double base, int exponent) {
         if( exponent == 0) return 1.0;
-        if( base == 0.0 ) return 0.0;//保证不同时为0，先处理各自为0的情况
+        if( base == 0.0 ) return 0.0;	// 保证不同时为0，先处理各自为0的情况
 
-        bool flag = false;//判断指数是否为负
+        bool flag = false;		// 判断指数是否为负
         if( exponent < 0) {
             flag = true;
-            exponent *=-1;//如果为负数，则将指数转正
+            exponent *=-1;		// 如果为负数，则将指数转正
         }
         double res = base; 
         for(int i = 2;i <= exponent; ++i){
-            res *=base;//逐渐递乘
+            res *= base;		// 逐渐递乘
         }
 
-        if(flag) return 1.0/res;
+        if(flag) 	
+            return 1.0 / res;
         else
             return res;
-    }Copy to clipboardErrorCopied
-```
-
-**2、快速幂算法，值得好好看看，力扣上的要求更严谨一些**
-
-https://leetcode-cn.com/problems/shu-zhi-de-zheng-shu-ci-fang-lcof/
-
-执行用时：0 ms, 在所有 C++ 提交中击败了100.00%的用户
-
-内存消耗：5.9 MB, 在所有 C++ 提交中击败了100.00%的用户
-
-```cpp
-    double myPow(double x, int n) {
-        if( n == 0) return 1;
-        if( x == 0.0) return 0;
-        long  exp = n;//
-        if(n < 0) {
-            exp = n* (-1.0);//，当n == INT_MIN时正数时大于INT_MAX的，所以要用一个大于 INT_MAX的类型来保存，同时在将他转正的时候， n*(-1)的结果依然是一个 int，此时的int是个隐藏类型，然后才将这个结果赋值给 exp，所以用来保存结果值的不应该是个int型，我们用double型的 -1 ,这样就可以将相乘的结果值保存为一个 double类型了，然后再进行赋值
-        } 
-
-        double res = 1.0;
-        while(exp != 0){
-            if( (exp &1) == 1 ){
-                res *=x;
-            }
-            x *=x;
-            exp >>= 1;
-        }
-
-        return n<0 ? 1/res: res;
-
-    }Copy to clipboardErrorCopied
+    }
 ```
 
 ## No13、调整数组顺序使奇数位于偶数前面
@@ -737,125 +590,60 @@ https://leetcode-cn.com/problems/shu-zhi-de-zheng-shu-ci-fang-lcof/
 **1、暴力解法，新开辟一个数组保存数据**
 
 ```cpp
-void reOrderArray(vector<int>& array) {
-
-
+void reOrderArray(vector<int>& array) 
+{
     vector<int> temp(array.size(), 0);
     int low = 0;
     for (int i = 0; i < array.size(); ++i) {
-        if ((array[i] & 1) == 1) { temp[low++] = array[i]; }
+        if ((array[i] & 1) == 1) 
+            temp[low++] = array[i]; 
     }
 
     for (int i = 0; i < array.size(); ++i) {
-        if ((array[i] & 1) == 0) { temp[low++] = array[i]; }
+        if ((array[i] & 1) == 0) 
+            temp[low++] = array[i]; 
     }
     array.assign(temp.begin(), temp.end());
-}Copy to clipboardErrorCopied
+}
 ```
 
 **2、一种很巧妙的解法，空间复杂度o1的做法，时间复杂度是on^2**
 
 ```cpp
-void reOrderArray(vector<int>& array) {
-
+void reOrderArray(vector<int>& array) 
+{
     for (int i = 0; i < array.size(); i++)
     {
-        //for (auto a : array) {
-        //    cout << a << " ";
-        //}
-        cout << endl;
         for (int j = array.size() - 1; j > i; j--)
         {
-            if (array[j] % 2 == 1 && array[j-1] % 2 == 0) //前偶后奇就进行交换，这样一趟下来可以将第一个奇数放在首位，同时最后一个偶数放在末尾
+            //前偶后奇就进行交换，这样一趟下来可以将第一个奇数放在首位
+            if (array[j] % 2 == 1 && array[j-1] % 2 == 0) 
             {
                 swap(array[j], array[j - 1]);
             }
         }
     }
-}Copy to clipboardErrorCopied
-```
-
-**3、时间和空间都是on的做法，只保存偶数部分**
-
-```cpp
-    void reOrderArray(vector<int> &array) {
-    vector<int> temp(array.size(), 0);
-    int oddIndex = 0, evenIndex = 0;
-    for (auto a : array) {
-        if ((a & 1) == 1) array[oddIndex++] = a;
-        else
-            temp[evenIndex++] = a;
-    }
-
-    for (int i = 0; i < evenIndex; ++i)
-        array[oddIndex + i] = temp[i];
-    }Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、笨方法另外开辟一个数组，先保存奇数，再保存偶数**
-
-```cpp
-    void reOrderArray(vector<int> &array) {
-
-        int len = array.size();
-        if(len <= 1) return;
-        int index = 0;
-        vector<int> temp(len,0);
-        for(int i=0;i<len;++i){
-            if(array[i] %2 == 1) temp[index++] = array[i];
-        }
-
-       for(int i=0;i<len;++i){
-            if(array[i] %2 == 0) temp[index++] = array[i];
-        }
-
-        array.assign(temp.begin(), temp.end());
-    }Copy to clipboardErrorCopied
-```
-
-**2、一种原地解法，很巧妙，从后向前进行修正，类似于冒泡法，同时对一刷的时候进行改进**
-
-运行时间：2ms 占用内存：480k
-
-```cpp
-    void reOrderArray(vector<int> &array) {
-
-    int len = array.size();
-    if (len <= 1) return;
-    for (int i = 0; i <= len/2; ++i) {
-
-        for (int j = len - 1; j > i; --j) {
-            if ( (array[j]&1) == 1 && (array[j - 1]&1) == 0)  swap(array[j], array[j - 1]);//前偶后奇就进行交换，并且一次就可以固定最前面的奇数位置后最后面的偶数位置，所以最多只需要遍历一般数组的长度即可，所以i<=len/2即可
-        }
-    }
-    }Copy to clipboardErrorCopied
+}
 ```
 
 **3、第三种解法，但是并不是原地解法，至少比第一种要好一点，只保存偶数数据**
 
-运行时间：3ms 占用内存：484k odd奇数：even偶数
-
 ```cpp
-    void reOrderArray(vector<int> &array) {
-
-    int len = array.size(),evenIndex = 0,oddIndex = 0;
-    if (len <= 1) return;        
-    vector<int> temp(len/2+1,0);
-    for (int i = 0; i <len; ++i) {
-
-        if ( (array[i]&1) == 1)  array[oddIndex++] = array[i];
-        else{
-            temp[evenIndex++] = array[i];//将偶数另外保存起来
-        }
-
+void reOrderArray(vector<int> &array) 
+{
+	int evenIndex = 0, oddIndex = 0;       
+    vector<int> temp(array.size() / 2 + 1,0);
+    for (int i = 0; i < array.size(); ++i) 
+    {
+        if ( (array[i] & 1) == 1)  
+            array[oddIndex++] = array[i];
+        else
+            temp[evenIndex++] = array[i];	// 将偶数另外保存起来
     }
 
-    for(int j = 0;j < evenIndex; ++j){
+    for(int j = 0;j < evenIndex; ++j)
         array[j + oddIndex] = temp[j];
-    }
-    }Copy to clipboardErrorCopied
+}
 ```
 
 ## No14、 链表中倒数第k个结点
@@ -866,64 +654,30 @@ void reOrderArray(vector<int>& array) {
 
 输入一个链表，输出该链表中倒数第k个结点。
 
-**示例1**
-
-**输入**
-
-```
-1,{1,2,3,4,5}Copy to clipboardErrorCopied
-```
-
-**返回值**
-
-```
-{5}Copy to clipboardErrorCopied
-```
-
-**1、比较简单的一种方法**
-
-时间复杂度较高，没有二刷的那种方法好
+**快慢指针**
 
 ```cpp
-ListNode* FindKthToTail(ListNode* pListHead, unsigned int k) {
-        int count=0;
-        ListNode * node=pListHead;
-        while(pListHead!=nullptr){
-            count++;
-            pListHead=pListHead->next;
-        }
-        count = count-k;
-        if(count<0) return nullptr;
-        while(count--)
-            node=node->next;
-        return node;
-    }Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、快慢指针，不应该说是先后指针**
-
-3 ms 376K
-
-```cpp
+class Solution {
+public:
     ListNode* FindKthToTail(ListNode* pListHead, unsigned int k) {
-    ListNode * slowNode = pListHead;
-        while(k != 0){//这里判断 k 一直走到 0 即可
-            k--;
-            if(pListHead != nullptr) pListHead = pListHead->next;//在其中判断是否出现k 大于链表总长度的情况，
-            //比如 【1,2,3,4,5】 6这样的情况，如果出现这样的情况，返回即可
+        if (!pListHead || k <= 0) 
+            return nullptr;
+        auto slow = pListHead, fast = pListHead;
+ 
+        while (k--) 
+        {
+            if (fast)
+                fast = fast->next;
             else
-                return nullptr;
+                return nullptr; 	// 如果单链表长度 < K,直接返回
         }
-
-        while(pListHead != nullptr){//先走的不能为空
-            slowNode = slowNode->next;
-            pListHead = pListHead->next;
+        while (fast) {
+            slow = slow->next;
+            fast = fast->next;
         }
-        return slowNode;
+        return slow;
     }
-Copy to clipboardErrorCopied
+};
 ```
 
 ## No15、反转链表
@@ -933,24 +687,6 @@ Copy to clipboardErrorCopied
 **题目描述**
 
 输入一个链表，反转链表后，输出新链表的表头。
-
-**示例1**
-
-**输入**
-
-```
-{1,2,3}Copy to clipboardErrorCopied
-```
-
-**返回值**
-
-```
-{3,2,1}Copy to clipboardErrorCopied
-```
-
-很好的解答
-
-https://blog.csdn.net/qq_42351880/article/details/88637387
 
 **1、头插法 很经典的做法啊**
 
@@ -963,121 +699,19 @@ struct ListNode {
     }
 }; 
 
-ListNode* ReverseList(ListNode* pHead) {
-
-    struct ListNode* Head = NULL;
-    struct ListNode* node = (ListNode*)malloc(sizeof(struct ListNode));
-
-    while (pHead != nullptr) {
-        node = pHead;
-        pHead = pHead->next;
-
-        node->next = Head;
-        Head = node;
+ListNode* reverseList(ListNode* head) {
+    ListNode* temp; 			// 保存cur的下一个节点
+    ListNode* cur = head;
+	ListNode* pre = NULL;
+    while(cur) {
+        temp = cur->next;  		// 保存一下 cur的下一个节点，因为接下来要改变cur->next
+        cur->next = pre; 		// 翻转操作
+            
+        pre = cur;				// 更新pre 和 cur指针
+        cur = temp;
     }
-    return Head;
+    return pre;
 }
-
-void test02()
-{
-    ListNode* head = (ListNode*)malloc(sizeof(ListNode));
-    head->val = 1;
-
-    ListNode* node1 = (ListNode*)malloc(sizeof(ListNode));
-    node1->val = 2;
-
-    ListNode* node2 = (ListNode*)malloc(sizeof(ListNode));
-    node2->val = 3;
-
-    ListNode* node3 = (ListNode*)malloc(sizeof(ListNode));
-    node3->val = 4;
-
-    head->next = node1;
-    node1->next = node2;
-    node2->next = node3;
-    node3->next = nullptr;
-
-    auto node = ReverseList(head);
-    while(node!=nullptr){
-
-        cout << node->val << endl;
-        node = node->next;
-    }
-    }Copy to clipboardErrorCopied
-```
-
-**2、第二种方法，借助三个结点进行不断更替**
-
-```cpp
-ListNode* ReverseList(ListNode* pHead) {
-
-    struct ListNode* node0 = NULL;
-    struct ListNode* node1 = (ListNode*)malloc(sizeof(struct ListNode));
-    struct ListNode* node2 = (ListNode*)malloc(sizeof(struct ListNode));
-    node1 = pHead;
-    node2 = pHead->next;
-    while (node1 != nullptr) {
-        node1->next = node0;
-
-        node0 = node1;
-        node1 = node2;
-        if (node2!= nullptr) {
-            node2 = node2 -> next;
-        }
-    }
-    return node0;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、头插法来做，将元素开辟在栈上，这样会避免内存泄露**
-
-运行时间：3ms 占用内存：364k
-
-```cpp
-ListNode* ReverseList(ListNode* pHead) {
-
-    // 头插法
-    if (pHead == nullptr || pHead->next == nullptr) return pHead;
-    ListNode dummyNode = ListNode(0);
-    ListNode* pre = &(dummyNode);
-    pre->next = pHead;
-    ListNode* cur = pHead->next;
-    pHead->next = nullptr;
-    //pre = cur;
-    ListNode* temp = nullptr;
-    while (cur != nullptr) {
-        temp = cur;
-        cur = cur->next;
-        temp->next = pre->next;
-        pre->next = temp;
-    }
-    return dummyNode.next;
-
-}Copy to clipboardErrorCopied
-```
-
-**2、借助三个节点来进行迭代即可**
-
-运行时间：3ms 占用内存：504k
-
-```cpp
-    ListNode* ReverseList(ListNode* pHead) {
-
-
-        if (pHead == nullptr || pHead->next == nullptr) return pHead;
-        ListNode * pre = nullptr,*cur = pHead,*after = pHead->next;
-        while(cur != nullptr){//建议画个图看看就知道了
-            cur->next = pre;
-            pre = cur;
-            cur = after;
-            if(after != nullptr)
-                after = after->next;
-        }
-
-        return pre;
-    }Copy to clipboardErrorCopied
 ```
 
 ## No16、合并两个有序链表
@@ -1088,275 +722,115 @@ ListNode* ReverseList(ListNode* pHead) {
 
 输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。
 
-**示例1**
-
-**输入**
-
-```
-{1,3,5},{2,4,6}Copy to clipboardErrorCopied
-```
-
-**返回值**
-
-```
-{1,2,3,4,5,6}Copy to clipboardErrorCopied
-```
-
-**1、常规做法，非递归花了好久才做出来**
+**1、非递归**
 
 ```cpp
-struct ListNode {
-    int val;
-    struct ListNode* next;
-    ListNode(int x) :
-        val(x), next(NULL) {
+class Solution {
+public:
+    ListNode* Merge(ListNode* pHead1, ListNode* pHead2) {
+        if (pHead1 == nullptr)
+            return pHead2;
+        if (pHead2 == nullptr)
+            return pHead1;
+        ListNode *p = new ListNode(-1);
+        ListNode *p1 = new ListNode(-1);
+        p1->next = p;
+        while (pHead1 && pHead2)
+        {
+            if (pHead1->val < pHead2->val)
+            {
+                p->next = pHead1;
+                p = p->next;
+                pHead1 = pHead1->next;
+            }
+            else 
+            {
+                p->next = pHead2;
+                p = p->next;
+                pHead2 = pHead2->next;
+            }
+        }
+        if (pHead1)
+        {
+            p->next = pHead1;
+        }
+        if (pHead2)
+        {
+            p->next = pHead2;
+        }
+        return p1->next->next;
     }
-}; 
+};
+```
 
+**2、递归**
 
+```cpp
 ListNode* Merge(ListNode* pHead1, ListNode* pHead2)
-    {
-       if (pHead1 == nullptr) return pHead2;
-    if (pHead2 == nullptr) return pHead1;
-
-    ListNode* Head = (ListNode*)malloc(sizeof(struct ListNode));
-
-    if (pHead1->val <= pHead2->val) {
-        Head = pHead1;
-        pHead1 = pHead1->next;
-    }else {
-        Head = pHead2;
-        pHead2 = pHead2->next;
-    }
-
-    ListNode* node = (ListNode*)malloc(sizeof(struct ListNode));
-    node = Head;
-
-    while (pHead1 && pHead2) {
-        if (pHead1->val <= pHead2->val) {
-            node->next = pHead1;
-            pHead1 = pHead1->next;
-            node = node->next;
-        }
-        else {
-            node->next = pHead2;
-            pHead2 = pHead2->next;
-            node = node->next;
-        }
-
-    }
-    if (pHead1 != nullptr) {
-        node->next = pHead1;
-    }
-    else {
-        node->next = pHead2;
-    }
-    return Head;
-    }
-
-
-    void test02()
 {
-    ListNode* head = (ListNode*)malloc(sizeof(ListNode));
-    head->val = 1;
+	if (pHead1 == nullptr) 
+        return pHead2;
+    if (pHead2 == nullptr) 
+        return pHead1;
 
-    ListNode* node1 = (ListNode*)malloc(sizeof(ListNode));
-    node1->val = 5;
-
-    ListNode* node2 = (ListNode*)malloc(sizeof(ListNode));
-    node2->val = 9;
-
-    ListNode* node3 = (ListNode*)malloc(sizeof(ListNode));
-    node3->val = 11;
-    //node3->next = NULL;
-
-    head->next = node1;
-    node1->next = node2;
-    node2->next = node3;
-    node3->next = nullptr;
-
-
-    ListNode* head2 = (ListNode*)malloc(sizeof(ListNode));
-    head2->val = 3;
-
-    ListNode* node12 = (ListNode*)malloc(sizeof(ListNode));
-    node12->val = 3;
-
-    ListNode* node22 = (ListNode*)malloc(sizeof(ListNode));
-    node22->val = 4;
-
-    ListNode* node32 = (ListNode*)malloc(sizeof(ListNode));
-    node32->val = 9;
-    //node3->next = NULL;
-
-    head2->next = node12;
-    node12->next = node22;
-    node22->next = node32;
-    node32->next = nullptr;
-
-
-    auto node = Merge(head,head2);
-    while(node!=nullptr){
-
-        cout << node->val << endl;
-        node = node->next;
-    }
-}Copy to clipboardErrorCopied
-```
-
-**2、递归版本**
-
-```cpp
- ListNode* Merge(ListNode* pHead1, ListNode* pHead2)
+    if (pHead1->val <= pHead2->val) 
     {
-    if (pHead1 == nullptr) return pHead2;
-    if (pHead2 == nullptr) return pHead1;
-
-
-
-    if (pHead1->val <= pHead2->val) {
         pHead1->next = Merge(pHead1->next, pHead2);
         return pHead1;
     }
-    else {
+    else 
+    {
         pHead2->next = Merge(pHead1, pHead2->next);
         return pHead2;
     }
-    }Copy to clipboardErrorCopied
+}
 ```
 
-**二刷：很容易了**
-
-**1、迭代版本，依然还是迭代版本要快一点**
-
-运行时间：2ms 占用内存：480k
-
-```cpp
-    ListNode* Merge(ListNode* pHead1, ListNode* pHead2)
-    {
-        if(pHead1 == nullptr) return pHead2;
-        if(pHead2 == nullptr) return pHead1;
-        ListNode *newHead = new ListNode(-1),*node = newHead;
-        //newHead->next=node;
-        while(pHead1 != nullptr && pHead2 != nullptr){
-
-            if(pHead1->val > pHead2->val)  swap(pHead1,pHead2);
-            node->next = pHead1;
-            pHead1 = pHead1->next;
-            node = node->next;
-        }
-
-        node->next = (pHead1 ? pHead1:pHead2);
-        return newHead->next;
-    }Copy to clipboardErrorCopied
-```
-
-**2、递归版本**
-
-运行时间：3ms 占用内存：504k
-
-```cpp
-    void MergeCore(ListNode*newHead, ListNode*node1, ListNode*node2){
-        if(node1 == nullptr || node2 == nullptr) {
-            newHead->next = (node1?node1:node2);
-            return ;
-        }
-
-        if(node1->val < node2->val){
-            newHead->next = node1;
-            node1 = node1->next;            
-        }
-        else{
-            newHead->next = node2;
-            node2 = node2->next;
-
-        }
-        newHead = newHead->next;
-        MergeCore(newHead,node1,node2);
-    }
-
-
-    ListNode* Merge(ListNode* pHead1, ListNode* pHead2)
-    {
-        if(pHead1 == nullptr) return pHead2;
-        if(pHead2 == nullptr) return pHead1;
-        ListNode *newHead = new ListNode(-1),*node = newHead;
-        MergeCore(node, pHead1, pHead2);
-        return newHead->next;
-    }Copy to clipboardErrorCopied
-```
-
-## No17、树的子结构
+## ***No17、树的子结构
 
 [牛客网原题链接](https://www.nowcoder.com/practice/6e196c44c7004d15b1610b9afca8bd88?tpId=13&&tqId=11170&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
-输入两棵二叉树A，B，判断B是不是A的子结构。（ps：我们约定空树不是任意一个树的子结构）
+输入两棵二叉树 A，B，判断 B 是不是 A 的子结构。（ps：我们约定空树不是任意一个树的子结构）
 
 **示例1**
 
 **输入**
 
 ```
-{8,8,#,9,#,2,#,5},{8,9,#,2}Copy to clipboardErrorCopied
+{8,8,#,9,#,2,#,5},{8,9,#,2}
 ```
 
 **返回值**
 
-```
-trueCopy to clipboardErrorCopied
+```cpp
+true
 ```
 
 **1、解析见[力扣-14 树 - medium - 面试题26](https://leetcode-cn.com/problems/shu-de-zi-jie-gou-lcof/)，讲得很好**
 
 ```cpp
-    bool HasSubtreeCore(TreeNode* pRoot1, TreeNode* pRoot2){
-        if(pRoot2==nullptr)  return true;
-        if(pRoot1==nullptr) return false;
-        if(pRoot1->val == pRoot2->val)
-            return HasSubtreeCore(pRoot1->left,pRoot2->left) && HasSubtreeCore(pRoot1->right,pRoot2->right);
-        else
-            return false;
-    }
-    bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2)
-    {
-        if(pRoot1==nullptr || pRoot2==nullptr) return false;
-        return HasSubtree(pRoot1->left,pRoot2) ||
-               HasSubtree(pRoot1->right,pRoot2) || 
-                HasSubtreeCore(pRoot1,pRoot2);
-
-     }Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、树的题目，大多都是递归来做**
-
-运行时间：2ms 占用内存：484k
-
-```cpp
-bool HasSubtreeCore(TreeNode* pRoot1, TreeNode* pRoot2){
-
-        if(pRoot2 == nullptr) return true;//p2为空 ，那么P1为什么都是相等的了
-        if(pRoot1 == nullptr ) return false;//如果p2不为空，但是p1为空，那肯定是不对的
-        if(pRoot1->val == pRoot2->val)//当前一样，再判断左右子树，这里必须是 与 的并列关系才行
-            return HasSubtreeCore(pRoot1->left,pRoot2->left) && HasSubtreeCore(pRoot1->right,pRoot2->right);
-        else{
-            return false;
-        }
-
-    }
-    bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2)
-    {
-
-        if(pRoot1 == nullptr || pRoot2 == nullptr) return false;
-
-        return HasSubtree(pRoot1->left, pRoot2) ||//有可能是我的左子树
-               HasSubtree(pRoot1->right, pRoot2) || //或则是右子树
-                HasSubtreeCore(pRoot1, pRoot2);//或者是当前节点就开始比较，注意这里是 或 的关系
-
-    }Copy to clipboardErrorCopied
+bool HasSubtreeCore(TreeNode* pRoot1, TreeNode* pRoot2)			// 对比函数
+{
+    if(pRoot2 == nullptr)  
+        return true;
+    if(pRoot1 == nullptr) 
+        return false;
+    if(pRoot1->val == pRoot2->val)
+        return HasSubtreeCore(pRoot1->left, pRoot2->left) 
+        	&& HasSubtreeCore(pRoot1->right, pRoot2->right);
+    else
+        return false;
+}
+bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2)
+{
+   if(pRoot1 == nullptr || pRoot2 == nullptr)
+       return false;
+   return HasSubtree(pRoot1->left,pRoot2) 
+       || HasSubtree(pRoot1->right,pRoot2) 
+       || HasSubtreeCore(pRoot1,pRoot2);
+}
 ```
 
 ## No18、二叉树的镜像
@@ -1380,14 +854,15 @@ bool HasSubtreeCore(TreeNode* pRoot1, TreeNode* pRoot2){
            /  \
           10   6
          / \  / \
-        11  9 7  5                Copy to clipboardErrorCopied
+        11  9 7  5                
 ```
 
 **1、借助队列来做，跟上面一题中的迭代版本很像**
 
 ```cpp
 void Mirror(TreeNode* pRoot) {
-    if (pRoot == nullptr) return;
+    if (pRoot == nullptr) 
+        return;
     queue<TreeNode*> q;
     q.push(pRoot);
     while (!q.empty()) {
@@ -1400,7 +875,7 @@ void Mirror(TreeNode* pRoot) {
             swap(node->left, node->right);
         }
     }
-}Copy to clipboardErrorCopied
+}
 ```
 
 **2、不使用swap函数的迭代版本**
@@ -1423,26 +898,29 @@ void Mirror(TreeNode* pRoot) {
             node->right = temp;
         }
     }
-}Copy to clipboardErrorCopied
+}
 ```
 
 **3、递归版本**
 
 ```cpp
-    void Mirror(TreeNode *pRoot) {
-    if (pRoot == nullptr) return;
+void Mirror(TreeNode *pRoot) 
+{
+    if (pRoot == nullptr) 
+        return;
     TreeNode* temp = pRoot->left;
     pRoot->left = pRoot->right;
     pRoot->right = temp;
     Mirror(pRoot->right);
     Mirror(pRoot->left);
-    }Copy to clipboardErrorCopied
+}
 ```
 
 **4、栈的迭代版本**
 
 ```cpp
-void Mirror(TreeNode* pRoot) {
+void Mirror(TreeNode* pRoot) 
+{
     if (pRoot == nullptr) return;
     stack<TreeNode*> s;
     s.push(pRoot);
@@ -1455,46 +933,7 @@ void Mirror(TreeNode* pRoot) {
             swap(node->left, node->right);
         }
     }
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、迭代版本，想多了**
-
-运行时间：2ms 占用内存：376k
-
-队列来做，有点类似于层次遍历的意思
-
-```cpp
-    void Mirror(TreeNode *pRoot) {//有点类似于二叉树的层次遍历
-        if(pRoot == nullptr) return;
-        queue<TreeNode*> q;
-        TreeNode *node = nullptr;
-        q.push(pRoot);
-        while(!q.empty()){
-                node = q.front();
-                q.pop();
-            if(node != nullptr)
-            {   q.push(node->left);
-                q.push(node->right);                
-                swap(node->left,node->right);
-            }
-        }
-    }Copy to clipboardErrorCopied
-```
-
-**2、递归版本，而更容易理解一些，也更好写**
-
-运行时间：2ms 占用内存：504k
-
-```cpp
-    void Mirror(TreeNode *pRoot) {//有点类似于二叉树的层次遍历
-        if(pRoot == nullptr) return;             
-        swap(pRoot->left,pRoot->right);
-        Mirror(pRoot->left);
-        Mirror(pRoot->right);
-    }Copy to clipboardErrorCopied
+}
 ```
 
 ## No19、顺时针打印矩阵
@@ -1504,20 +943,6 @@ void Mirror(TreeNode* pRoot) {
 **题目描述**
 
 输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字，例如，如果输入如下4 X 4矩阵： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 则依次打印出数字1,2,3,4,8,12,16,15,14,13,9,5,6,7,11,10.
-
-**示例1**
-
-**输入**
-
-```
-[[1,2],[3,4]]Copy to clipboardErrorCopied
-```
-
-**返回值**
-
-```
-[1,2,4,3]Copy to clipboardErrorCopied
-```
 
 **1、有点难，在力扣上写了好久**
 
@@ -1577,10 +1002,6 @@ vector<int> spiralOrder(vector<vector<int>>& matrix) {
 
 **2、新的写法，这种其实更好理解**
 
-执行用时：24 ms, 在所有 C++ 提交中击败了56.85%的用户
-
-内存消耗：10 MB, 在所有 C++ 提交中击败了100.00%的用户
-
 ```cpp
 vector<int> spiralOrder(vector<vector<int>>& matrix) {
         vector <int> res;
@@ -1598,14 +1019,10 @@ vector<int> spiralOrder(vector<vector<int>>& matrix) {
             if(++cl > ch) break;
         }
         return res;
-    }Copy to clipboardErrorCopied
+    }
 ```
 
 **3、改进一下第二种写法，快上不少**
-
-执行用时：12 ms, 在所有 C++ 提交中击败了98.41%的用户
-
-内存消耗：10.3 MB, 在所有 C++ 提交中击败了100.00%的用户
 
 ```cpp
 vector<int> spiralOrder(vector<vector<int>>& matrix) {
@@ -1630,102 +1047,53 @@ vector<int> spiralOrder(vector<vector<int>>& matrix) {
 }Copy to clipboardErrorCopied
 ```
 
-**二刷：**
-
-**1、最快的做法，注意中间的判断条件不可少**
-
-运行时间：3ms 占用内存：496k
-
-```cpp
- vector<int> printMatrix(vector<vector<int> > matrix) {
-
-if (matrix.size() == 0 || matrix[0].size() == 0) return vector<int>();
-    int left = 0, right = matrix[0].size() - 1, top = 0, bottom = matrix.size() - 1;
-    vector<int> result;
-    while (left <= right && top <= bottom) {
-        for (int i = left; i <= right; ++i)
-        {
-            //cout << matrix[top][i] << " ";
-            result.push_back(matrix[top][i]);
-
-        }
-        if (++top > bottom) break;
-        for (int i = top; i <= bottom; ++i)
-        {
-            //cout << matrix[i][right] << " ";
-            result.push_back(matrix[i][right]);
-
-        }
-        if (--right < left) break;
-        for (int i = right ; i >= left; --i) {
-            //cout << matrix[bottom][i] << " ";
-            result.push_back(matrix[bottom][i]);
-        }
-        if (--bottom < top) break;
-        for (int i = bottom; i >= top; --i) {
-            //cout << matrix[i][left] << " ";
-            result.push_back(matrix[i][left]);
-        }
-        if (++left > right) break;
-    }
-
-    return result;
-    }Copy to clipboardErrorCopied
-```
-
 ## No20、包含min函数的栈
 
 [牛客网原题链接](https://www.nowcoder.com/practice/4c776177d2c04c2494f2555c9fcc1e49?tpId=13&&tqId=11173&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
-定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的min函数（时间复杂度应为O（1））。
+定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的 min 函数（时间复杂度应为O(1)）。
 
-**1、一次解决 以前做过**
+**1、用两个栈：一个记录数值，一个记录最小值**
 
 ```cpp
 class Solution {
+	stack<int> minSt;
+    stack<int> st;
 public:
     void push(int value) {
-        if(st.size()==0&&minSt.size()==0) {
+        if(st.size() == 0) 
+        {
             st.push(value);
             minSt.push(value);
-        }else{
-            st.push(value);
-            if(value<=minSt.top()){
-                minSt.push(value);
-            }
-            else{
-                minSt.push(minSt.top());
-            }
-
         }
-        //st.push(value); #这里应该删除
+        else
+        {
+            st.push(value);
+            if(value < minSt.top())
+                minSt.push(value);            
+            else
+                minSt.push(minSt.top());
+        }
     }
-    void pop() {
+    void pop() 
+    {
         st.pop();
         minSt.pop();
     }
-    int top() {
+    int top() 
+    {
         return st.top();
     }
-    int min() {
+    int min() 
+    {
         return minSt.top();
     }
-    stack<int> minSt;
-    stack<int> st;
-};Copy to clipboardErrorCopied
+};
 ```
 
-> 感谢微信好友“Pikachuts”指出笔误，现在改正，多谢。-2021.06.11
-
-**二刷：**
-
-**1、只一个栈来做，维持一个最小值，这种方法毫无疑问是更好一点的**
-
-运行时间：2ms 占用内存：504k
-
-注意函数重名问题
+**1、只用一个栈**
 
 ```cpp
 class Solution {
@@ -1737,23 +1105,19 @@ public:
         //所以我们需要明确此时的min函数是哪个函数
         st.push(minNum);
         st.push(value);
-
     }
     void pop() {
-        st.pop();//pop掉当前值
-        st.pop();//pop掉当前最小值
+        st.pop();		// pop掉当前值
+        st.pop();		// pop掉当前最小值
         int temp = st.top();
         st.pop();
-        if(minNum == st.top()){
-            st.push(temp);
-        }else{
+        if(minNum < st.top())	// 更新最小值
+        {
             minNum = st.top();
             st.pop();
-            st.push(minNum);
-            st.push(temp);
+            st.push(minNum);	// 最小值入栈
         }
-
-
+        st.push(temp);
     }
     int top() {
         return st.top();
@@ -1761,7 +1125,7 @@ public:
     int min() {
         return minNum;
     }
-};Copy to clipboardErrorCopied
+};
 ```
 
 ## No21、栈的压入弹出序列
@@ -1775,107 +1139,33 @@ public:
 **输入**
 
 ```
-[1,2,3,4,5],[4,3,5,1,2]Copy to clipboardErrorCopied
+[1,2,3,4,5],[4,3,5,1,2]
 ```
 
 **返回值**
 
 ```
-falseCopy to clipboardErrorCopied
+false
 ```
 
-**1、想岔了，用vector**
+**存储用vector、stack均可**
 
 ```cpp
-    bool IsPopOrder(vector<int> pushV,vector<int> popV) {
-
-       if(pushV.size() == 0) return false;
-        vector<int> v;
-        for(int i = 0,j = 0 ;i < pushV.size();){
-            v.push_back(pushV[i++]);
-            while(j < popV.size() && v.back() == popV[j]){
-                v.pop_back();
-                j++;
-            }      
-            }
-            return v.empty();
-    }Copy to clipboardErrorCopied
-```
-
-**2、借助栈**
-
-```cpp
-    bool IsPopOrder(vector<int> pushV,vector<int> popV) {
-
-if (pushV.empty() || popV.empty() || pushV.size() != popV.size())
-    return false;
-    stack<int> s;
-    int j = 0;
-    for (int i = 0; i < pushV.size(); ++i) {
-        s.push(pushV[i]);
-        while (!s.empty() && s.top() == popV[j]) {
-            s.pop();
-            ++j;
-        }
+bool IsPopOrder(vector<int> pushV,vector<int> popV) 
+{
+	if(pushV.size() == 0) 
+        return false;
+	vector<int> v;
+    for(int i = 0,j = 0 ;i < pushV.size();){
+        v.push_back(pushV[i++]);
+        while(j < popV.size() && v.back() == popV[j])
+        {
+            v.pop_back();
+            j++;
+    	}      
     }
-    if (s.empty())
-        return true;
-    return false;
-    }Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、挺容易的，可以再看一下**
-
-运行时间：3ms 占用内存：508k
-
-```cpp
-    bool IsPopOrder(vector<int> pushV,vector<int> popV) {
-    int len = pushV.size();
-    int pushIndex = 0, popIndex = 0;
-    stack<int>st;
-    while (pushIndex < len && popIndex < len) {
-        if (pushV[pushIndex] != popV[popIndex]) {
-            st.push(pushV[pushIndex++]);
-        }
-        else {
-            popIndex++;
-            pushIndex++;
-            while (!st.empty() && popIndex<len && st.top() == popV[popIndex]) {
-                st.pop();
-                popIndex++;
-            }
-        }
-    }
-
-    while (popIndex < len && st.top() == popV[popIndex]) {
-        st.pop();
-        popIndex++;
-    }
-    return popIndex == len && st.empty();
-    }Copy to clipboardErrorCopied
-```
-
-**2、精练一下代码**
-
-运行时间：3ms 占用内存：380k
-
-```cpp
-    bool IsPopOrder(vector<int> pushV,vector<int> popV) {
-    if(pushV.size() == 0 || popV.size() == 0 || pushV.size() != popV.size()) return false;
-    int len = pushV.size();
-    int popIndex = 0;
-    stack<int>st;
-    for(int i = 0; i < len; ++i){
-        st.push(pushV[i]);
-        while (popIndex < len && !st.empty() &&st.top() == popV[popIndex]) {
-            st.pop();
-            popIndex++;
-        }        
-    }
-    return st.empty();
-    }Copy to clipboardErrorCopied
+	return v.empty();
+}
 ```
 
 ## No22、从上往下打印二叉树
@@ -1884,67 +1174,31 @@ if (pushV.empty() || popV.empty() || pushV.size() != popV.size())
 
 **题目描述**
 
-从上往下打印出二叉树的每个节点，同层节点从左至右打印。
-
-**示例1**
-
-**输入**
-
-```
-{5,4,#,3,#,2,#,1}Copy to clipboardErrorCopied
-```
-
-**返回值**
-
-```
-[5,4,3,2,1]Copy to clipboardErrorCopied
-```
+从上往下打印出二叉树的每个节点，同层节点从左至右打印。层次打印二叉树
 
 **1、迭代做法，借助队列，比较简单**
 
 ```cpp
-    vector<int> PrintFromTopToBottom(TreeNode* root) {
-
+vector<int> PrintFromTopToBottom(TreeNode* root) 
+{
     vector<int> result;
-    if (root == nullptr) return result;
+    if (root == nullptr) 
+        return result;
     queue<TreeNode*>  q;
     q.push(root);
     TreeNode* node;
-    while (!q.empty()) {
-        node = .front();
-        result.push_back(node->val);
-        if (node->left) q.push(node->left);
-        if (node->right) q.push(node->right);
+    while (!q.empty()) 
+    {
+        node = q.front();
         q.pop();
+        result.push_back(node->val);
+        if (node->left) 
+            q.push(node->left);
+        if (node->right) 
+            q.push(node->right);        
     }
     return result;
-    }Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、借助队列来做，简单**
-
-运行时间：2ms 占用内存：528k
-
-```cpp
-    vector<int> PrintFromTopToBottom(TreeNode* root) {
-        if(root == nullptr) return vector<int>();
-        queue<TreeNode*>q;
-        q.push(root);
-        TreeNode *node = nullptr;
-        vector<int> result;
-        while(!q.empty()){
-
-            node = q.front();
-            q.pop();
-            result.push_back(node->val);
-            if(node->left) q.push(node->left);
-            if(node->right) q.push(node->right);
-        }
-
-        return result;
-    }Copy to clipboardErrorCopied
+}
 ```
 
 ## No23、二叉搜索树的后序遍历序列
@@ -1953,69 +1207,35 @@ if (pushV.empty() || popV.empty() || pushV.size() != popV.size())
 
 **题目描述**
 
-从上往下打印出二叉树的每个节点，同层节点从左至右打印。
-
-**示例1**
-
-**输入**
-
-```
-{5,4,#,3,#,2,#,1}Copy to clipboardErrorCopied
-```
-
-**返回值**
-
-```
-[5,4,3,2,1]Copy to clipboardErrorCopied
-```
+输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历的结果。如果是则返回true,否则返回false。假设输入的数组的任意两个数字都互不相同。（ps：我们约定空树不是二叉搜索树）
 
 **1、递归写法，树主要的做法就是递归**
 
 ```cpp
 bool VerifySquenceOfBST(vector<int> sequence) {
-    if (sequence.empty())  return false;
-    if (sequence.size() == 1) return true;
-    return VerifySquenceOfBSTCore(sequence, 0, sequence.size()-1);
+    if (sequence.empty())  
+        return false;
+    if (sequence.size() == 1) 
+        return true;
+    return VerifySquenceOfBSTCore(sequence, 0, sequence.size() - 1);
 }
 
 bool VerifySquenceOfBSTCore(vector<int>& sequence, int start, int end) {
-    if (start >= end) return true;
+    if (start >= end) 
+        return true;
     int low = start;
-    while (low < end && sequence[low] < sequence[end])  ++low;
+    while (low < end && sequence[low] < sequence[end])  // end 为根节点
+        ++low;
 
-    for (int i = low; i < end; ++i) {
-        if (sequence[i] <= sequence[end]) return false;
+    for (int i = low; i < end; ++i) 			// [low, end-1] 为二叉搜索树的右子树，都需要大于根节点
+    {
+        if (sequence[i] <= sequence[end]) 
+            return false;
     }
 
-    return  VerifySquenceOfBSTCore(sequence, start,low-1) &&
-        VerifySquenceOfBSTCore(sequence, low,end-1);
+    return VerifySquenceOfBSTCore(sequence, start,low-1) 
+        && VerifySquenceOfBSTCore(sequence, low,end-1);
 }
-Copy to clipboardErrorCopied
-```
-
-**二刷：依然没有思路，值得再看一遍**
-
-1、并没有想象中的难，下次应该仔细想一想的
-
-```cpp
-    bool VerifySquenceOfBSTCore(vector<int>&sequence,int low,int high){
-        if(low >= high) return true;
-        int start = low;
-        while(start < high && sequence[start] < sequence[high]) ++start;//二叉搜索树，左右根，左子树全部小于根
-        //右子树全部打大于根，找到第一个大于根的元素，那么在他之前都是左子树，之后都是右子树
-        for(int i = start;i < high; ++i)
-            if(sequence[i] <= sequence[high]) return false; //右子树必须全部大于根，否则就是假
-        return VerifySquenceOfBSTCore(sequence, low, start-1) //判断当前节点的其左子树
-            && VerifySquenceOfBSTCore(sequence, start, high-1);//判断当前节点的其右子树
-
-    }
-    bool VerifySquenceOfBST(vector<int> sequence) {
-
-        if(sequence.empty()) return false;//为空，则为假
-        if(sequence.size() == 1) return true;//只有一个元素，为真
-
-        return VerifySquenceOfBSTCore(sequence,0,sequence.size()-1);
-    }Copy to clipboardErrorCopied
 ```
 
 ## No24、二叉树中和为某一值的路径
@@ -2031,13 +1251,13 @@ Copy to clipboardErrorCopied
 **输入**
 
 ```
-{10,5,12,4,7},22Copy to clipboardErrorCopied
+{10,5,12,4,7},22
 ```
 
 **返回值**
 
 ```
-[[10,5,7],[10,12]]Copy to clipboardErrorCopied
+[[10,5,7],[10,12]]
 ```
 
 **示例2**
@@ -2045,13 +1265,13 @@ Copy to clipboardErrorCopied
 **输入**
 
 ```
-{10,5,12,4,7},15Copy to clipboardErrorCopied
+{10,5,12,4,7},15
 ```
 
 **返回值**
 
 ```
-[]Copy to clipboardErrorCopied
+[]
 ```
 
 **1、带有回溯性质的解法**
@@ -2196,19 +1416,19 @@ void FindPathCore(TreeNode*root,vector<vector<int>>&result,vector<int>temp,int s
 **输入**
 
 ```
-{10,5,12,4,7},22Copy to clipboardErrorCopied
+{10,5,12,4,7},22
 ```
 
 **返回值**
 
 ```
-[[10,5,7],[10,12]]Copy to clipboardErrorCopied
+[[10,5,7],[10,12]]
 ```
 
 **示例2** **输入**
 
 ```
-{10,5,12,4,7},15Copy to clipboardErrorCopied
+{10,5,12,4,7},15
 ```
 
 **返回值**

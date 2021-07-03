@@ -24,5 +24,18 @@ sudo mysql -uroot -p
 sudo mysql
 ```
 
-## Redis
+## Redis 6379
+
+### 安装
+
+```shell
+sudo apt-get update
+sudo apt-get install redis-server
+```
+
+### 启动
+
+```shell 
+r
+```
 

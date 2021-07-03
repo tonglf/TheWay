@@ -79,15 +79,18 @@
 - [CS模型-TCP](./Linux杂谈/Linux网络编程/CS模型-TCP.md)
 - [多进程并发服务器](./Linux杂谈/Linux网络编程/多进程并发服务器.md)
 - [多线程并发服务器](./Linux杂谈/Linux网络编程/多线程并发服务器.md)
+- [多路IO转接-select](./Linux杂谈/Linux网络编程/多路IO转接-select.md)
 
 ## 数据库
 
-### MySQL
+[linux下数据库的安装与配置](./数据库/linux下数据库的安装与配置.md)
+
+### MySQL 3306
 
 - [MySQL基础知识](./数据库/MySQL/MySQL基础知识.md)
 - [MySQL练习题](./数据库/MySQL/MySQL练习题.md)
 
-### Redis
+### Redis 6379
 
 - [Redis 常用五大数据类型](./数据库/Redis/Redis常用五大数据类型.md)
 

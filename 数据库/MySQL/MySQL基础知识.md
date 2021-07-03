@@ -780,9 +780,10 @@ select e.ename,d.dname from emp e,dept d;
 
 **案例：找出每一个员工的部门名称，要求显示员工名和部门名。**
 
-    ```mysql
-    select e.ename, d.dname from emp e, dept d where e.deptno = d.deptno; # SQL92，以后不用。
-    ```
+```mysql
+# SQL92，以后不用。
+select e.ename, d.dname from emp e, dept d where e.deptno = d.deptno; 
+```
 
 ### 2.5、内连接之等值连接：最大特点是：条件是等量关系。
 
@@ -840,7 +841,7 @@ on
 
 ​    **内连接：**
 
-​       假设A和B表进行连接，使用内连接的话，凡是 A 表和 B 表能够匹配上的记录查询出来，这就是内连接。AB两张表没有主副之分，两张表是平等的。
+​       假设A和B表进行连接，使用内连接的话，凡是 A 表和 B 表能够匹配上的记录查询出来，这就是内连接。AB 两张表没有主副之分，两张表是平等的。
 
 ​    **外连接：**
 
@@ -892,13 +893,13 @@ select e.ename,d.dname,s.grade from emp e
 
 **案例：找出每一个员工的部门名称、工资等级、以及上级领导。**
 
-    ```mysql
-    select  e.ename '员工',d.dname,s.grade,e1.ename '领导' from emp e 
-    	join dept d on e.deptno = d.deptno 
-    	join salgrade s on e.sal 
-    	between s.losal and s.hisal
-        left join emp e1 on e.mgr = e1.empno;
-    ```
+```mysql
+select  e.ename '员工',d.dname,s.grade,e1.ename '领导' from emp e 
+	join dept d on e.deptno = d.deptno 
+	join salgrade s on e.sal 
+	between s.losal and s.hisal
+    left join emp e1 on e.mgr = e1.empno;
+```
 
 ## 3、子查询
 
@@ -998,7 +999,7 @@ select dname from dept;
 
 - union拼接后数据的字段名为第一个查询字段名，即上述查询后的数据字段名为 ename;
 
-- union拼接的数据字段数必须一致，即前后拼接数据的列一致，否则无法拼接，例：
+- **union拼接的数据字段数必须一致，即前后拼接数据的列一致**，否则无法拼接，例：
 
  ```mysql
  # 拼接的数据必须两两相对应。不能一张表是一个数据，另一张表是两个数据，这样无法拼接！
@@ -1156,29 +1157,29 @@ insert into 表名(字段名1,字段名2,字段名3,....) values(值1,值2,值3,
 
 ​	插入：
 
-       ```mysql
-       drop table if exists t_student;     # 当这个表存在的话删除。
-       
-       create table t_student(
-       	no bigint,
-       	name varchar(255),
-       	sex char(1) default 1,    # 默认填充1
-       	classno varchar(255),
-       	birth char(10)
-       );
-       
-       insert into t_student(no,name,sex,classno,birth) values(1,'zhangsan','1','gaosan1ban', '1950-10-12');
-       
-       insert into t_student(name,sex,classno,birth,no) values('lisi','1','gaosan1ban', '1950-10-12',2);
-       
-       insert into t_student(name) values('wangwu'); # 除name字段之外，剩下的所有字段自动插入NULL。
-       
-       insert into t_student(no) values(3); 
-       
-       select * from t_student;
-       
-       insert into t_student(name) values('zhangsan');   
-       ```
+```mysql
+   drop table if exists t_student;     # 当这个表存在的话删除。
+   
+   create table t_student(
+   	no bigint,
+   	name varchar(255),
+   	sex char(1) default 1,    # 默认填充1
+   	classno varchar(255),
+   	birth char(10)
+   );
+   
+   insert into t_student(no,name,sex,classno,birth) values(1,'zhangsan','1','gaosan1ban', '1950-10-12');
+   
+   insert into t_student(name,sex,classno,birth,no) values('lisi','1','gaosan1ban', '1950-10-12',2);
+   
+   insert into t_student(name) values('wangwu'); # 除name字段之外，剩下的所有字段自动插入NULL。
+   
+   insert into t_student(no) values(3); 
+   
+   select * from t_student;
+   
+   insert into t_student(name) values('zhangsan');   
+```
 
 需要注意的地方：
 
@@ -1188,14 +1189,14 @@ insert into 表名(字段名1,字段名2,字段名3,....) values(值1,值2,值3,
 
 ​    insert语句插入数据了，只能使用 update 进行更新。
 
-    ```mysql
-    # 字段可以省略不写，但是后面的value对数量和顺序都有要求。
-    insert into t_student values(1,'jack','0','gaosan2ban','1986-10-23');
-    
-    # 一次插入多行数据
-    insert into t_student (no,name,sex,classno,birth) values
-    	(3,'rose','1','gaosi2ban','1952-12-14'),(4,'laotie','1','gaosi2ban','1955-12-14');
-    ```
+```mysql
+# 字段可以省略不写，但是后面的value对数量和顺序都有要求。
+insert into t_student values(1,'jack','0','gaosan2ban','1986-10-23');
+
+# 一次插入多行数据
+insert into t_student (no,name,sex,classno,birth) values
+	(3,'rose','1','gaosi2ban','1952-12-14'),(4,'laotie','1','gaosi2ban','1955-12-14');
+```
 
 ## 8、表的复制
 
@@ -1247,9 +1248,9 @@ update dept1 set loc = 'x', dname = 'y';
 
 **删除 10 部门数据？**
 
-       ```mysql
-       delete from dept1 where deptno = 10;
-       ```
+```mysql
+delete from dept1 where deptno = 10;
+```
 
 ​    **删除所有记录？**
 
@@ -1564,9 +1565,9 @@ CREATE TABLE t_x (
 
 ###   2.3、查看当前mysql支持的存储引擎？
 
-    ```mysql
-    show engines \G
-    ```
+```mys
+show engines \G
+```
 
 ###   2.4、常见的存储引擎？
 
