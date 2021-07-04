@@ -6,6 +6,36 @@
 
 刷题网站推荐：[力扣网](https://www.nowcoder.com/ta/coding-interviews?from=cyc_github)、[牛客网](https://leetcode-cn.com/problemset/lcof/)
 
+## 分类
+
+### 数组
+
+1、6、13、19、28、32、35、37、40、50、51、63
+
+### 字符串
+
+2、27、34、43、44、49、53、54
+
+### 链表
+
+3、14、15、16、25、36、55、56
+
+### 树
+
+4、17、18、22、23、24、26、38、39、57、58、59、60、61、62
+
+### 栈、队列
+
+5、20、21、52
+
+### 动态规划
+
+7、8、9、10、30、64、65、66
+
+### 其他
+
+11、12、29、31、33、41、42、45、46、47、48、6
+
 ## No1、二维数组中的查找
 
 [牛客网原题链接](https://www.nowcoder.com/practice/abc3fe2ce8e146608e868a70efebf62e?tpId=13&&tqId=11154&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
@@ -1299,7 +1329,7 @@ vector<vector<int> > FindPath(TreeNode* root, int expectNumber) {
     vector<int>  temp;
     FindPathCore(result, temp, root, expectNumber);
     return result;
-}Copy to clipboardErrorCopied
+}
 ```
 
 但这题是要求按照字典序返回结果的，所以最后应该是将result进行排序，优先返回那些长度较长的路径。所以最后应该再判断一下，可以用lambda表达式或者重载一个 （） 也可以
@@ -1365,7 +1395,7 @@ vector<vector<int> > FindPath(TreeNode* root, int expectNumber) {
     FindPathCore(result, temp, root, expectNumber);
     sort(result.begin(),result.end(),compare());
     return result;
-}Copy to clipboardErrorCopied
+}
 ```
 
 **二刷：**
