@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 ```cpp
 struct sockaddr_in addr;
 
-addr.sin_family = AF_INET/AF_INET6      man 7 ip
+addr.sin_family = AF_INET/AF_INET6;      // man 7 ip
 
 addr.sin_port = htons(9527);  
 
