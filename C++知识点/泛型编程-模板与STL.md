@@ -20,7 +20,7 @@
 * C++另一种编程思想称为 ==泛型编程== ，主要利用的技术就是模板
 
 
-* C++提供两种模板机制：**函数模板**和**类模板** 
+* C++提供两种模板机制：**函数模板** 和 **类模板** 
 
 #### 1.2.1 函数模板语法
 
@@ -201,9 +201,9 @@ void test02()
 
 **普通函数与函数模板区别：**
 
-* 普通函数调用时可以发生自动类型转换（隐式类型转换）
-* 函数模板调用时，如果利用自动类型推导，不会发生隐式类型转换
-* 如果利用显示指定类型的方式，可以发生隐式类型转换
+* ==普通函数调用时可以发生自动类型转换（隐式类型转换）==
+* ==函数模板调用时，如果利用自动类型推导，不会发生隐式类型转换==
+* ==如果利用显示指定类型的方式，可以发生隐式类型转换==
 
 **示例：**
 
@@ -532,8 +532,7 @@ void test02()
 **示例：**
 
 ```C++
-class Person1
-{
+class Person1 {
 public:
 	void showPerson1()
 	{
@@ -541,8 +540,7 @@ public:
 	}
 };
 
-class Person2
-{
+class Person2 {
 public:
 	void showPerson2()
 	{
@@ -551,8 +549,7 @@ public:
 };
 
 template<class T>
-class MyClass
-{
+class MyClass {
 public:
 	T obj;
 
@@ -594,8 +591,7 @@ void test01()
 #include <string>
 //类模板
 template<class NameType, class AgeType = int> 
-class Person
-{
+class Person {
 public:
 	Person(NameType name, AgeType age)
 	{
@@ -646,7 +642,7 @@ void printPerson3(T& p)
 }
 void test03()
 {
-	Person <string, int >p("唐僧", 30);
+	Person <string, int>p("唐僧", 30);
 	printPerson3(p);
 }
 ```
@@ -669,8 +665,7 @@ void test03()
 
 ```C++
 template<class T>
-class Base
-{
+class Base {
 	T m;
 };
 
@@ -891,8 +886,7 @@ myArray.hpp中代码
 using namespace std;
 
 template<class T>
-class MyArray
-{
+class MyArray {
 public:
 	//构造函数
 	MyArray(int capacity)
@@ -1124,7 +1118,7 @@ STL**容器**就是将运用**最广泛的一些数据结构**实现出来
 
 - **算法：**问题之解法也 
 
-有限的步骤，解决逻辑或数学上的问题，这一门学科我们叫做算法( Algorithms )
+有限的步骤，解决逻辑或数学上的问题，这一门学科叫做算法( Algorithms )
 
 算法分为:**质变算法**和**非质变算法**。
 
@@ -1172,9 +1166,9 @@ STL**容器**就是将运用**最广泛的一些数据结构**实现出来
 
 string 类内部封装了很多成员方法
 
-例如：查找find，拷贝copy，删除delete 替换replace，插入insert
+例如：查找 find，拷贝 copy，删除 delete 替换 replace，插入 insert
 
-string管理char*所分配的内存，不用担心复制越界和取值越界等，由类内部进行负责
+string 管理 char* 所分配的内存，不用担心复制越界和取值越界等，由类内部进行负责
 
 #### 3.1.2 string构造函数
 
@@ -1192,16 +1186,16 @@ string管理char*所分配的内存，不用担心复制越界和取值越界等
 //string构造
 void test01()
 {
-	string s1; //创建空字符串，调用无参构造函数
+	string s1; // 创建空字符串，调用无参构造函数
 
 	const char* str = "hello world";
-	string s2(str); //把c_string转换成了string
+	string s2(str); // 把c_string转换成了string
 
-	string s3(s2); //调用拷贝构造函数
+	string s3(s2); // 调用拷贝构造函数
 
 	string s4(10, 'a');
     
-// 其他方式：
+	// 其他方式：
     string str1 = "asd";
 	string str2("asd");
 	string str3{ "233" };
@@ -1360,7 +1354,7 @@ void test02()
 总结：
 
 * **find查找是从左往后，rfind从右往左**（成员函数）
-* **find找到字符串后返回查找的第一个字符位置，找不到返回-1**
+* **find找到字符串后返回查找的第一个字符位置，找不到返回 -1**
 * **replace在替换时，要指定从哪个位置起，多少个字符，替换成什么样的字符串**
 
 
@@ -1536,7 +1530,7 @@ void test01()
 
 **函数原型：**
 
-* `vector<T> v; `               		     //采用模板实现类实现，默认构造函数
+* `vector<T> v; `               		     		//采用模板实现类实现，默认构造函数
 * `vector(v.begin(), v.end());   `       //将v[begin(), end())区间中的元素拷贝给本身。
 * `vector(n, elem);`                            //构造函数将n个elem拷贝给本身。
 * `vector(const vector &vec);`         //拷贝构造函数。
@@ -2018,7 +2012,7 @@ List有一个重要的性质，插入操作和删除操作都不会造成原有l
 * 反转   --- reverse（成员函数）
 * 排序   --- sort （成员函数）
 
-### 3.8 set/ multiset 容器
+### 3.8 set / multiset 容器
 
 #### 3.8.1 set基本概念
 
@@ -2243,7 +2237,7 @@ void test01()
 
 **函数原型：**
 
-- `find(key);`                  //查找key是否存在,若存在，返回该键的元素的迭代器；若不存在，返回set.end();
+- `find(key);`                  //查找key是否存在,若存在，返回该键的元素的迭代器；若不存在，返回map.end();
 - `count(key);`                //统计key的元素个数
 
 #### 3.9.6 map容器排序
@@ -2301,8 +2295,7 @@ void test01()
 }
 
 //2、函数对象可以有自己的状态
-class MyPrint
-{
+class MyPrint {
 public:
 	MyPrint()
 	{
