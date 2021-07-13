@@ -143,8 +143,8 @@ int main(int argc, char *argv[])
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(SERV_PORT);
-    //inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
-    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);
+    //inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr);
+    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr.s_addr);
 
     cfd = socket(AF_INET, SOCK_STREAM, 0);
     if (cfd == -1)
