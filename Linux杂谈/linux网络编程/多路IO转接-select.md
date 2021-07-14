@@ -1,5 +1,7 @@
 # 多路IO转接-select
 
+select 原理：  借助内核， select 来监听， 客户端连接、数据通信事件。
+
 **select优缺点：**
 
 - 优点：跨平台
@@ -43,7 +45,7 @@ int main(int argc, char *argv[])
     bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     listen(listenfd, 128);
     
-    fd_set rset, allset;                            // rset 读事件文件描述符集合 allset用来暂存 
+    fd_set rset, allset;                            // rset 读事件文件描述符集合 allset 用来暂存 
 
     maxfd = listenfd;
 
@@ -52,7 +54,7 @@ int main(int argc, char *argv[])
 
     while (1) 
     {   
-        rset = allset;                                          // 每次循环时都从新设置select监控信号集 
+        rset = allset;                                          // 每次循环时都从新设置 select 监控信号集 
         nready = select(maxfd+1, &rset, NULL, NULL, NULL);
         if (nready < 0)
             perr_exit("select error");
@@ -92,5 +94,73 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+```
+
+## 函数原型
+
+**文件描述符数组**
+
+**FD_ZERO**
+
+```cpp
+void FD_ZERO(fd_set *set);	--- 清空一个文件描述符集合。
+
+	fd_set rset;
+
+	FD_ZERO(&rset);
+```
+
+**FD_SET**
+
+
+```cpp
+void FD_SET(int fd, fd_set *set);	--- 将待监听的文件描述符，添加到监听集合中
+
+	FD_SET(3, &rset);	FD_SET(5, &rset);	FD_SET(6, &rset);
+```
+
+**FD_CLR**
+
+```cpp
+void FD_CLR(int fd, fd_set *set);	--- 将一个文件描述符从监听集合中 移除。
+
+	FD_CLR（4， &rset）;
+```
+
+**FD_ISSET**
+
+```cpp
+int  FD_ISSET(int fd, fd_set *set);	--- 判断一个文件描述符是否在监听集合中。
+
+	返回值： 在：1；不在：0；
+
+	FD_ISSET（4， &rset）;
+```
+
+**select**
+
+```cpp
+int select(int nfds, fd_set *readfds, fd_set *writefds,fd_set *exceptfds, struct timeval *timeout);
+
+	nfds：监听的所有文件描述符中，最大文件描述符+1
+
+	readfds： 读 文件描述符监听集合。	传入、传出参数
+
+	writefds：写 文件描述符监听集合。	传入、传出参数		NULL
+
+	exceptfds：异常 文件描述符监听集合	传入、传出参数		NULL
+
+	timeout： 	> 0: 	设置监听超时时长。
+
+				NULL:	阻塞监听
+
+				0：	非阻塞监听，轮询
+	返回值：
+
+		> 0:	所有监听集合（3个）中， 满足对应事件的总数。
+
+		0：	没有满足监听条件的文件描述符
+
+		-1： 	errno
 ```
 
