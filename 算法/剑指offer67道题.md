@@ -974,107 +974,41 @@ void Mirror(TreeNode* pRoot)
 
 输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字，例如，如果输入如下4 X 4矩阵： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 则依次打印出数字1,2,3,4,8,12,16,15,14,13,9,5,6,7,11,10.
 
-**1、有点难，在力扣上写了好久**
-
-主要就是分析清楚上下左右的情况
-
-执行用时：0 ms, 在所有 C++ 提交中击败了100.00%的用户
-
-内存消耗：6.7 MB, 在所有 C++ 提交中击败了100.00%的用户
+注意：矩阵非方阵，可能为行矩阵也可能为列矩阵。
 
 ```cpp
-vector<int> spiralOrder(vector<vector<int>>& matrix) {
-    if (matrix.size()==0) return vector<int>();
-    if (matrix.size() == 1) return matrix[0];
-    int row = matrix.size(), col = matrix[0].size();
-    int left = 0, right = 0, top = 0, bottom = 0;
-    vector<int> result;
-    while (left + right < col && top + bottom < row) {
-
-        for (int i = left; i < col - left - right + left; ++i) {
-            //cout << matrix[top][i];
-            result.push_back(matrix[top][i]);
-        }
-
-        top++;
-        //cout << " top " <<top<<bottom<< endl;
-        if (top + bottom == row) break;
-
-
-        for (int i = top; i < row - top - bottom + top; ++i) {
-            //cout << matrix[i][col - right - 1];
-            result.push_back(matrix[i][col - right - 1]);
-        }        
-        right++;
-        //cout << "right"<<left<<right<<endl;
-        if (left + right == col) break;
-
-
-        for (int i = col-right-1; i >= left ; --i) {
-            //cout << matrix[row - bottom - 1][i];
-            result.push_back(matrix[row - bottom - 1][i]);
-        }
-        bottom++;
-        //cout << " bottom " << top << bottom << endl;
-        if (top + bottom == row) break;
-
-
-        for (int i = row-bottom-1; i >= top; --i) {
-            //cout << matrix[i][left];
-            result.push_back(matrix[i][left]);
-        }
-        left++;
-        //cout << "left" << left << right << endl;
-    }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-**2、新的写法，这种其实更好理解**
-
-```cpp
-vector<int> spiralOrder(vector<vector<int>>& matrix) {
+class Solution {
+public:
+	vector<int> spiralOrder(vector<vector<int>>& matrix) {
         vector <int> res;
         if(matrix.empty()) return res;
-        int rl = 0, rh = matrix.size()-1; //记录待打印的矩阵上下边缘
-        int cl = 0, ch = matrix[0].size()-1; //记录待打印的矩阵左右边缘
-        while(1){
-            for(int i=cl; i<=ch; i++) res.push_back(matrix[rl][i]);//从左往右
-            if(++rl > rh) break; //若超出边界，退出
-            for(int i=rl; i<=rh; i++) res.push_back(matrix[i][ch]);//从上往下
-            if(--ch < cl) break;
-            for(int i=ch; i>=cl; i--) res.push_back(matrix[rh][i]);//从右往左
-            if(--rh < rl) break;
-            for(int i=rh; i>=rl; i--) res.push_back(matrix[i][cl]);//从下往上
-            if(++cl > ch) break;
+        int rl = 0, rh = matrix.size() - 1;    // 记录待打印的矩阵上下边缘
+        int cl = 0, ch = matrix[0].size() - 1; // 记录待打印的矩阵左右边缘
+        while(1)
+        {
+            for(int i = cl; i <= ch; i++) 
+                res.push_back(matrix[rl][i]);	// 从左往右
+            if(++rl > rh) 
+                break; //若超出边界，退出
+            
+            for(int i = rl; i <= rh; i++) 
+                res.push_back(matrix[i][ch]);	// 从上往下
+            if(--ch < cl) 
+                break;
+            
+            for(int i = ch; i >= cl; i--) 
+                res.push_back(matrix[rh][i]);	// 从右往左
+            if(--rh < rl) 
+                break;
+            
+            for(int i = rh; i >= rl; i--) 
+                res.push_back(matrix[i][cl]);	// 从下往上
+            if(++cl > ch) 
+                break;
         }
         return res;
     }
-```
-
-**3、改进一下第二种写法，快上不少**
-
-```cpp
-vector<int> spiralOrder(vector<vector<int>>& matrix) {
-    vector <int> res;
-    if (matrix.empty()) return res;
-    int top = 0, bottom = matrix.size() - 1; //记录待打印的矩阵上下边缘
-    int left = 0, right = matrix[0].size() - 1; //记录待打印的矩阵左右边缘
-    while (1) {
-        for (int i = left; i <= right; ++i) res.push_back(matrix[top][i]);//从左往右
-        if (++top > bottom) break; //若超出边界，退出
-
-        for (int i = top; i <= bottom; ++i) res.push_back(matrix[i][right]);//从上往下
-        if (--right < left) break;
-
-        for (int i = right; i >= left; --i) res.push_back(matrix[bottom][i]);//从右往左
-        if (--bottom < top) break;
-
-        for (int i = bottom; i >= top; --i) res.push_back(matrix[i][left]);//从下往上
-        if (++left > right) break;
-    }
-    return res;
-}Copy to clipboardErrorCopied
+};
 ```
 
 ## No20、包含min函数的栈
