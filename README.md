@@ -96,9 +96,9 @@
 
 ### MySQL 3306
 
-- [MySQL基础知识](./数据库/MySQL/MySQL基础知识.md)
-- [MySQL练习题](./数据库/MySQL/MySQL练习题.md)
-- [MySQL实战45讲](./数据库/MySQL/MySQL实战45讲/00MySQL实战45讲.md)
+- [MySQL 基础知识](./数据库/MySQL/MySQL基础知识.md)
+- [MySQL 练习题](./数据库/MySQL/MySQL练习题.md)
+- [MySQL 实战45讲](./数据库/MySQL/MySQL实战45讲/00MySQL实战45讲.md)
 
 ### Redis 6379
 
