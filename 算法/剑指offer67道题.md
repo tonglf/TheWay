@@ -10,31 +10,31 @@
 
 ### 数组
 
-1、6、13、19、28、32、35、37、40、50、51、63
+- [ ] 1、6、13、19、28、32、35、37、40、50、51、63
 
 ### 字符串
 
-2、27、34、43、44、49、53、54
+- [ ] 2、27、34、43、44、49、53、54
 
 ### 链表
 
-3、14、15、16、25、36、55、56
+- [x] 3、14、15、16、25、36、55、56
 
 ### 树
 
-4、17、18、22、23、24、26、38、39、57、58、59、60、61、62
+- [ ] 4、17、18、22、23、24、26、38、39、57、58、59、60、61、62
 
 ### 栈、队列
 
-5、20、21、52
+- [ ] 5、20、21、52
 
 ### 动态规划
 
-7、8、9、10、30、64、65、66
+- [ ] 7、8、9、10、30、64、65、66
 
 ### 其他
 
-11、12、29、31、33、41、42、45、46、47、48、6
+- [ ] 11、12、29、31、33、41、42、45、46、47、48、6
 
 ## No1、二维数组中的查找
 
@@ -1398,93 +1398,10 @@ void FindPathCore(TreeNode*root,vector<vector<int>>&result,vector<int>temp,int s
 **返回值**
 
 ```
-[]Copy to clipboardErrorCopied
+[]
 ```
 
-**1、第一种方法，在节点后复制一个节点，然后再分离开这方法超级棒，太麻烦了，不建议用这种方法**
-
-```cpp
-/*
-struct RandomListNode {
-    int label;
-    struct RandomListNode *next, *random;
-    RandomListNode(int x) :
-            label(x), next(NULL), random(NULL) {
-    }
-};
-*/
-class Solution {
-public:
-
-//复制原始链表的任一节点N并创建新节点N'，再把N'链接到N的后边
-void CloneNodes(RandomListNode* pHead)
-{
-    RandomListNode* pNode = pHead;
-    while (pNode != nullptr)
-    {
-        RandomListNode* pCloned = new RandomListNode(pNode->label);
-        pCloned->next = pNode->next;
-        pNode->next = pCloned;
-        pNode = pCloned->next;
-    }
-}
-//如果原始链表上的节点N的random指向S，则对应的复制节点N'的random指向S的下一个节点S'
-void ConnectRandomNodes(RandomListNode* pHead)
-{
-    RandomListNode* pNode = pHead;
-    while (pNode != nullptr)
-    {
-        RandomListNode* pCloned = pNode->next;
-        if (pNode->random != nullptr)
-            pCloned->random = pNode->random->next;
-        pNode = pCloned->next;
-    }
-}
-//把得到的链表拆成两个链表，奇数位置上的结点组成原始链表，偶数位置上的结点组成复制出来的链表
-RandomListNode* ReConnectNodes(RandomListNode* pHead)
-{
-    RandomListNode* pNode = pHead;
-    RandomListNode* pClonedHead = nullptr;
-    RandomListNode* pClonedNode = nullptr;
-
-    //初始化
-    if (pNode != nullptr)
-    {
-        pClonedHead = pNode->next;
-        pClonedNode = pNode->next;
-        pNode->next = pClonedNode->next;
-        pNode = pNode->next;
-
-    }
-    //循环
-    while (pNode != nullptr)
-    {
-        pClonedNode->next = pNode->next;
-        pClonedNode = pClonedNode->next;
-        pNode->next = pClonedNode->next;
-        pNode = pNode->next;
-    }
-
-    return pClonedHead;
-}
-//三步合一
-RandomListNode* Clone(RandomListNode* pHead)
-{
-    CloneNodes(pHead);
-    ConnectRandomNodes(pHead);
-
-    return ReConnectNodes(pHead);
-}
-};Copy to clipboardErrorCopied
-```
-
-**自己在力扣上复现第一种做法，有很多要注意的地方**
-
-https://leetcode-cn.com/problems/fu-za-lian-biao-de-fu-zhi-lcof/
-
-执行用时：24 ms, 在所有 C++ 提交中击败了21.10%的用户
-
-内存消耗：11.1 MB, 在所有 C++ 提交中击败了100.00%的用户
+**题解：**
 
 ```cpp
 class Node {
@@ -1502,228 +1419,35 @@ public:
 
 class Solution {
 public:
-
-    void copyList(Node* head) {
-        Node* node = head;
-        while (node != nullptr) {
-            Node* temp = new Node(node->val);
-            temp->next = node->next;
-            node->next = temp;
-            node = temp->next;
-        }
-    }
-    void connectRandomNodeList(Node* head) {
-        Node* node = head;
-        Node* copyNode = head->next;
-        while (node != nullptr) {
-            if (node->random != nullptr) //每当你要进行赋值的时候都要注意进行非空判断
-                copyNode->random = node->random->next;
-            node = copyNode->next;
-            if (node != nullptr) //每当你要进行赋值的时候都要注意进行非空判断
-                copyNode = node->next;
-        }
-    }
-    Node* reCopyList(Node* head) {
-        Node* node = head;
-        Node* copyNode = head->next;
-        Node* copyNodeHead = head->next;
-        while (node != nullptr) {
-            node->next = copyNode->next;
-            node = node->next;
-            if (node != nullptr)//每当你要进行赋值的时候都要注意进行非空判断
-                copyNode->next = node->next;
-            copyNode = copyNode->next;
-        }
-
-        return copyNodeHead;
-    }
     Node* copyRandomList(Node* head) {
-
-        if (head == nullptr) return nullptr;
-        copyList(head);
-        connectRandomNodeList(head);
-        return reCopyList(head);
-    }
-};Copy to clipboardErrorCopied
-```
-
-**2、哈希表的做法，其实更简单一下啊**
-
-```cpp
-RandomListNode* Clone(RandomListNode* pHead)
-{
-    if (pHead == nullptr)
-    {
-        return nullptr;
-    }
-
-    std::unordered_map<RandomListNode*, RandomListNode*> hash_map;
-
-    for (RandomListNode* p = pHead; p != nullptr; p = p->next)
-    {
-        hash_map[p] = new RandomListNode(p->label);
-    }
-
-    for (RandomListNode* p = pHead; p != nullptr; p = p->next)
-    {
-        hash_map[p]->next = hash_map[p->next];//这里要注意是 unmp[p->next] 千万注意，好好想想
-        hash_map[p]->random = hash_map[p->random];//下同
-    }
-
-    return hash_map[pHead];
-}
-Copy to clipboardErrorCopied
-```
-
-**在力扣上复现了一遍**
-
-执行用时：20 ms, 在所有 C++ 提交中击败了49.48%的用户
-
-内存消耗：11.4 MB, 在所有 C++ 提交中击败了100.00%的用户
-
-```cpp
-    Node* copyRandomList(Node* head) {
-
-        if (head == nullptr) return nullptr;
-        unordered_map<Node*, Node*> unmp;
-        for (Node* p = head; p != nullptr;p=p->next)
+        Node* p = head;
+        while (p)								// 在原本链表后面添加节点
         {
-            unmp[p] = new Node(p->val);
+            Node * node = new Node(p->val);
+            node->next = p->next;
+            p->next = node;
+            p = p->next->next;
         }
-        for (Node* p = head; p != nullptr; p = p->next)
+        p = head;
+        while (p)								// 对节点的随机指针赋值，注意为空的情况
         {
-            unmp[p]->next = unmp[p->next];//这里要注意是 unmp[p->next] 千万注意，好好想想
-            unmp[p]->random = unmp[p->random];//下同
+            p->next->random = p->random == nullptr ? nullptr : p->random->next;
+            p = p->next->next;
         }
 
-        return unmp[head];
-    }Copy to clipboardErrorCopied
-```
-
-**3、哈希表的递归写法**
-
-```cpp
-struct RandomListNode {
-    int label;
-    struct RandomListNode* next, * random;
-    RandomListNode(int x) :
-        label(x), next(NULL), random(NULL) {
-    }
-};
-
-
-class Solution {
-public:
-    unordered_map<RandomListNode*, RandomListNode*> unmp;
-    RandomListNode* Clone(RandomListNode* pHead)
-    {
-        if (pHead == NULL) return NULL;
-        RandomListNode* head = new RandomListNode(pHead->label);
-        unmp[pHead] = head;
-        head->next = Clone(pHead->next);  //在这里递归是关键，保证所有节点都已生成，放入map
-        head->random = NULL;
-        if (pHead->random!=nullptr) head->random = unmp[pHead->random];   //查找map中对应节点
-        return head;
-    }
-};Copy to clipboardErrorCopied
-```
-
-**力扣上复现做法**
-
-执行用时：24 ms, 在所有 C++ 提交中击败了21.10%的用户
-
-内存消耗：11.5 MB, 在所有 C++ 提交中击败了100.00%的用户
-
-```cpp
-class Node {
-public:
-    int val;
-    Node* next;
-    Node* random;
-
-    Node(int _val) {
-        val = _val;
-        next = NULL;
-        random = NULL;
-    }
-};
-
-class Solution {
-public:
-
-    unordered_map<Node*, Node*> unmp;
-    Node* copyRandomList(Node* head) {
-
-        if (head == NULL) return NULL;
-        Node* newHead = new Node(head->val);
-        unmp[head] = newHead;
-        newHead->next = copyRandomList(head->next);  //在这里递归是关键，保证所有节点都已生成，放入map
-        newHead->random = NULL;
-        if (head->random != nullptr) newHead->random = unmp[head->random];   //查找map中对应节点
-        return newHead;
-    }
-};Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、哈希表递归写法**
-
-运行时间：3ms 占用内存：520k
-
-```cpp
-class Solution {
-public:
-
-  //关键是保存住映射关系，可以说是哈希表和链表的组合吧
-    unordered_map<RandomListNode*,RandomListNode*> unmp;
-    RandomListNode* Clone(RandomListNode* pHead)
-    {
-        if(pHead == nullptr) return nullptr;
-        RandomListNode* newHead = new RandomListNode(pHead->label);
-        unmp[pHead] = newHead;//这里需要保存的是 pHead -》 newHead 的映射关系,必须在这里保存
-        newHead->next = Clone(pHead->next);//到这一步，其实所有的点已经全部生成了
-        newHead->random = nullptr;//其实默认已经是nullptr了，有没有这一步其实没什么关系
-        if(pHead->random != nullptr)  newHead->random = unmp[pHead->random];//这一步，真的是灵魂所在了
-        return newHead;
-    }
-};Copy to clipboardErrorCopied
-```
-
-**2、哈希表迭代写法**
-
-运行时间：2ms 占用内存：492k
-
-```cpp
-/*
-struct RandomListNode {
-    int label;
-    struct RandomListNode *next, *random;
-    RandomListNode(int x) :
-            label(x), next(NULL), random(NULL) {
-    }
-};
-*/
-class Solution {
-public:
-
-  //关键是保存住映射关系，可以说是哈希表和链表的组合吧
-    RandomListNode* Clone(RandomListNode* pHead)
-    {
-        if(pHead == nullptr) return nullptr;
-        unordered_map<RandomListNode*,RandomListNode*> unmp;
-        for( auto p = pHead; p != nullptr; p=p->next){
-            unmp[p] = new RandomListNode(p->label);
+        Node* headCopy = new Node(-1);
+        Node* p2 = headCopy;
+        p = head;
+        while (p)								// 一个链表拆分为两个链表
+        {
+            p2->next = p->next;
+            p->next = p->next->next;
+            p = p->next;
+            p2 = p2->next;
         }
-        for( auto p = pHead; p != nullptr; p=p->next){
-
-            unmp[p]->next = unmp[p->next];
-            unmp[p]->random = unmp[p->random];
-        }
-
-        return unmp[pHead];
+        return headCopy->next;
     }
-};Copy to clipboardErrorCopied
+};
 ```
 
 ## No26、二叉搜索树与双向链表
@@ -2949,44 +2673,73 @@ int InversePairs(vector<int> data) {
 
 输入两个链表，找出它们的第一个公共结点。（注意因为传入数据是链表，所以错误测试数据的提示是用其他方式显示的，保证传入数据是正确的）
 
-**1、暴力遍历法**
+**题解：**
+
+**1、长度大的链表先走两个链表长度的差值，之后一起走**
 
 ```cpp
-ListNode* FindFirstCommonNode(ListNode* pHead1, ListNode* pHead2) {
-    if (pHead1 == NULL || pHead2 == NULL) return NULL;
-    ListNode* node = (ListNode*)malloc(sizeof(ListNode));    
-    while (pHead1 != NULL) {
-
-        node = pHead2;
-        while (node != NULL) {
-            //cout << "node " << node->val << " phead1 " << pHead1->val << endl;
-            if (node == pHead1) return node;
-            else
-                node = node->next;
+class Solution {
+protected:
+    int LensList(ListNode *head)
+    {
+        int n = 0;
+        ListNode* p = head;
+        while (p)
+        {
+            p = p->next;
+            n++;
         }
-        //cout << endl;
-        pHead1 = pHead1->next;
-
+        return n;
     }
-    return NULL;
-}Copy to clipboardErrorCopied
+
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) 
+    {
+        ListNode* pA = headA;
+        ListNode* pB = headB;
+
+        int lengthA = LensList(pA);
+        int lengthB = LensList(pB);
+
+        if (lengthA > lengthB)
+        {
+            int dis = lengthA - lengthB;
+            while (dis--)
+            {
+                pA = pA->next;
+            }
+        }
+        else
+        {
+            int dis = lengthB - lengthA;
+            while (dis--)
+            {
+                pB = pB->next;
+            }
+        }
+
+        while (pA && pA != pB)
+        {
+            pA = pA->next;
+            pB = pB->next;
+        }
+        return pA;
+    }
+};
 ```
 
 **2、大神写法 太厉害了，真的佩服**
-
-朋友们，请一定要珍惜身边的那个 ta 啊！你们之所以相遇，正是因为你走了 ta 走过的路，而 ta 也刚好走了你走过的路。这是何等的缘分！
-
-而当你们携手继续走下去时，你会慢慢变成 ta 的样子，ta 也会慢慢变成你的样子。
 
 a.长度相同的：1. 有公共结点的，第一次就遍历到；2. 没有公共结点的，走到尾部NULL相遇，返回NULL； b.长度不同的：1. 有公共结点的，第一遍差值就出来了，第二遍就会一起到公共结点；2. 没有公共结点的，第二次遍历一起到结尾NULL。
 
 ```cpp
 //定义两个指针, 第一轮让两个到达末尾的节点指向另一个链表的头部, 最后如果相遇则为交点(在第一轮移动中恰好抹除了长度差)
-        两个指针等于移动了相同的距离, 有交点就返回, 无交点就是各走了两条指针的长度
+//        两个指针等于移动了相同的距离, 有交点就返回, 无交点就是各走了两条指针的长度
 ListNode* FindFirstCommonNode(ListNode* pHead1, ListNode* pHead2) {
-    if (pHead1 == NULL || pHead2 == NULL) return NULL;
-    ListNode* p1 = (ListNode*)malloc(sizeof(ListNode));
-    ListNode* p2 = (ListNode*)malloc(sizeof(ListNode));
+    if (pHead1 == NULL || pHead2 == NULL) 
+        return NULL;
+    ListNode* p1 = new ListNode(-1);
+    ListNode* p2 = new ListNode(-1);
     p1 = pHead1;
     p2 = pHead2;
     while (p1 != p2) {
@@ -2995,24 +2748,6 @@ ListNode* FindFirstCommonNode(ListNode* pHead1, ListNode* pHead2) {
     }
     return p1;
 }
-Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-1、有个地方要注意
-
-```cpp
-ListNode* FindFirstCommonNode( ListNode* pHead1, ListNode* pHead2) {
-    if(pHead1 == nullptr || pHead2 == nullptr) return nullptr;
-    ListNode*p1 = pHead1,*p2 = pHead2;
-    while(p1 != p2){
-        p1 = (p1 == nullptr?pHead2:p1->next);//这里需要是 p == null 来进行判断，不能是 p->next == nullptr 来判断，因为有可能是最后一个节点是公共节点
-        p2 = (p2 == nullptr?pHead1:p2->next);
-    }
-
-    return p1;
-}Copy to clipboardErrorCopied
 ```
 
 ## No37、 统计一个数字在排序数组中出现的次数
@@ -5064,92 +4799,70 @@ public:
 
 给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
 
-**1、老办法，借助unordered_map**
+**1、借助unordered_map**
 
 ```cpp
 ListNode* EntryNodeOfLoop(ListNode* pHead)
 {
     if (pHead == nullptr) return NULL;
-    unordered_map<ListNode*, int> unmp;//注意是ListNode*，不是ListNode
+    unordered_map<ListNode*, int> unmp;	// 注意是ListNode*，不是ListNode
     while (pHead != NULL) {
 
         unmp[pHead]++;
-        if (unmp[pHead] == 2) return pHead;
+        if (unmp[pHead] == 2) 
+            return pHead;
         pHead = pHead->next;
     }
     return NULL;
-}Copy to clipboardErrorCopied
+}
 ```
 
-借助se't其实也可以，但是set和map底层其实差不多，而且set里的两个元素类型相同，sizeof（listnode）肯定比 sizeof要大
+借助set其实也可以，但是set和map底层其实差不多，而且set里的两个元素类型相同，sizeof（listnode）肯定比 sizeof要大
 
 ```cpp
 ListNode* EntryNodeOfLoop(ListNode* pHead)
 {
     set<ListNode*> s;
     ListNode* node = pHead;
-    while(node!=NULL){
+    while(node!=NULL)
+    {
         if(s.insert(node).second)
             node = node->next;
         else
             return node;
     }
     return node;
-
-}Copy to clipboardErrorCopied
+}
 ```
 
-**2、有个快慢指针的做法**
+**2、快慢指针**
 
-先说个定理：两个指针一个fast、一个slow同时从一个链表的头部出发 fast一次走2步，slow一次走一步，如果该链表有环，两个指针必然在环内相遇 此时只需要把其中的一个指针重新指向链表头部，另一个不变（还在环内）， 这次两个指针一次走一步，相遇的地方就是入口节点。 这个定理可以自己去网上看看证明。
+先说个定理：两个指针一个 fast、一个 slow 同时从一个链表的头部出发 fast一次走2步，slow 一次走一步，如果该链表有环，两个指针必然在环内相遇 此时只需要把其中的一个指针重新指向链表头部，另一个不变（还在环内）， 这次两个指针一次走一步，相遇的地方就是入口节点。 这个定理可以自己去网上看看证明。
 
 ```C++
-ListNode* EntryNodeOfLoop(ListNode* pHead)
-{
-    ListNode*fast=pHead,*low=pHead;
-    while(fast&&fast->next){
-        fast=fast->next->next;
-        low=low->next;
-        if(fast==low)
-            break;
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while (fast && fast->next)
+        {
+            slow = slow->next;
+            fast = fast->next->next;
+            if (slow == fast)
+            {
+                ListNode* slow2 = head;
+                while (slow2 != slow)
+                {
+                    slow2 = slow2->next;
+                    slow = slow->next;
+                }
+                return slow2;
+            }
+        }
+        return nullptr;
     }
-    if(!fast||!fast->next)return NULL;
-    low=pHead;//low从链表头出发
-    while(fast!=low){//fast从相遇点出发
-        fast=fast->next;
-        low=low->next;
-    }
-    return low;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、快慢指针，常规题**
-
-运行时间：3ms 占用内存：376k
-
-```cpp
-ListNode* EntryNodeOfLoop(ListNode* pHead)
-{
-
-    if(pHead == nullptr || pHead->next == nullptr) return nullptr;
-    ListNode*fast = pHead, *slow = pHead;
-    while(fast != nullptr && fast->next != nullptr)
-    {
-        fast = fast->next->next;
-        slow = slow->next;
-        if(fast == slow) break;
-    }
-
-    if(fast == nullptr || fast->next == nullptr) return nullptr;
-    slow = pHead;
-    while(fast != slow){
-        fast = fast->next;
-        slow = slow->next;
-    }
-    return fast;      
-}Copy to clipboardErrorCopied
+};
 ```
 
 ## No56、删除链表中的重复结点
@@ -5165,185 +4878,56 @@ ListNode* EntryNodeOfLoop(ListNode* pHead)
 **输入**
 
 ```
-{1,2,3,3,4,4,5}Copy to clipboardErrorCopied
+{1,2,3,3,4,4,5}
 ```
 
 **返回值**
 
 ```
-{1,2,5}Copy to clipboardErrorCopied
+{1,2,5}
 ```
 
-**1、真的是超级笨，我服了，调试了很多遍才通过的**
-
-大概思想：采用vector保存链表中的不重复元素，然后将链表从表头开始挨个对比，一样就将当前结点保存下来，然后index++，不一样就继续向下遍历，注意边界条件。
+**题解：**
 
 ```cpp
-ListNode* deleteDuplication(ListNode* pHead)
-{
-    if (pHead == nullptr || pHead->next == nullptr) return pHead;
-    ListNode* node = (ListNode*)malloc(sizeof(struct ListNode));
-    node = pHead;
-    vector<int> result;
-    result.push_back(node->val);
-    node = node->next;
-    while (node != nullptr) {
-        if (result.size()!=0 && result.back() == node->val) {
-            while (node!=nullptr && result.back() == node->val) {
-                node = node->next;
-            }
-            result.pop_back();
-        }
-        else if (result.size() == 0 || (result.size()!=0 && result.back()!=node->val))
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) 
+    {
+        if (head == nullptr || head->next == nullptr)
+            return head;
+
+        ListNode* dummy = new ListNode(-1, head);
+        ListNode* prev = dummy;
+        ListNode* cur = head;
+        
+        while (cur)
         {
-            result.push_back(node->val);
-            node = node->next;
-        }    
-        else
-            node = node->next;
-    }
-
-    if (result.size() == 0) {
-        return nullptr;
-    }
-    node = pHead;
-    int index = 0;
-    int len = result.size();
-    ListNode* resultNode = (ListNode*)malloc(sizeof(struct ListNode));
-    while (node != nullptr) {
-        if (index<len && node->val == result[index]) {
-            index++;
-            resultNode = node;
-            break;
-
-        } node = node->next;
-    }
-    pHead = resultNode;
-    while (node != nullptr) {
-        if (index < len && node->val == result[index]) {
-            index++;
-            pHead->next = node;
-            pHead = pHead->next;
-
-        } node = node->next;
-    }
-    pHead->next = nullptr;//最后要设置尾点结束
-    return resultNode;
-}Copy to clipboardErrorCopied
-```
-
-**2、别人的思路和方法，三指针法，取到原来指针的前一个指针**
-
-1. 首先添加一个头节点，以方便碰到第一个，第二个节点就相同的情况
-
- 2.设置 pre ，cur指针， pre指针指向当前确定不重复的那个节点，而last指针相当于工作指针，一直往后面搜索。
-
-```cpp
-if (pHead == nullptr || pHead->next == nullptr) { return pHead; }
-    ListNode *Head = (ListNode*)malloc(sizeof(struct ListNode));
-    ListNode* pre = (ListNode*)malloc(sizeof(struct ListNode));
-    ListNode* cur = (ListNode*)malloc(sizeof(struct ListNode));
-    Head->next = pHead;
-    pre = Head; //pre相当于原来节点的前一个节点
-    cur = Head->next; //cur相当于 原来的节点
-    while (cur != nullptr) {
-        if (cur->next != nullptr && cur->val == cur->next->val) {
-            // 找到最后的一个相同节点
-            while (cur->next != nullptr && cur->val == cur->next->val) {
-                cur = cur->next;
-            }
-            pre->next = cur->next; //这里等于cur->next真的很棒
-            cur = cur->next;
-        }
-        else {
-            pre = pre->next;
-            cur = cur->next;
-        }
-    }
-    return Head->next;Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、三指针法，可以将元素开辟到栈上**
-
-```cpp
-ListNode* deleteDuplication(ListNode* pHead)
-{
-
-    if(pHead == nullptr || pHead->next == nullptr) return pHead;
-    ListNode dummpyHead(0);
-    dummpyHead.next = pHead;
-    ListNode *pre = &dummpyHead;
-    ListNode *cur = dummpyHead.next;//cur是真正工作的节点
-    while(cur != nullptr){
-        if(cur->next != nullptr && cur->val == cur->next->val){
-            while(cur->next != nullptr && cur->val == cur->next->val)
+            bool flag = false;
+            while (cur->next && cur->val == cur->next->val)	// 删除节点
             {
+                ListNode* tmp = cur;
                 cur = cur->next;
-            }
-            pre->next = cur->next;//这里还不要马上把 pre 赋值过来
-            cur = cur->next;
-        }else{
-            pre = pre->next;
-            cur = cur->next;
-        }
-    }
-    return dummpyHead.next;
-}Copy to clipboardErrorCopied
-```
-
-**变种：删除链表中的重复结点，保留一个重复点**
-
-在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->3->4->5
-
-```cpp
-ListNode* deleteDuplication(ListNode* pHead)
-{
-    if (pHead == nullptr) return nullptr;
-    ListNode* node = (ListNode*)malloc(sizeof(struct ListNode));
-    node = pHead;
-    while (node != nullptr) {
-
-        if (node->next!=nullptr && node->val == node->next->val) {//这里千万要判断node->next也不为空才可以
-            while (node->next != nullptr && node->val == node->next->val) {
-                node->next = node->next->next;
-            }
-        }
-        node = node->next;
-    }
-    return pHead;
-}Copy to clipboardErrorCopied
-```
-
-**另一种写法**
-
-```cpp
-ListNode* deleteDuplication(ListNode* pHead)
-{
-    if (pHead == nullptr || pHead->next == nullptr) return pHead;
-    ListNode dummpyHead(0);
-    dummpyHead.next = pHead;
-    ListNode* pre = &dummpyHead;
-    ListNode* cur = dummpyHead.next;
-    while (cur != nullptr) {
-        if (cur->next != nullptr && cur->val == cur->next->val) {
-            while (cur->next != nullptr && cur->val == cur->next->val)
+                delete tmp;
+                flag = true;
+            } 
+            if (flag)						// 删除最后一个重复的节点
             {
+                ListNode* tmp = cur;
                 cur = cur->next;
+                delete tmp;
             }
-            pre->next = cur;
-            pre = pre->next;
-            cur = cur->next;
+            else
+            {
+                prev->next = cur;
+                prev = prev->next;
+                cur = cur->next;                
+            }
         }
-        else {
-            pre = pre->next;
-            cur = cur->next;
-        }
-
+        prev->next = cur;				// 最后指向 nullptr
+        return dummy->next;
     }
-    return dummpyHead.next;
-}Copy to clipboardErrorCopied
+};
 ```
 
 ## No57、二叉树的下一个结点
