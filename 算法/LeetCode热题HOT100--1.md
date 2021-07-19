@@ -36,7 +36,8 @@
 ```cpp
 class Solution {
 public:
-    vector<int> twoSum(vector<int>& nums, int target) {
+    vector<int> twoSum(vector<int>& nums, int target) 
+    {
         unordered_map<int, int> HashMap;
         for (int i = 0; i < nums.size(); ++i)
         {
@@ -503,11 +504,55 @@ pair<int, int> extend(const string s, int i, int j, int n)
 输出：[]
 ```
 
+**题解：双指针**
 
+```cpp
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) 
+    {
+        vector<vector<int>> result;
+        sort(nums.begin(), nums.end());
+        for (int i = 0; i < nums.size(); i++)
+        {
+            if (nums[i] > 0)
+            {
+                break;
+            }
+            if (i > 0 && nums[i] == nums[i - 1])		// 第一个元素去重
+            {
+                continue;
+            }
+            int left = i + 1;
+            int right = nums.size() - 1;
+            while (left < right)
+            {
+                if (nums[left] + nums[right] + nums[i] == 0)
+                {
+                    result.push_back({nums[i], nums[left], nums[right]});
+                    while (left < right && nums[left] == nums[left + 1])	// 第二个元素去重
+                        left++;
 
-
-
-
+                    while (left < right && nums[right] == nums[right - 1])	// 第三个元素去重
+                        right--;
+                    
+                    left++;
+                    right--;
+                }
+                else if (nums[left] + nums[right] + nums[i] > 0)
+                {
+                    right--;
+                }
+                else
+                {
+                    left++;
+                }
+            }
+        }
+        return result;
+    }
+};
+```
 
 ## 17.电话号码的字母组合
 
