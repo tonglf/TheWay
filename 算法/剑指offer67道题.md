@@ -141,31 +141,33 @@ bool Find(int target, vector<vector<int> > array) {
 **1、首先统计出长度，然后从后向前替换**
 
 ```cpp
-void replaceSpace(char *str,int length) {//int length是指当前的长度
-    int spaceCount = 0;
-    int totalLen = length;
-    for(int i = 0; i < length; ++i)
-    {
-        if(str[i] == ' ') 
-            spaceCount++;
-    }
-
-    totalLen += spaceCount*2;
-    for(int i = length-1; i >= 0 && spaceCount >= 0; --i)	// spaceCount = 0 时已经无空格，不用继续赋值
-    {
-        if(str[i] != ' ') 
-            str[--totalLen] = str[i];	// 先 -- 后赋值，因为 totalLen 为字符的长度，索引要先减一
-        
-        else
+class Solution {
+public:
+    string replaceSpace(string s) {
+        int count = 0;
+        int n = s.size();
+        for (int i = 0; i < n; ++i)
         {
-            str[--totalLen] = '0';
-            str[--totalLen] = '2';
-            str[--totalLen] = '%';    
-            spaceCount--;
+            if (s[i] == ' ')
+                count++;
         }
-
+        s.resize(n + count * 2);		// 重点
+        for (int i = n - 1, j = s.size() - 1; i >= 0; --i, --j)
+        {
+            if (s[i] == ' ')
+            {
+                s[j--] = '0';
+                s[j--] = '2';
+                s[j] = '%'; 
+            }
+            else
+            {
+                s[j] = s[i];
+            }
+        }
+        return s;
     }
-}
+};
 ```
 
 ## No3、从尾到头打印链表
@@ -1710,7 +1712,7 @@ TreeNode* Convert(TreeNode* pRootOfTree)
 **输入描述:**
 
 ```
-输入一个字符串,长度不超过9(可能有字符重复),字符只包括大小写字母。Copy to clipboardErrorCopied
+输入一个字符串,长度不超过9(可能有字符重复),字符只包括大小写字母。
 ```
 
 **示例1**
@@ -1718,13 +1720,13 @@ TreeNode* Convert(TreeNode* pRootOfTree)
 **输入**
 
 ```
-"ab"Copy to clipboardErrorCopied
+"ab"
 ```
 
 **返回值**
 
 ```
-["ab","ba"]Copy to clipboardErrorCopied
+["ab","ba"]
 ```
 
 **1、一个很奇特的函数next_permutation**
@@ -2334,13 +2336,13 @@ int GetUglyNumber_Solution(int index) {
 **输入**
 
 ```
-"google"Copy to clipboardErrorCopied
+"google"
 ```
 
 **返回值**
 
 ```
-4Copy to clipboardErrorCopied
+4
 ```
 
 **1、挺简单的，想多了**
@@ -3365,61 +3367,28 @@ vector<int> FindNumbersWithSum(vector<int> array,int sum) {
 **输入**
 
 ```
-"abcXYZdef",3Copy to clipboardErrorCopied
+"abcXYZdef",3
 ```
 
 **返回值**
 
 ```
-"XYZdefabc"Copy to clipboardErrorCopied
+"XYZdefabc"
 ```
 
-**1、我真的是太傻比了，其实很容易的**
+**题解：**
 
 ```cpp
- string LeftRotateString(string str, int n) {
-    int len = str.size();
-    if(len==0) return str;//考虑str为空
-    if (n >= len) n = n % len;//考虑n比str的长度还要大的情况下
-    string temp = str + str;
-    string result;
-    result.resize(len);
-    for (int i = n,index=0; i <len+n; ++i,++index) {
-        result[index] = temp[i];
+class Solution {
+public:
+    string reverseLeftWords(string s, int n) 
+    {
+        reverse(s.begin(), s.begin() + n);
+        reverse(s.begin() + n, s.end());
+        reverse(s.begin(), s.end());
+        return s;
     }
-    return result;
-    }Copy to clipboardErrorCopied
-```
-
-**2、精简做法**
-
-```cpp
-string LeftRotateString(string str, int n) {
-    int len = str.size();
-    if(len==0) return str;
-    if (n >= len) n = n % len;
-    str += str;
-    return str.substr(n,len);
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、简单的字符串处理函数，记得边界条件**
-
-运行时间：2ms 占用内存：376k
-
-```cpp
-string LeftRotateString(string str, int n) {
-        int len = str.size();
-        if(len <= 1) return str;//可能为空
-        n = n%len;//并且n有可能比len大的情况
-        vector<char> temp(str.begin(),str.end());
-        for(int i = 0;i < n;++i)
-            temp.push_back(str[i]);
-        str.assign(n + temp.begin(),temp.end());
-        return std::move(str);
-    }Copy to clipboardErrorCopied
+};
 ```
 
 ## No44、反转单词序列
@@ -3435,21 +3404,23 @@ string LeftRotateString(string str, int n) {
 **输入**
 
 ```
-"nowcoder. a am I"Copy to clipboardErrorCopied
+"nowcoder. a am I"
 ```
 
 **返回值**
 
 ```
-"I am a nowcoder."Copy to clipboardErrorCopied
+"I am a nowcoder."
 ```
 
 **1、别想太多，能做出来就好**
 
 ```cpp
-string ReverseSentence(string str) {
+string ReverseSentence(string str) 
+{
     string res = "", tmp = "";
-    for (unsigned int i = 0; i < str.size(); ++i) {
+    for (unsigned int i = 0; i < str.size(); ++i) 
+    {
         if (str[i] == ' ')
         {
             res = " " + tmp + res;
@@ -3460,34 +3431,7 @@ string ReverseSentence(string str) {
     if (tmp.size()) 
         res = tmp + res;
     return res;
-}Copy to clipboardErrorCopied
-```
-
-**2、借助栈 反而会出错，直接第一种方法就可以**
-
-**二刷：**
-
-**直接做就行**
-
-运行时间：2ms 占用内存：464k
-
-```cpp
-string ReverseSentence(string str) {
-    if (str.size() <= 1) return str;
-    string result, temp;
-    for (int i = str.size() - 1; i >= 0; --i) {
-        if (str[i] != ' ') {
-            temp = str[i] + temp;
-        }
-        else if (str[i] == ' ') {
-            result = result + temp + " ";
-            temp = "";
-        }
-    }
-    if (temp.size() != 0) result = result + temp;
-
-    return std::move(result);
-}Copy to clipboardErrorCopied
+}
 ```
 
 ## No45、扑克牌顺子
@@ -3989,14 +3933,14 @@ int Add(int num1, int num2)
 
 ```
 +2147483647
-1a33Copy to clipboardErrorCopied
+1a33
 ```
 
 **输出**
 
 ```
 2147483647
-0Copy to clipboardErrorCopied
+0
 ```
 
 **1、自己思考的一种笨方法,这题用C++ AC 不了**
@@ -4566,13 +4510,13 @@ public:
 **输入**
 
 ```
-"123.45e+6"Copy to clipboardErrorCopied
+"123.45e+6"
 ```
 
 **返回值**
 
 ```
-trueCopy to clipboardErrorCopied
+true
 ```
 
 **示例2**
@@ -4580,13 +4524,13 @@ trueCopy to clipboardErrorCopied
 **输入**
 
 ```
-"1.2.3"Copy to clipboardErrorCopied
+"1.2.3"
 ```
 
 **返回值**
 
 ```
-falseCopy to clipboardErrorCopied
+false
 ```
 
 **1、看的写法，很好**
