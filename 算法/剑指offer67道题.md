@@ -4321,13 +4321,13 @@ vector<int> multiply(const vector<int>& A) {
 **输入**
 
 ```
-"aaa","a*a"Copy to clipboardErrorCopied
+"aaa","a*a"
 ```
 
 **返回值**
 
 ```
-trueCopy to clipboardErrorCopied
+true
 ```
 
 **1、太他吗难了，不会不会，老子不会**
