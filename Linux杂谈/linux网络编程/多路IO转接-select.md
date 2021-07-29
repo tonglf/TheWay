@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
                     for (j = 0; j < n; j++)
                     {
                         buf[j] = toupper(buf[j]);
-                        
+                    }   
                     write(i, buf, n);
                 }
             }
