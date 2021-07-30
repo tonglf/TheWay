@@ -68,14 +68,14 @@ bool LRUCache<KeyT, ValueT>::put(KeyT key, ValueT value)
     {
         // 从链表里删除老数据
         m_list.erase(itor->second);
-        // 从哈希表中删除老数据
+        // 从哈希表中删除老数据 (迭代器位置也会改变，map 也要更新)
         m_map.erase(itor);
     }
     
     // 插入到链表队头
     m_list.push_front(std::make_pair(key, value));
     // 将队头的链表节点存放到哈希表
-    m_map[key] = m_list.begn();
+    m_map[key] = m_list.begin();
     
     // 当链表阈值超过阈值后，要进行末尾删除
     if (m_list.size() > m_capacity())
@@ -103,22 +103,19 @@ bool LRUCache<KeyT, ValueT>::get(KeyT key, ValueT* pvalue)
     }
     
     // 如果存在：
-    // 判断是否在队列头
-    // 在队列头，不需要更新
-    if (mapItor == m_map.begin())
-    {
-        // 取出链表节点内容 key-value 的 value 值，然后赋值
-    	*pValue = mapItor-second->second;    
-    	return true;
-    }
-    
-    // 不在队列头，需要更新
     // 1.链表要将数据删除
     // 2.再将数据加入到链表表头
     // 目的是为了维持链表队头是最近访问的数据
     
     // 取出哈希表的 value 值，也就是链表节点
     typename List::iterator listItor = mapItor->second;
+    
+    // 判断是否已经在队头
+    if (listItor == m_list.begin())
+    {
+        *pValue = listItor->second();
+        return true;
+    }
     
     // 创建新的键值对
     std::pair<KeyT, ValueT> listPair = std::make_pair(listItor->first, listItor->second);
@@ -127,7 +124,7 @@ bool LRUCache<KeyT, ValueT>::get(KeyT key, ValueT* pvalue)
     m_list.erase(listItor);
     
     // 将数据加入到队头
-    m_list.erase(listPair);
+    m_list.push_front(listPair);
     
     // 更新哈希表
     m_map[key] = m_list.begin();
