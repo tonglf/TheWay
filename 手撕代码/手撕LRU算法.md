@@ -78,7 +78,7 @@ bool LRUCache<KeyT, ValueT>::put(KeyT key, ValueT value)
     m_map[key] = m_list.begin();
     
     // 当链表阈值超过阈值后，要进行末尾删除
-    if (m_list.size() > m_capacity())
+    if (m_list.size() > m_capacity)
     {
         // 获取链表末尾的 key 值，以便哈希表能删除该节点
         KeyT endKey = m_list.back().first;
@@ -113,7 +113,7 @@ bool LRUCache<KeyT, ValueT>::get(KeyT key, ValueT* pvalue)
     // 判断是否已经在队头
     if (listItor == m_list.begin())
     {
-        *pValue = listItor->second();
+        *pValue = listItor->second;
         return true;
     }
     
