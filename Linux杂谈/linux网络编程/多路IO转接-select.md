@@ -36,13 +36,17 @@ int main(int argc, char *argv[])
     socklen_t clie_addr_len;
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);  
+    
     int opt = 1;
     setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
     bzero(&serv_addr, sizeof(serv_addr));
+    
     serv_addr.sin_family= AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port= htons(SERV_PORT);
+    
     bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    
     listen(listenfd, 128);
     
     fd_set rset, allset;                            // rset 读事件文件描述符集合 allset 用来暂存 
@@ -55,7 +59,7 @@ int main(int argc, char *argv[])
     while (1) 
     {   
         rset = allset;                                          // 每次循环时都从新设置 select 监控信号集 
-        nready = select(maxfd+1, &rset, NULL, NULL, NULL);
+        nready = select(maxfd + 1, &rset, NULL, NULL, NULL);
         if (nready < 0)
             perr_exit("select error");
 
@@ -64,16 +68,16 @@ int main(int argc, char *argv[])
             clie_addr_len = sizeof(clie_addr);
             connfd = accept(listenfd, (struct sockaddr *)&clie_addr, &clie_addr_len);// Accept 不会阻塞 
 
-            FD_SET(connfd, &allset);                  // 向监控文件描述符集合allset添加新的文件描述符 connfd 
+            FD_SET(connfd, &allset);                 // 向监控文件描述符集合 allset 添加新的文件描述符 connfd 
 
             if (maxfd < connfd)
                 maxfd = connfd;
 
-            if (0 == --nready)                                  // 只有listenfd有事件, 后续的 for 不需执行 
+            if (0 == --nready)                                // 只有 listenfd 有事件, 后续的 for 不需执行 
                 continue;
         } 
 
-        for (i = listenfd+1; i <= maxfd; i++)                   // 检测哪个clients 有数据就绪 
+        for (i = listenfd + 1; i <= maxfd; i++)                // 检测哪个 clients 有数据就绪 
 		{
             if (FD_ISSET(i, &rset)) 
             {
@@ -145,11 +149,11 @@ int  FD_ISSET(int fd, fd_set *set);	--- 判断一个文件描述符是否在监�
 ```cpp
 int select(int nfds, fd_set *readfds, fd_set *writefds,fd_set *exceptfds, struct timeval *timeout);
 
-	nfds：监听的所有文件描述符中，最大文件描述符+1
+	nfds：监听的所有文件描述符中，最大文件描述符 + 1
 
-	readfds： 读 文件描述符监听集合。	传入、传出参数
+	readfds：  读 文件描述符监听集合。	传入、传出参数
 
-	writefds：写 文件描述符监听集合。	传入、传出参数		NULL
+	writefds： 写 文件描述符监听集合。	传入、传出参数		NULL
 
 	exceptfds：异常 文件描述符监听集合	传入、传出参数		NULL
 

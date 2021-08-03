@@ -18,8 +18,6 @@ epoll 是 Linux 下多路复用 IO 接口 select / poll 的增强版本，**它�
 #include <errno.h>
 #include <ctype.h>
 
-#include "wrap.h"
-
 #define MAXLINE 8192
 #define SERV_PORT 8000
 
@@ -62,7 +60,7 @@ int main(int argc, char *argv[])
     if (res == -1)
         perr_exit("epoll_ctl error");
 
-    for ( ; ; ) 
+    while (1) 
     {
         // epoll 为 server 阻塞监听事件, ep 为 struct epoll_event 类型数组, OPEN_MAX 为数组容量, -1表永久阻塞
         nready = epoll_wait(efd, ep, OPEN_MAX, -1); 
