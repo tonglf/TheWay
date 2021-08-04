@@ -1,6 +1,8 @@
 # CS模型-UDP
 
-**server**
+## 代码实现
+
+### server
 
 ```cpp
 #include <string.h>
@@ -54,7 +56,7 @@ int main(void)
 }
 ```
 
-**client**
+### client
 
 ```cpp
 #include <stdio.h>
@@ -85,7 +87,7 @@ int main(int argc, char *argv[])
         if (n == -1)
             perror("sendto error");
 
-        n = recvfrom(sockfd, buf, BUFSIZ, 0, NULL, 0);         //NULL:不关心对端信息
+        n = recvfrom(sockfd, buf, BUFSIZ, 0, NULL, 0);         // NULL:不关心对端信息
         if (n == -1)
             perror("recvfrom error");
 
@@ -96,5 +98,43 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+```
+
+## 函数原型
+
+```cpp
+// read(cfd, buf, sizeof) --- 被替换 --- recvfrom（） --- 涵盖accept传出地址结构。
+ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+                 struct sockaddr *src_addr, socklen_t *addrlen);
+
+					sockfd： 套接字
+					buf：	缓冲区地址
+					len：	缓冲区大小
+					flags： 	0
+
+					src_addr：（struct sockaddr *）&addr 传出。 对端地址结构
+					addrlen：传入传出。
+
+				返回值： 	
+                        成功： 成功接收数据字节数。 
+                        失败：	-1 errn。 0： 对端关闭。
+
+                        
+                        
+// write();--- 被替换 --- sendto（）---- connect
+ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+               const struct sockaddr *dest_addr, socklen_t addrlen);
+
+					sockfd： 套接字
+					buf：存储数据的缓冲区
+					len：数据长度
+					flags： 0
+
+					src_addr：（struct sockaddr *）&addr 传入。 目标地址结构
+					addrlen：地址结构长度。
+
+				返回值：
+                        成功：	成功写出数据字节数。 
+                        失败： -1， errno                        
 ```
 
