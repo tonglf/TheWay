@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 ## 函数原型
 
 ```cpp
-int epoll_create(int size);						// 创建一棵监听红黑树
+	int epoll_create(int size);						// 创建一棵监听红黑树
 
 // size：创建的红黑树的监听节点数量。（仅供内核参考。）
 
@@ -140,33 +140,27 @@ int epoll_create(int size);						// 创建一棵监听红黑树
 
 
 
-int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);	// 操作监听红黑树
+	int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);	// 操作监听红黑树
 
 	// epfd：epoll_create 函数的返回值。 epfd
 
 	// op：对该监听红黑数所做的操作。
 
-	//		EPOLL_CTL_ADD 添加fd到 监听红黑树
-
-	//		EPOLL_CTL_MOD 修改fd在 监听红黑树上的监听事件。
-
-	//		EPOLL_CTL_DEL 将一个fd 从监听红黑树上摘下（取消监听）
+	//		EPOLL_CTL_ADD 添加 fd 到监听红黑树
+	//		EPOLL_CTL_MOD 修改 fd 在监听红黑树上的监听事件。
+	//		EPOLL_CTL_DEL 将一个 fd 从监听红黑树上摘下（取消监听）
 
 	// fd：
 	//		待监听的fd
 
 	// event：	本质 struct epoll_event 结构体 地址
-
-	//	成员 events：
-
-	//		EPOLLIN / EPOLLOUT / EPOLLERR
-
-	//	成员 data： 联合体（共用体）：
-
-	//		int fd;	  对应监听事件的 fd
-	//		void *ptr； 
-	//		uint32_t u32;
-	//		uint64_t u64;		
+	//		成员 events：
+	//				EPOLLIN / EPOLLOUT / EPOLLERR
+	//		成员 data： 联合体（共用体）：
+	//				int fd;	  对应监听事件的 fd
+	//				void *ptr； 
+	//				uint32_t u32;
+	//				uint64_t u64;		
 
 	// 返回值：
 	//		成功 0； 
@@ -174,23 +168,23 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);	// 操作监
 
 
 
-int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout); 	 // 阻塞监听
+	int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout); 	 // 阻塞监听
 
 	// epfd：epoll_create 函数的返回值。 epfd
 
-	// events：传出参数，【数组】， 满足监听条件的 哪些 fd 结构体。
+	// events：传出参数，【数组】， 满足监听条件的哪些 fd 结构体。
 
-	// maxevents：数组 元素的总个数。 1024			
+	// maxevents：数组元素的总个数。 1024			
 	//		struct epoll_event evnets[1024]
 
 	// timeout：
 	//		-1: 阻塞
 	//		0 ：不阻塞
-	//		>0: 超时时间 （毫秒）
+	//		>0: 超时时间（毫秒）
 
 	// 返回值：
-	//		>0: 满足监听的 总个数。 可以用作循环上限。
-	//		0 ： 没有fd满足监听事件
+	//		>0: 满足监听的总个数。 可以用作循环上限。
+	//		0 ： 没有 fd 满足监听事件
 	//		-1：	失败。 errno
 ```
 
