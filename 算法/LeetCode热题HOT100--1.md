@@ -365,13 +365,49 @@ pair<int, int> extend(const string s, int i, int j, int n)
 }
 ```
 
-
-
 **方法二：动态规划**
 
 ```cpp
+class Solution {
+public:
+    string longestPalindrome(string s) 、
+    {
+        int maxLen = 1;
+        int begin = 0;
+        vector<vector<int>> dp(s.size(), vector<int>(s.size(), 0));
+        for (int i = 0; i < s.size(); i++) 
+        {
+            dp[i][i] = 1;
+        }
 
+        for (int i = s.size() - 1; i >= 0; --i)
+        {
+            for (int j = i + 1; j < s.size(); ++j)
+            {
+                if (s[i] == s[j])
+                {
+                    if (j - i < 3)
+                    {
+                        dp[i][j] = 1;
+                    }
+                    else if (dp[i + 1][j - 1])
+                    {
+                        dp[i][j] = 1;
+                    }
+                }
+                if (dp[i][j] && j - i + 1 > maxLen) 
+                {
+                    maxLen = j - i + 1;
+                    begin = i;
+                }
+            }
+        }                
+        return s.substr(begin, maxLen);
+    }
+};
 ```
+
+相似题目：[647.回文子串](https://leetcode-cn.com/problems/palindromic-substrings/)
 
 ## 10.正则表达式匹配
 
