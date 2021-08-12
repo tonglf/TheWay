@@ -20,11 +20,11 @@ private:
 	{
 		int key;
 		int value;
-		CacheNode(int k, int v) : key(k), value(v) {}
+		CacheNode(int k, int v) : key(k), value(v) { }
 	};
 
 public:
-	LRUCache(int capacity) : m_capacity(capacity) {   }
+	LRUCache(int capacity) : m_capacity(capacity) { }
 
 	int get(int key)
 	{
@@ -88,26 +88,25 @@ class LRUCache
     // ...
 };
 
-
 void main()
 {
-	LRUCache cache(5);
+	LRUCache cache( 5 );
 
-	cache.set(1, 100);
-	cache.set(2, 200);
-	cache.set(3, 300);
-	cache.set(4, 400);
-	cache.set(5, 500);
-
-	cache.printList();
-
-	cache.get(3);
-	cache.get(2);
+	cache.set( 1, 100 );
+	cache.set( 2, 200 );
+	cache.set( 3, 300 );
+	cache.set( 4, 400 );
+	cache.set( 5, 500 );
 
 	cache.printList();
 
-	cache.set(6, 600);
-	cache.set(5, 700);
+	cache.get( 3 );
+	cache.get( 2 );
+
+	cache.printList();
+
+	cache.set( 6, 600 );
+	cache.set( 5, 700 );
 
 	cache.printList();
 }
