@@ -126,6 +126,7 @@
 
 [Effective C++](./读书笔记/EffectiveC++/EffectiveC++读书笔记.md)
 
-[More Effective C++](./读书笔记/MoreEffectiveC++.md)
+[More Effective C++](./读书笔记/MoreEffectiveC++/MoreEffectiveC++.md)
 
-[秋招面经总结 C++ 篇](./读书笔记/秋招面经总结 C++ 篇.md)
+[秋招面经总结 C++ 篇](./读书笔记/秋招面经总结C++/秋招面经总结 C++ 篇.md)
+
