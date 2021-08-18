@@ -1182,9 +1182,35 @@ public:
 输出：[1]
 ```
 
+**题解：两遍扫描**
 
+```cpp
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) 
+    {
+        int i = nums.size() - 2;
+        while (i >= 0 && nums[i] >= nums[i + 1]) 
+        {
+            i--;
+        }
+        if (i >= 0) 
+        {
+            int j = nums.size() - 1;
+            while (j >= 0 && nums[i] >= nums[j]) 
+            {
+                j--;
+            }
+            swap(nums[i], nums[j]);
+        }
+        reverse(nums.begin() + i + 1, nums.end());
+    }
+};
+```
 
+**时间复杂度：O(N)**
 
+**空间复杂度：O(1)**
 
 ## 32. 最长有效括号
 
@@ -1280,11 +1306,53 @@ public:
 输出：-1
 ```
 
+**题解：二分查找**
 
+```cpp
+class Solution {
+public:
+    int search(vector<int>& nums, int target) 
+    {
+        int l = 0;
+        int r = nums.size() - 1;
+        while (l <= r)
+        {
+            int mid = l + (r - l) / 2;
+            if (nums[mid] == target)
+            {
+                return mid;
+            }
+            else if (nums[mid] < nums[r])
+            {
+                if (target > nums[mid] && target <= nums[r])
+                {
+                    l = mid + 1;
+                }
+                else
+                {
+                    r = mid - 1;
+                }
+            }
+            else
+            {
+                if (target >= nums[l] && target < nums[mid])
+                {
+                    r = mid - 1;
+                }
+                else
+                {
+                    l = mid + 1;
+                }
+            }
+        }
+        return -1;
+    }
+};
+```
 
+**时间复杂度： O(log n)**
 
-
-
+**空间复杂度：O(1)**
 
 ## 34.在排序数组中查找元素的第一个和最后一个位置
 
@@ -1319,11 +1387,57 @@ public:
 输出：[-1,-1]
 ```
 
+**题解：二分查找**
 
+```cpp
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) 
+    {
+        vector<int> result {-1, -1};
+        int l = 0;
+        int r = nums.size() - 1;
+        int ans = -1;
+        while (l <= r)						// 首先二分查找
+        {
+            int mid = l + (r - l) / 2;
+            if (nums[mid] == target)
+            {
+                ans = mid;
+                break;
+            }
+            else if (nums[mid] < target)
+            {
+                l = mid + 1;
+            }
+            else
+                r = mid - 1;
+        }
+        if (ans != -1)					// 然后左右扩散
+        {
+            int index1 = ans;
+            int index2 = ans;
+            while (index1 > 0 && nums[--index1] == target);	// 左扩散
+            if (index1 == 0 && nums[index1] == target)		// 判断第一个数是否为 target
+            {
+                result[0] = 0;
+            }
+            else
+                result[0] = index1 + 1;
+            while (index2 < nums.size() - 1 && nums[++index2] == target);	// 右扩散
+            if (nums[index2] == target)						// 判断最后一个数是否为 target
+                result[1] = index2;
+            else
+                result[1] = index2 - 1;
+        }
+        return result;
+    }
+};
+```
 
+**时间复杂度： O(log n)**
 
-
-
+**空间复杂度：O(1)**
 
 ## 39.组合求和
 
@@ -1358,11 +1472,46 @@ candidates 中的数字可以无限制重复被选取。
 ]
 ```
 
+**题解：回溯法**
 
+```cpp
+class Solution {
+private:
+    vector<vector<int>> result;
+    vector<int> path;
+    void backtracking(vector<int>& candidates, int target, int sum, int startIndex) 
+    {
+        if (sum > target) 
+        {
+            return;
+        }
+        if (sum == target) 
+        {
+            result.push_back(path);
+            return;
+        }
 
+        for (int i = startIndex; i < candidates.size(); i++) 
+        {
+            sum += candidates[i];
+            path.push_back(candidates[i]);
+            backtracking(candidates, target, sum, i); // 不用 i + 1 了，表示可以重复读取当前的数
+            sum -= candidates[i];
+            path.pop_back();
+        }
+    }
+public:
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) 
+    {
+        backtracking(candidates, target, 0, 0);
+        return result;
+    }
+};
+```
 
+**时间复杂度：**
 
-
+**空间复杂度：O*(*target)**
 
 ## 42.接雨水
 
@@ -1370,7 +1519,7 @@ candidates 中的数字可以无限制重复被选取。
 
 示例 1：
 
-![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/22/rainwatertrap.png)
+![img](./Image/42_leetcode.png)
 
 ```c++
 输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]
@@ -1386,3 +1535,36 @@ candidates 中的数字可以无限制重复被选取。
 输出：9
 ```
 
+**题解：双指针**
+
+```cpp
+class Solution {
+public:
+    int trap(vector<int>& height) 
+    {
+        int ans = 0;
+        int left = 0, right = height.size() - 1;
+        int leftMax = 0, rightMax = 0;
+        while (left < right) 
+        {
+            leftMax = max(leftMax, height[left]);
+            rightMax = max(rightMax, height[right]);
+            if (height[left] < height[right]) 
+            {
+                ans += leftMax - height[left];
+                ++left;
+            } 
+            else 
+            {
+                ans += rightMax - height[right];
+                --right;
+            }
+        }
+        return ans;
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：*O*(1)**
