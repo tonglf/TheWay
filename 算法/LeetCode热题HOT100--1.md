@@ -2,7 +2,7 @@
 
 ## 1、两数之和
 
-给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。
+给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那两个整数，并返回它们的数组下标。
 
 你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
 
@@ -169,17 +169,17 @@ ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
 int lengthOfLongestSubstring(string s) 
 {
     unordered_set<char> occ;			// 哈希集合，记录每个字符是否出现过
-    int rk = -1, ans = 0;				// 右指针，初始值为 -1，相当于我们在字符串的左边界的左侧，还没有开始移动
+    int rk = 0, ans = 0;				// 右指针，初始值为 0
     for (int i = 0; i < s.size(); ++i)
     {
         if (i != 0)
             occ.erase(s[i - 1]);		// 左指针向右移动一格，移除一个字符
-        while (rk + 1 < s.size() && !occ.count(s[rk + 1]))
+        while (rk < s.size() && !occ.count(s[rk]))  // rk 不满足要求时退出
         {
-            occ.insert(s[rk + 1]);		// 不断地移动右指针
+            occ.insert(s[rk]);		// 不断地移动右指针
             rk++;
         }
-        ans = max(ans, rk - i + 1);		// 第 i 到 rk 个字符是一个极长的无重复字符子串
+        ans = max(ans, rk - i);		// 第 i 到 rk 个字符是一个极长的无重复字符子串，不包括 rk
     }
     return ans;
 }
@@ -229,7 +229,7 @@ int lengthOfLongestSubstring(string s)
 **题解：二分法**
 
 ```cpp
-double findMedianSortedArrays(int[] nums1, int[] nums2) 
+double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) 
 {
 	int length1 = nums1.size(), length2 = nums2.size();
 	int totalLength = length1 + length2;
@@ -248,7 +248,7 @@ double findMedianSortedArrays(int[] nums1, int[] nums2)
     }
 }
 
-int getKthElement(int[] nums1, int[] nums2, int k) 
+int getKthElement(vector<int>& nums1, vector<int>& nums2, int k) 
 {
     int length1 = nums1.size(), length2 = nums2.size();
     int index1 = 0, index2 = 0;
@@ -290,7 +290,7 @@ int getKthElement(int[] nums1, int[] nums2, int k)
 
 - **时间复杂度：O(log(m+n))**
 
-- **空间复杂度：O(1)O(1)**
+- **空间复杂度：O(1)**
 
 ## 5.最长回文子串
 
@@ -351,7 +351,7 @@ string longestPalindrome(string s)
             end = right2;
         }
     }
-    return s.substr(start, (e))
+    return s.substr(start, end - start + 1);
 }
 
 pair<int, int> extend(const string s, int i, int j, int n)
@@ -459,11 +459,60 @@ public:
 输出：false
 ```
 
+**题解：动态规划**
 
+```cpp
+class Solution {
+public:
+    bool isMatch(string s, string p) 
+    {
+        int m = s.size();
+        int n = p.size();
 
+        auto matches = [&](int i, int j) 
+        {
+            if (i == 0) 
+            {
+                return false;
+            }
+            if (p[j - 1] == '.') 
+            {
+                return true;
+            }
+            return s[i - 1] == p[j - 1];
+        };
 
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+        dp[0][0] = true;
+        for (int i = 0; i <= m; ++i) 
+        {
+            for (int j = 1; j <= n; ++j) 
+            {
+                if (p[j - 1] == '*') 
+                {
+                    dp[i][j] |= dp[i][j - 2];
+                    if (matches(i, j - 1)) 
+                    {
+                        dp[i][j] |= dp[i - 1][j];
+                    }
+                }
+                else 
+                {
+                    if (matches(i, j)) 
+                    {
+                        dp[i][j] |= dp[i - 1][j - 1];
+                    }
+                }
+            }
+        }
+        return dp[m][n];
+    }
+};
+```
 
+**时间复杂度：*O*(m*n)**
 
+**空间复杂度：*O*(m*n)**
 
 ## 11.盛最多水的容器
 
@@ -505,11 +554,36 @@ public:
 输出：2
 ```
 
+**题解：双指针**
 
+```cpp
+class Solution {
+public:
+    int maxArea(vector<int>& height) 
+    {
+        int l = 0, r = height.size() - 1;
+        int ans = 0;
+        while (l < r) 
+        {
+            int area = min(height[l], height[r]) * (r - l);
+            ans = max(ans, area);
+            if (height[l] <= height[r]) 
+            {
+                ++l;
+            }
+            else 
+            {
+                --r;
+            }
+        }
+        return ans;
+    }
+};
+```
 
+**时间复杂度：O(N)**
 
-
-
+**空间复杂度：O(1)**
 
 ## 15.三数之和
 
@@ -590,13 +664,16 @@ public:
 };
 ```
 
+**时间复杂度：O(N^2)**
+**空间复杂度：O(log N)**
+
 ## 17.电话号码的字母组合
 
 给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
 
 给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
 
-<img src="https://assets.leetcode-cn.com/aliyun-lc-upload/original_images/17_telephone_keypad.png" alt="img" style="zoom: 33%;" />
+<img src="./Image/17_leetcode.png" alt="img" style="zoom: 50%;" />
 
 示例 1：
 
@@ -650,12 +727,12 @@ public:
             return;
         }
         
-        int digit = digits[index] - '0';        // 将index指向的数字转为int
+        int digit = digits[index] - '0';        // 将 index 指向的数字转为 int
         string letters = letterMap[digit];      // 取数字对应的字符集
         for (int i = 0; i < letters.size(); i++) 
         {
             s.push_back(letters[i]);            // 处理
-            backtracking(digits, index + 1);    // 递归，注意index+1，一下层要处理下一个数字了
+            backtracking(digits, index + 1);    // 递归，注意index + 1，一下层要处理下一个数字了
             s.pop_back();                       // 回溯
         }
     }
@@ -701,11 +778,33 @@ public:
 输出：[1]
 ```
 
+**题解：快慢指针**
 
+```cpp
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) 
+    {
+        ListNode* dummy = new ListNode(-1, head);
+        ListNode* slow = dummy;
+        ListNode* fast = dummy;
+        while (n--)
+        {
+            fast = fast->next;
+        }
+        while (fast->next)
+        {
+            fast = fast->next;
+            slow = slow->next;
+        }
+        slow->next = slow->next->next;
+        return dummy->next;
+    }
+};
+```
 
-
-
-
+**时间复杂度：O(N)**
+**空间复杂度：O(1)**
 
 ## 20.有效的括号
 
@@ -755,19 +854,56 @@ public:
 输出：true
 ```
 
+**题解：栈**
 
+```cpp
+class Solution {
+public:
+    bool isValid(string s) 
+    {
+        stack<char> cs;
+        for (int i = 0; i < s.size(); ++i)
+        {
+            if (s[i] == '(' || s[i] == '[' || s[i] == '{')
+            {
+                if (s[i] == '(')
+                {
+                    cs.push(')');
+                }
+                else if (s[i] == '[')
+                {
+                    cs.push(']');
+                }
+                else
+                {
+                    cs.push('}');
+                }
+            }
+            else
+            {
+                if (cs.empty() || s[i] != cs.top())		// 注意！！！ 判空（例："]"）
+                {
+                    return false;
+                }
+                else
+                {
+                    cs.pop();
+                }
+            }
+        }
+        return cs.empty();		// 注意！！！ 判空(例："[")
+    }
+};
+```
 
-
-
-
+**时间复杂度：O(N)**
+**空间复杂度：O(N)**
 
 ## 21.合并两个有序数组
 
 将两个升序链表合并为一个新的 **升序** 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
 
 示例 1：
-
-![img](https://assets.leetcode.com/uploads/2020/10/03/merge_ex1.jpg)
 
 ```cpp
 输入：l1 = [1,2,4], l2 = [1,3,4]
@@ -790,11 +926,81 @@ public:
 输出：[0]
 ```
 
+**题解：**
 
+**方法一：递归**
 
+```cpp
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) 
+    {
+        if (l1 == nullptr) 
+        {
+            return l2;
+        } 
+        else if (l2 == nullptr) 
+        {
+            return l1;
+        } 
+        else if (l1->val < l2->val) 
+        {
+            l1->next = mergeTwoLists(l1->next, l2);
+            return l1;
+        } 
+        else 
+        {
+            l2->next = mergeTwoLists(l1, l2->next);
+            return l2;
+        }
+    }
+};
+```
 
+**时间复杂度：O(M + N)**
+**空间复杂度：O(M + N)**
 
+**方法二：迭代**
 
+```cpp
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) 
+    {
+        ListNode* dummy = new ListNode(-1);
+        ListNode* cur = dummy;
+        while (l1 && l2)
+        {
+            if (l1->val <= l2->val)
+            {
+                cur->next = l1;
+                l1 = l1->next;
+            }
+            else
+            {
+                cur->next = l2;
+                l2 = l2->next;
+            }
+            cur = cur->next;
+        }
+        
+        //if (l1)
+        //{
+        //    cur->next = l1;
+        //}
+        //if (l2)
+        //{
+        //    cur->next = l2;
+        //}
+        cur->next = l1 == nullptr ? l2 : l1;
+        
+        return dummy->next;
+    }
+};
+```
+
+**时间复杂度：O(M + N)**
+**空间复杂度：O(1)**
 
 ## 22.括号生成
 
@@ -814,17 +1020,50 @@ public:
 输出：["()"]
 ```
 
+**题解：回溯法**
 
+```cpp
+class Solution {
+    void backtrack(vector<string>& ans, string& cur, int open, int close, int n) 
+    {
+        if (cur.size() == n * 2) 
+        {
+            ans.push_back(cur);
+            return;
+        }
+        if (open < n) 
+        {
+            cur.push_back('(');
+            backtrack(ans, cur, open + 1, close, n);
+            cur.pop_back();
+        }
+        if (close < open) 
+        {
+            cur.push_back(')');
+            backtrack(ans, cur, open, close + 1, n);
+            cur.pop_back();
+        }
+    }
+public:
+    vector<string> generateParenthesis(int n) 
+    {
+        vector<string> result;
+        string current;
+        backtrack(result, current, 0, 0, n);
+        return result;
+    }
+};
+```
 
+**时间复杂度：**
 
+**空间复杂度：O(n)**
 
 ## 23.合并 K 个升序链表
 
 给你一个链表数组，每个链表都已经按升序排列。
 
 请你将所有链表合并到一个升序链表中，返回合并后的链表。
-
- 
 
 示例 1：
 
@@ -857,11 +1096,53 @@ public:
 输出：[]
 ```
 
+**题解：分治合并——两两链表合并**
 
+```cpp
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) 
+    {
+        if (l1 == nullptr) 
+        {
+            return l2;
+        } 
+        else if (l2 == nullptr) 
+        {
+            return l1;
+        } 
+        else if (l1->val < l2->val) 
+        {
+            l1->next = mergeTwoLists(l1->next, l2);
+            return l1;
+        } 
+        else 
+        {
+            l2->next = mergeTwoLists(l1, l2->next);
+            return l2;
+        }
+    }
 
+    ListNode* merge(vector<ListNode*> &lists, int l, int r) 
+    {
+        if (l == r) 
+            return lists[l];
+        if (l > r) 
+            return nullptr;
+        int mid = (l + r) >> 1;
+        return mergeTwoLists(merge(lists, l, mid), merge(lists, mid + 1, r));
+    }
 
+    ListNode* mergeKLists(vector<ListNode*>& lists) 
+    {
+        return merge(lists, 0, lists.size() - 1);
+    }
+};
+```
 
+**时间复杂度：O*(*kn * log*k*)**
 
+**空间复杂度：O(log k)**
 
 ## 31.下一个排列
 
@@ -905,9 +1186,68 @@ public:
 
 
 
-## 
+## 32. 最长有效括号
 
+给你一个只包含 `'('` 和 `')'` 的字符串，找出最长有效（格式正确且连续）括号子串的长度。
 
+示例 1：
+
+```cpp
+输入：s = "(()"
+输出：2
+解释：最长有效括号子串是 "()"
+```
+
+示例 2：
+
+```cpp
+输入：s = ")()())"
+输出：4
+解释：最长有效括号子串是 "()()"
+```
+
+示例 3：
+
+```cpp
+输入：s = ""
+输出：0
+```
+
+**题解：动态规划**
+
+```cpp
+class Solution {
+public:
+    int longestValidParentheses(string s) 
+    {
+        int maxans = 0, n = s.length();
+        vector<int> dp(n, 0);
+        for (int i = 1; i < n; i++) 
+        {
+            if (s[i] == ')') 
+            {
+                if (s[i - 1] == '(') 
+                {
+                    dp[i] = (i >= 2 ? dp[i - 2] : 0) + 2;
+                } 
+                else 
+                {
+                    if (i - dp[i - 1] > 0 && s[i - dp[i - 1] - 1] == '(') // "(()())"
+                    {
+                    	dp[i] = dp[i - 1] + ((i - dp[i - 1]) >= 2 ? dp[i - dp[i - 1] - 2] : 0) + 2;    
+                    }
+                }
+                maxans = max(maxans, dp[i]);
+            }
+        }
+        return maxans;
+    }
+};
+```
+
+**时间复杂度：O*(*N)**
+
+**空间复杂度：O(N)**
 
 ## 33.搜索旋转排序数组
 
