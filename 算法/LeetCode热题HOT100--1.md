@@ -881,7 +881,7 @@ public:
             }
             else
             {
-                if (cs.empty() || s[i] != cs.top())		// 注意！！！ 判空（例："]"）
+                if (cs.empty() || s[i] != cs.top())		// 注意！！！ 判空（ 例："]" ）
                 {
                     return false;
                 }
@@ -891,7 +891,7 @@ public:
                 }
             }
         }
-        return cs.empty();		// 注意！！！ 判空(例："[")
+        return cs.empty();		// 注意！！！ 判空( 例："[" )
     }
 };
 ```
@@ -1419,11 +1419,10 @@ public:
             int index2 = ans;
             while (index1 > 0 && nums[--index1] == target);	// 左扩散
             if (index1 == 0 && nums[index1] == target)		// 判断第一个数是否为 target
-            {
                 result[0] = 0;
-            }
             else
                 result[0] = index1 + 1;
+            
             while (index2 < nums.size() - 1 && nums[++index2] == target);	// 右扩散
             if (nums[index2] == target)						// 判断最后一个数是否为 target
                 result[1] = index2;

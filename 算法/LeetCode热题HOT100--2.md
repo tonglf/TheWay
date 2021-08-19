@@ -25,14 +25,47 @@
 输出：[[1]]
 ```
 
-
+**题解：回溯法**
 
 ```cpp
+class Solution {
+    vector<vector<int>> result;
+    vector<int> path;
+public:
+    vector<vector<int>> permute(vector<int>& nums) 
+    {
+        vector<bool> used(nums.size(), false);
+        backTracking(nums, used);
+        return result;
+    }
+
+    void backTracking(const vector<int>& nums, vector<bool>& used)
+    {
+        if (path.size() == nums.size())
+        {
+            result.push_back(path);
+            return ;
+        }
+
+        for (int i = 0; i < nums.size(); ++i)
+        {
+            if (used[i] == true)
+            {
+                continue;
+            }
+            used[i] = true;
+            path.push_back(nums[i]);
+            backTracking(nums, used);
+            path.pop_back();
+            used[i] = false;
+        }
+    }
+};
 ```
 
+**时间复杂度：O*(*n *×* n!)**
 
-
-
+**空间复杂度：O*(*n)**
 
 ## 48.旋转图像
 
@@ -42,7 +75,7 @@
 
 示例 1：
 
-![img](https://assets.leetcode.com/uploads/2020/08/28/mat1.jpg)
+<img src="./Image/48_leetcode_1.jpg" alt="img" style="zoom:67%;" />
 
 ```c++
 输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
@@ -52,7 +85,7 @@
 
 示例 2：
 
-![img](https://assets.leetcode.com/uploads/2020/08/28/mat2.jpg)
+<img src="./Image/48_leetcode_2.jpg" alt="img" style="zoom: 67%;" />
 
 ```cpp
 输入：matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]
@@ -73,14 +106,37 @@
 输出：[[3,1],[4,2]]
 ```
 
-
+**题解：两次对折**
 
 ```cpp
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) 
+    {
+        for (int i = 0; i < matrix.size() - 1; ++i)				// 沿副对角线对折
+        {
+            for (int j = 0; j < matrix.size() - i - 1; ++j)
+            {
+                swap(matrix[i][j], matrix[matrix.size() - 1 - j][matrix.size() - 1 -i]);
+            }
+        }
+
+        for (int i = 0; i < matrix.size() / 2; ++i)				// 上下对折
+        {
+            for (int j = 0; j < matrix.size(); ++j)
+            {
+                swap(matrix[i][j], matrix[matrix.size() - 1 - i][j]);
+            }
+        }
+
+        return ;
+    }
+};
 ```
 
+**时间复杂度：O(N^2)**
 
-
-
+**空间复杂度：O(1)**
 
 ## 49.字母异位词分组
 
@@ -98,14 +154,32 @@
 ]
 ```
 
-
+**题解：排序**
 
 ```cpp
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        unordered_map<string, vector<string>> mp;
+        for (string& str: strs) 
+        {
+            string key = str;
+            sort(key.begin(), key.end());
+            mp[key].emplace_back(str);			// push_back 也可
+        }
+        vector<vector<string>> ans;
+        for (auto it = mp.begin(); it != mp.end(); ++it) 
+        {
+            ans.emplace_back(it->second);		// push_back 也可
+        }
+        return ans;
+    }
+};
 ```
 
+**时间复杂度：O*(*n**k *log* k）
 
-
-
+**空间复杂度：O*(*n k)**
 
 ## 53.最大子序和
 
@@ -147,14 +221,54 @@
 输出：-100000
 ```
 
-
+**题解一：遍历**
 
 ```cpp
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) 
+    {
+        int sum = 0;
+        int ans = INT_MIN;
+        for (int i = 0; i < nums.size(); ++i)
+        {
+            sum += nums[i];
+            ans = max(sum, ans);
+            if (sum < 0)
+            {
+                sum = 0;
+            }
+        }
+        return ans;
+    }
+};
 ```
 
+**时间复杂度：O(n）**
 
+**空间复杂度：O*(*1)**
 
+**题解二：动态规划**
 
+```cpp
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) 
+    {
+        int pre = 0, maxAns = nums[0];
+        for (const auto &x: nums) 
+        {
+            pre = max(pre + x, x);
+            maxAns = max(maxAns, pre);
+        }
+        return maxAns;
+    }
+};
+```
+
+**时间复杂度：O(n）**
+
+**空间复杂度：O*(*1)**
 
 ## 55.跳跃游戏
 
@@ -181,14 +295,30 @@
 解释：无论怎样，总会到达下标为 3 的位置。但该下标的最大跳跃长度是 0 ， 所以永远不可能到达最后一个下标。
 ```
 
-
-
-
+**题解：贪心**
 
 ```cpp
+class Solution {
+public:
+    bool canJump(vector<int>& nums) 
+    {
+        int cover = 0;
+        for (int i = 0; i <= cover; i++) 		// 注意这里是小于等于cover
+        { 
+            cover = max(i + nums[i], cover);
+            if (cover >= nums.size() - 1) 		// 说明可以覆盖到终点了
+            {
+                return true; 
+            }    
+        }
+        return false;
+    }
+};
 ```
 
+**时间复杂度：O(n）**
 
+**空间复杂度：O*(*1)**
 
 ## 56.合并区间
 
@@ -210,14 +340,39 @@
 解释：区间 [1,4] 和 [4,5] 可被视为重叠区间。
 ```
 
-
-
-
+**题解：贪心**
 
 ```cpp
+class Solution {
+    static bool mycmp(const vector<int>& a, const vector<int>& b)	// 值传递与引用传递性能差别巨大
+    {
+        return a[0] < b[0];
+    }
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) 
+    {
+        sort(intervals.begin(), intervals.end(), mycmp);
+        vector<vector<int>> ans;
+        ans.push_back(intervals[0]);
+        for (int i = 1; i < intervals.size(); ++i)
+        {
+            if (intervals[i][0] <= ans.back()[1])
+            {
+                ans.back()[1] = max(intervals[i][1], ans.back()[1]);
+            }
+            else
+            {
+                ans.push_back(intervals[i]);
+            }
+        }
+        return ans;
+    }
+};
 ```
 
+**时间复杂度：O(n log(n)）**（快排）
 
+**空间复杂度：O*(*1)**
 
 ## 62.不同路径
 
@@ -229,7 +384,7 @@
 
 示例 1：
 
-![img](https://assets.leetcode.com/uploads/2018/10/22/robot_maze.png)
+![img](./Image/62_leetcode.png)
 
 ```cpp
 输入：m = 3, n = 7
@@ -265,14 +420,38 @@
 输出：6
 ```
 
-
+**题解：动态规划**
 
 ```cpp
+class Solution {
+public:
+    int uniquePaths(int m, int n) 
+    {
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+        for (int i = 0; i < m; ++i)
+        {
+            dp[i][0] = 1;
+        }
+        for (int i = 1; i < n; ++i)
+        {
+            dp[0][i] = 1;
+        }
+
+        for (int i = 1; i < m; ++i)
+        {
+            for (int j = 1; j < n; ++j)
+            {
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+};
 ```
 
+**时间复杂度：O*(*m*n)**
 
-
-
+**空间复杂度：O*(*m*n)**
 
 ## 64.最小路径和
 
@@ -282,7 +461,7 @@
 
 示例 1：
 
-![img](https://assets.leetcode.com/uploads/2020/11/05/minpath.jpg)
+![img](./Image/64_leetcode.jpg)
 
 ```cpp
 输入：grid = [[1,3,1],[1,5,1],[4,2,1]]
@@ -297,14 +476,42 @@
 输出：12
 ```
 
-
+**题解：动态规划**
 
 ```cpp
+class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) 
+    {
+        int rows = grid.size();
+        int cols = grid[0].size();
+        vector<vector<int>> dp(rows, vector<int>(cols, 0));
+        dp[0][0] = grid[0][0];
+        for (int i = 1; i < rows; ++i)
+        {
+            dp[i][0] = dp[i - 1][0] + grid[i][0];
+        }
+        for (int j = 1; j < cols; ++j)
+        {
+            dp[0][j] = dp[0][j - 1] + grid[0][j];
+        }
+
+        for (int i = 1; i < rows; ++i)
+        {
+            for (int j = 1; j < cols; ++j)
+            {
+                dp[i][j] = min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+            }
+        }
+
+        return dp[rows - 1][cols - 1];
+    }
+};
 ```
 
+**时间复杂度：O*(*m*n)**
 
-
-
+**空间复杂度：O*(*m*n)**
 
 ## 70.爬楼梯
 
@@ -337,7 +544,29 @@
 3.  2 阶 + 1 阶
 ```
 
+**题解：动态规划**
 
+```cpp
+class Solution {
+public:
+    int climbStairs(int n) {
+        if (n < 3)
+            return n;
+        vector<int> dp(n + 1, 0);
+        dp[1] = 1;
+        dp[2] = 2;
+        for (int i = 3; i <= n; ++i)
+        {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[n];
+    }
+};
+```
+
+**时间复杂度：O(n)**
+
+**空间复杂度：O(1)**
 
 ## 72.编辑距离
 
@@ -373,16 +602,40 @@ exention -> exection (将 'n' 替换为 'c')
 exection -> execution (插入 'u')
 ```
 
-
+**题解：动态规划**
 
 ```cpp
+class Solution {
+public:
+    int minDistance(string word1, string word2) {
+        vector<vector<int>> dp(word1.size() + 1, vector<int>(word2.size() + 1, 0));
+        for (int i = 0; i <= word1.size(); i++) 
+            dp[i][0] = i;
+        for (int j = 0; j <= word2.size(); j++) 
+            dp[0][j] = j;
+        
+        for (int i = 1; i <= word1.size(); i++) 
+        {
+            for (int j = 1; j <= word2.size(); j++) 
+            {
+                if (word1[i - 1] == word2[j - 1]) 
+                {
+                    dp[i][j] = dp[i - 1][j - 1];
+                }
+                else 
+                {
+                    dp[i][j] = min({dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]}) + 1;
+                }
+            }
+        }
+        return dp[word1.size()][word2.size()];
+    }
+};
 ```
 
+**时间复杂度：O*(*m*n)**
 
-
-
-
-
+**空间复杂度：O*(*m*n)**
 
 ## 75.颜色分类
 
@@ -419,14 +672,40 @@ exection -> execution (插入 'u')
 输出：[1]
 ```
 
-
+**题解：双指针**
 
 ```cpp
+class Solution {
+public:
+    void sortColors(vector<int>& nums) 
+    {
+        int n = nums.size();
+        int p0 = 0, p1 = 0;
+        for (int i = 0; i < n; ++i) 
+        {
+            if (nums[i] == 1) 
+            {
+                swap(nums[i], nums[p1]);
+                ++p1;
+            } 
+            else if (nums[i] == 0) 
+            {
+                swap(nums[i], nums[p0]);
+                if (p0 < p1) 
+                {
+                    swap(nums[i], nums[p1]);
+                }
+                ++p0;
+                ++p1;
+            }
+        }
+    }
+};
 ```
 
+**时间复杂度：O(n)**
 
-
-
+**空间复杂度：O(1)**
 
 ## 76.最小覆盖子串
 
@@ -449,14 +728,59 @@ exection -> execution (插入 'u')
 输出："a"
 ```
 
-
+**题解：滑动窗口**
 
 ```cpp
+class Solution {
+public:
+    unordered_map<char, int> ori, cnt;
+
+    bool check() 
+    {
+        for (const auto &p: ori) 
+        {
+            if (cnt[p.first] < p.second) 
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    string minWindow(string s, string t) 
+    {
+        for (const auto &c: t) 
+        {
+            ++ori[c];
+        }
+
+        int l = 0, r = -1;
+        int len = INT_MAX, ansL = -1, ansR = -1;
+
+        while (r < s.size()) 
+        {
+            if (ori.find(s[++r]) != ori.end()) 
+            {
+                ++cnt[s[r]];
+            }
+            while (check() && l <= r) 
+            {
+                if (r - l + 1 < len) 
+                {
+                    len = r - l + 1;
+                    ansL = l;
+                }
+                if (ori.find(s[l]) != ori.end()) 
+                {
+                    --cnt[s[l]];
+                }
+                ++l;
+            }
+        }
+        return ansL == -1 ? string() : s.substr(ansL, len);
+    }
+};
 ```
-
-
-
-
 
 ## 78.子集
 
@@ -478,12 +802,36 @@ exection -> execution (插入 'u')
 输出：[[],[0]]
 ```
 
-
+**题解：回溯法**
 
 ```cpp
+class Solution {
+    vector<vector<int>> result;
+    vector<int> path;
+public:
+    vector<vector<int>> subsets(vector<int>& nums) 
+    {
+        backTracking(nums, 0);
+        return result;
+    }
+
+    void backTracking(const vector<int>& nums, int index)
+    {
+        result.push_back(path);
+
+        for (int i = index; i < nums.size(); ++i)
+        {
+            path.push_back(nums[i]);
+            backTracking(nums, i + 1);
+            path.pop_back();
+        }
+    }
+};
 ```
 
+**时间复杂度：O*(*n×2^n)**
 
+**空间复杂度：O*(*n)**
 
 ## 79.单词搜索
 
@@ -493,7 +841,7 @@ exection -> execution (插入 'u')
 
 示例 1：
 
-![img](https://assets.leetcode.com/uploads/2020/11/04/word2.jpg)
+![img](./Image/79_leetcode_1.jpg)
 
 ```cpp
 输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
@@ -503,7 +851,7 @@ exection -> execution (插入 'u')
 
 示例 2：
 
-![img](https://assets.leetcode.com/uploads/2020/11/04/word-1.jpg)
+![img](./Image/79_leetcode_2.jpg)
 
 ```cpp
 输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "SEE"
@@ -513,21 +861,69 @@ exection -> execution (插入 'u')
 
 示例 3：
 
-![img](https://assets.leetcode.com/uploads/2020/10/15/word3.jpg)
+![img](./Image/79_leetcode_3.jpg)
 
 ```cpp
 输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCB"
 输出：false
 ```
 
-
+**题解：回溯法**
 
 ```cpp
+class Solution {
+public:
+    bool check(vector<vector<char>>& board, vector<vector<int>>& visited, int i, int j, string& s, int k) {
+        if (board[i][j] != s[k]) 
+        {
+            return false;
+        } 
+        else if (k == s.length() - 1) 
+        {
+            return true;
+        }
+        visited[i][j] = true;
+        vector<pair<int, int>> directions{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        bool result = false;
+        for (const auto& dir: directions) 
+        {
+            int newi = i + dir.first, newj = j + dir.second;
+            if (newi >= 0 && newi < board.size() && newj >= 0 && newj < board[0].size()) 
+            {
+                if (!visited[newi][newj]) 
+                {
+                    bool flag = check(board, visited, newi, newj, s, k + 1);
+                    if (flag) 
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+        }
+        visited[i][j] = false;
+        return result;
+    }
+
+    bool exist(vector<vector<char>>& board, string word) 
+    {
+        int h = board.size(), w = board[0].size();
+        vector<vector<int>> visited(h, vector<int>(w));
+        for (int i = 0; i < h; i++) 
+        {
+            for (int j = 0; j < w; j++) 
+            {
+                bool flag = check(board, visited, i, j, word, 0);
+                if (flag) 
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+};
 ```
-
-
-
-
 
 ## 84.柱状图中最大的矩形
 
@@ -535,15 +931,13 @@ exection -> execution (插入 'u')
 
 求在该柱状图中，能够勾勒出来的矩形的最大面积。
 
- ![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/histogram.png)
+ ![img](./Image/84_leetcode_1.jpg)
 
 以上是柱状图的示例，其中每个柱子的宽度为 1，给定的高度为 [2,1,5,6,2,3]。
 
- ![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/histogram_area.png)
+ ![img](./Image/84_leetcode_2.jpg)
 
 图中阴影部分为所能勾勒出的最大矩形面积，其面积为 10 个单位。
-
- 
 
 示例:
 
@@ -552,14 +946,51 @@ exection -> execution (插入 'u')
 输出: 10
 ```
 
-
+**题解：栈**
 
 ```cpp
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) 
+    {
+        int n = heights.size();
+        vector<int> left(n), right(n);
+        
+        stack<int> mono_stack;
+        for (int i = 0; i < n; ++i) 
+        {
+            while (!mono_stack.empty() && heights[mono_stack.top()] >= heights[i]) 
+            {
+                mono_stack.pop();
+            }
+            left[i] = (mono_stack.empty() ? -1 : mono_stack.top());
+            mono_stack.push(i);
+        }
+
+        mono_stack = stack<int>();
+        for (int i = n - 1; i >= 0; --i) 
+        {
+            while (!mono_stack.empty() && heights[mono_stack.top()] >= heights[i]) 
+            {
+                mono_stack.pop();
+            }
+            right[i] = (mono_stack.empty() ? n : mono_stack.top());
+            mono_stack.push(i);
+        }
+        
+        int ans = 0;
+        for (int i = 0; i < n; ++i) 
+        {
+            ans = max(ans, (right[i] - left[i] - 1) * heights[i]);
+        }
+        return ans;
+    }
+};
 ```
 
+**时间复杂度：O*(*n)**
 
-
-
+**空间复杂度：O*(*n)**
 
 ## 85.最大矩形
 
@@ -567,7 +998,7 @@ exection -> execution (插入 'u')
 
 示例 1：
 
-![img](https://assets.leetcode.com/uploads/2020/09/14/maximal.jpg)
+![img](./Image/85_leetcode.jpg)
 
 ```c++
 输入：matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
@@ -617,7 +1048,63 @@ exection -> execution (插入 'u')
 
 给定一个二叉树的根节点 `root` ，返回它的 **中序** 遍历。
 
+**题解一：递归**
 
+```cpp
+class Solution {
+public:
+    void inorderTraversal(TreeNode* root,  vector<int>& vec)
+    {
+		if (root)
+        {
+            inorderTraversal(root->left, vec);
+            vec.push_back(root->val);
+            inorderTraversal(root->right, vec);
+        }
+    }
+    
+    vector<int> inorderTraversal(TreeNode* root) 
+    {
+		vector<int> result;
+        inorderTraversal(root, result);
+        return result;
+    }
+};
+```
+
+**题解二：迭代**
+
+```cpp
+class Solution {
+public:
+    vector<int> inorderTraversal(TreeNode* root) 
+    {
+        vector<int> result;
+        stack<TreeNode*> s;
+        TreeNode* cur = root;
+        while (!s.empty() || cur != nullptr)
+        {
+            if (cur != nullptr)
+            {
+                s.push(cur);
+                cur = cur->left;					// 进入最左侧节点
+            }
+            else
+            {
+                cur = s.top();
+                result.push_back(cur->val);			// 输出节点值
+                s.pop();
+                cur = cur->right;					// 转移至右节点
+            }
+        }
+        return result;
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*n)**
 
 ## 96.不同的二叉搜索树
 
@@ -625,7 +1112,7 @@ exection -> execution (插入 'u')
 
 **示例 1：**
 
-![img](https://assets.leetcode.com/uploads/2021/01/18/uniquebstn3.jpg)
+![img](./Image/96_leetcode.jpg)
 
 ```cpp
 输入：n = 3
@@ -639,12 +1126,32 @@ exection -> execution (插入 'u')
 输出：1
 ```
 
-
+**题解：动态规划**
 
 ```cpp
+class Solution {
+public:
+    int numTrees(int n) 
+    {
+        vector<int> G(n + 1, 0);
+        G[0] = 1;
+        G[1] = 1;
+
+        for (int i = 2; i <= n; ++i) 
+        {
+            for (int j = 1; j <= i; ++j) 
+            {
+                G[i] += G[j - 1] * G[i - j];
+            }
+        }
+        return G[n];
+    }
+};
 ```
 
+**时间复杂度 : O(n^2)**
 
+**空间复杂度：O*(*n)**
 
 ## 98.验证二叉搜索树
 
@@ -679,12 +1186,43 @@ exection -> execution (插入 'u')
      根节点的值为 5 ，但是其右子节点值为 4 。
 ```
 
-
+**题解：中序遍历**
 
 ```cpp
+class Solution {
+public:
+    bool isValidBST(TreeNode* root) 
+    {
+        stack<TreeNode*> s;
+        TreeNode* cur = root;
+        TreeNode* pre = nullptr;
+        while (!s.empty() || cur)
+        {
+            if (cur)
+            {
+                s.push(cur);
+                cur = cur->left;
+            }
+            else
+            {
+                cur = s.top();
+                s.pop();
+                if (pre && pre->val >= cur->val)
+                {
+                    return false;
+                }
+                pre = cur;
+                cur = cur->right;
+            }
+        }
+        return true;
+    }
+};
 ```
 
+**时间复杂度 : O(n)**
 
+**空间复杂度：O*(*n)**
 
 ## 101.对称二叉树
 
@@ -710,8 +1248,70 @@ exection -> execution (插入 'u')
    3    3
 ```
 
-
+**题解一：递归**
 
 ```cpp
+class Solution {
+public:
+    bool compare(TreeNode* left, TreeNode* right) 
+    {
+        if (left == NULL && right != NULL) 
+            return false;
+        else if (left != NULL && right == NULL) 
+            return false;
+        else if (left == NULL && right == NULL) 
+            return true;
+        else if (left->val != right->val) 
+            return false;
+        else 
+            return compare(left->left, right->right) && compare(left->right, right->left);
+    }
+    bool isSymmetric(TreeNode* root) 
+    {
+        if (root == NULL) return true;
+        return compare(root->left, root->right);
+    }
+};
 ```
 
+**题解一：迭代**
+
+```cpp
+class Solution {
+public:
+    bool isSymmetric(TreeNode* root) 
+    {
+        if (root == NULL) 
+            return true;
+        stack<TreeNode*> st; 
+        st.push(root->left);
+        st.push(root->right);
+        
+        while (!st.empty()) 
+        {
+            TreeNode* leftNode = st.top(); 
+            st.pop();
+            TreeNode* rightNode = st.top(); 
+            st.pop();
+            
+            if (!leftNode && !rightNode) 
+            {
+                continue;
+            }
+            if ((!leftNode || !rightNode || (leftNode->val != rightNode->val))) 
+            {
+                return false;
+            }
+            st.push(leftNode->left);
+            st.push(rightNode->right);
+            st.push(leftNode->right);
+            st.push(rightNode->left);
+        }
+        return true;
+    }
+};
+```
+
+**时间复杂度 : O(n)**
+
+**空间复杂度：O*(*n)**
