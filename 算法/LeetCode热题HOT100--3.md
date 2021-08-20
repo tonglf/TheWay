@@ -4,7 +4,48 @@
 
 给你一个二叉树，请你返回其按 **层序遍历** 得到的节点值。 （即逐层地，从左到右访问所有节点）。
 
- 
+ **题解：队列**
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) 
+    {
+        vector<vector<int>> result;
+        if (root == nullptr)
+            return result;
+
+        queue<TreeNode*> q;
+        q.push(root);
+        
+        while (!q.empty())
+        {
+            int size = q.size();
+            vector<int> path;
+            for (int i = 0; i < size; ++i)
+            {
+                TreeNode* cur = q.front();
+                q.pop();
+                path.push_back(cur->val);
+                if (cur->left)
+                {
+                    q.push(cur->left);
+                }
+                if (cur->right)
+                {
+                    q.push(cur->right);
+                }
+            }
+            result.push_back(path);
+        }
+        return result;
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*n)**
 
 ## 104.二叉树的最大深度
 
@@ -12,13 +53,98 @@
 
 二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
 
+**题解一：递归**
 
+```cpp
+class Solution {
+public:
+    int maxDepth(TreeNode* root) 
+    {
+        if (root == nullptr)
+        {
+            return 0;
+        }
+        int left = maxDepth(root->left);
+        int right = maxDepth(root->right);
+
+        return max(left, right) + 1;
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*height)**
+
+**题解二：层次遍历（队列）**
+
+```cpp
+class Solution {
+public:
+    int maxDepth(TreeNode* root) 
+    {
+        if (root == NULL) return 0;
+        int depth = 0;
+        queue<TreeNode*> que;
+        que.push(root);
+        while(!que.empty()) 
+        {
+            int size = que.size();
+            depth++; // 记录深度
+            for (int i = 0; i < size; i++) 
+            {
+                TreeNode* node = que.front();
+                que.pop();
+                if (node->left) 
+                    que.push(node->left);
+                if (node->right) 
+                    que.push(node->right);
+            }
+        }
+        return depth;
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*n)**
 
 ## 105.从前序与中序遍历序列构造二叉树
 
 根据一棵树的前序遍历与中序遍历构造二叉树。
 
+**题解：递归**
 
+```cpp
+class Solution {
+    using Itor = vector<int>::iterator;
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) 
+    {
+        return buildTree(preorder.begin(), preorder.end(), inorder.begin(), inorder.end());
+    }
+
+    TreeNode* buildTree(Itor preFirst, Itor preLast, Itor inFirst, Itor inLast)
+    {
+        if (preFirst >= preLast || inFirst >= inLast)
+            return nullptr;
+
+        TreeNode* root = new TreeNode(*preFirst);
+        Itor index = find(inFirst, inLast, *preFirst);
+        int dis = distance(inFirst, index);
+        
+        root->left = buildTree(preFirst + 1, preFirst + dis + 1, inFirst, index);
+        root->right = buildTree(preFirst + dis + 1, preLast, index + 1, inLast);
+
+        return root;
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*n)**
 
 ## 114.二叉树展开为链表
 
@@ -29,7 +155,7 @@
 
 示例 1：
 
-<img src="https://assets.leetcode.com/uploads/2021/01/14/flaten.jpg" alt="img" style="zoom:50%;" />
+<img src="./Image/114_leetcode.jpg" alt="img" style="zoom:50%;" />
 
 ```cpp
 输入：root = [1,2,5,3,4,null,6]
@@ -52,11 +178,37 @@
 输出：[0]
 ```
 
+**题解：寻找前驱节点**
 
+```cpp
+class Solution {
+public:
+    void flatten(TreeNode* root) 
+    {
+        TreeNode *curr = root;
+        while (curr != nullptr) 
+        {
+            if (curr->left != nullptr) 
+            {
+                TreeNode *next = curr->left;
+                TreeNode *predecessor = next;
+                while (predecessor->right != nullptr) 
+                {
+                    predecessor = predecessor->right;
+                }
+                predecessor->right = curr->right;
+                curr->left = nullptr;
+                curr->right = next;
+            }
+            curr = curr->right;
+        }
+    }
+};
+```
 
+**时间复杂度：O*(*n)**
 
-
-
+**空间复杂度：O*(*1)**
 
 
 ## 121.买卖股票的最佳时机
@@ -85,11 +237,56 @@
 解释：在这种情况下, 没有交易完成, 所以最大利润为 0。
 ```
 
+**题解一：贪心**
 
+```cpp
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int ans = 0;
+        int minVal = prices[0];
+        for (int i = 1; i < prices.size(); ++i)
+        {
+            if (minVal > prices[i])
+            {
+                minVal = prices[i];
+            }
+            ans = max(prices[i] - minVal, ans);
+        }
+        return ans;
+    }
+};
+```
 
+**时间复杂度：O*(*n)**
 
+**空间复杂度：O*(*1)**
 
+**题解二：动态规划**
 
+```cpp
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) 
+    {
+        vector<vector<int>> dp(prices.size(), vector<int>(2));
+        dp[0][0] = -prices[0];
+        dp[0][1] = 0;
+
+        for (int i = 1; i < prices.size(); ++i)
+        {
+            dp[i][0] = max(dp[i - 1][0], -prices[i]);
+            dp[i][1] = max(dp[i - 1][1], prices[i] + dp[i - 1][0]);
+        }
+
+        return dp[prices.size() - 1][1];
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*n)**
 
 ## 124.二叉树中的最大路径和
 
@@ -101,7 +298,7 @@
 
 示例 1：
 
-![img](https://assets.leetcode.com/uploads/2020/10/13/exx1.jpg)
+![img](./Image/124_leetcode_1.jpg)
 
 ```c++
 输入：root = [1,2,3]
@@ -111,7 +308,7 @@
 
 示例 2：
 
-![img](https://assets.leetcode.com/uploads/2020/10/13/exx2.jpg)
+![img](./Image/124_leetcode_2.jpg)
 
 ```c++
 输入：root = [-10,9,20,null,null,15,7]
@@ -119,11 +316,46 @@
 解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
 ```
 
+**题解：递归**
 
+```cpp
+class Solution {
+private:
+    int maxSum = INT_MIN;
+public:
+    int maxGain(TreeNode* node) 
+    {
+        if (node == nullptr) 
+        {
+            return 0;
+        }
+        
+        // 递归计算左右子节点的最大贡献值
+        // 只有在最大贡献值大于 0 时，才会选取对应子节点
+        int leftGain = max(maxGain(node->left), 0);
+        int rightGain = max(maxGain(node->right), 0);
 
+        // 节点的最大路径和取决于该节点的值与该节点的左右子节点的最大贡献值
+        int priceNewpath = node->val + leftGain + rightGain;
 
+        // 更新答案
+        maxSum = max(maxSum, priceNewpath);
 
+        // 返回节点的最大贡献值
+        return node->val + max(leftGain, rightGain);
+    }
 
+    int maxPathSum(TreeNode* root) 
+    {
+        maxGain(root);
+        return maxSum;
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*n)**
 
 
 ## 128.最长连续序列
@@ -147,7 +379,45 @@
 输出：9
 ```
 
+**题解：哈希表**
 
+```cpp
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) 
+    {
+        unordered_set<int> num_set;
+        for (const int& num : nums) 
+        {
+            num_set.insert(num);
+        }
+
+        int longestStreak = 0;
+
+        for (const int& num : num_set) 
+        {
+            if (!num_set.count(num - 1)) 
+            {
+                int currentNum = num;
+                int currentStreak = 1;
+
+                while (num_set.count(currentNum + 1)) 
+                {
+                    currentNum += 1;
+                    currentStreak += 1;
+                }
+
+                longestStreak = max(longestStreak, currentStreak);
+            }
+        }
+        return longestStreak;           
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*n)**
 
 ## 136.只出现一次的数字
 
@@ -220,11 +490,35 @@ int singleNumber(vector<int>& nums)
 输出: false
 ```
 
+**题解：动态规划——完全背包**
 
+```cpp
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) 
+    {
+        unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
+        vector<bool> dp(s.size() + 1, false);
+        dp[0] = true;
+        for (int i = 1; i <= s.size(); i++) 	// 遍历背包
+        {   
+            for (int j = 0; j < i; j++) 		// 遍历物品
+            {       
+                string word = s.substr(j, i - j); // substr (起始位置，截取的个数)
+                if (wordSet.find(word) != wordSet.end() && dp[j]) 
+                {
+                    dp[i] = true;
+                }
+            }
+        }
+        return dp[s.size()];
+    }
+};
+```
 
+**时间复杂度：O(n^2)**
 
-
-
+**空间复杂度：O*(*n)**
 
 ## 141.环形链表
 
@@ -240,7 +534,7 @@ int singleNumber(vector<int>& nums)
 
 示例 1：
 
-![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist.png)
+![img](./Image/141_leetcode_1.png)
 
 ```cpp
 输入：head = [3,2,0,-4], pos = 1
@@ -251,7 +545,7 @@ int singleNumber(vector<int>& nums)
 
 示例 2：
 
-![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test2.png)
+![img](./Image/141_leetcode_2.png)
 
 ```cpp
 输入：head = [1,2], pos = 0
@@ -262,7 +556,7 @@ int singleNumber(vector<int>& nums)
 
 示例 3：
 
-![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test3.png)
+![img](./Image/141_leetcode_3.png)
 
 ```cpp
 输入：head = [1], pos = -1
@@ -270,11 +564,58 @@ int singleNumber(vector<int>& nums)
 解释：链表中没有环。
 ```
 
+**题解一：快慢指针**
 
+```cpp
+class Solution {
+public:
+    bool hasCycle(ListNode *head) 
+    {
+        ListNode* fast = head;
+        ListNode* slow = head;
+        while (fast && fast->next)
+        {
+            slow = slow->next;
+            fast = fast->next->next;
+            if (slow == fast)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+```
 
+- **时间复杂度：O(N)**
 
+- **空间复杂度：O(1)**
 
+**题解二：哈希表**
 
+```cpp
+class Solution {
+public:
+    bool hasCycle(ListNode *head) 
+    {
+        unordered_set<ListNode*> seen;
+        while (head != nullptr) 
+        {
+            if (seen.count(head)) 
+            {
+                return true;
+            }
+            seen.insert(head);
+            head = head->next;
+        }
+        return false;
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*n)**
 
 ## 142.环形链表 II
 
@@ -314,11 +655,64 @@ int singleNumber(vector<int>& nums)
 解释：链表中没有环。
 ```
 
+**题解一：快慢指针**
 
+```cpp
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) 
+    {
+        ListNode* fast = head;
+        ListNode* slow = head;
+        while (fast && fast->next)
+        {
+            slow = slow->next;
+            fast = fast->next->next;
+            if (slow == fast)
+            {
+                ListNode* cur = head;
+                while (cur != fast)
+                {
+                    cur = cur->next;
+                    fast = fast->next;
+                }
+                return cur;
+            }
+        }
+        return nullptr;
+    }
+};
+```
 
+- **时间复杂度：O(N)**
 
+- **空间复杂度：O(1)**
 
+**题解二：哈希表**
 
+```cpp
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) 
+    {
+        unordered_set<ListNode*> seen;
+        while (head != nullptr) 
+        {
+            if (seen.count(head)) 
+            {
+                return head;
+            }
+            seen.insert(head);
+            head = head->next;
+        }
+        return nullptr;
+    }
+};
+```
+
+**时间复杂度：O*(*n)**
+
+**空间复杂度：O*(*n)**
 
 ## 146.LRU  缓存机制
 
@@ -354,7 +748,74 @@ lRUCache.get(3);    // 返回 3
 lRUCache.get(4);    // 返回 4
 ```
 
+**题解：哈希表 + 双向链表**
 
+```cpp
+#include <iostream>
+#include <list>
+#include <unordered_map>
+
+using namespace std;
+
+class LRUCache
+{
+private:
+	struct CacheNode
+	{
+		int key;
+		int value;
+		CacheNode(int k, int v) : key(k), value(v) { }
+	};
+
+public:
+	LRUCache(int capacity) : m_capacity(capacity) { }
+
+	int get(int key)
+	{
+		if (m_cacheMap.find(key) == m_cacheMap.end())
+		{
+			return -1;
+		}
+
+		// 把当前访问的节点移到链表的头部，并且更新 map 中该节点的地址
+        // 把 m_cacheList 中 key 对应的迭代器放置到 m_cacheList.begin() 位置上
+		m_cacheList.splice(m_cacheList.begin(), m_cacheList, m_cacheMap[key]); 
+		m_cacheMap[key] = m_cacheList.begin();
+		return m_cacheMap[key]->value;
+	}
+
+	void put(int key, int value)
+	{
+		if (m_cacheMap.find(key) == m_cacheMap.end())
+		{
+			if (m_cacheList.size() == m_capacity)
+			{
+				m_cacheMap.erase(m_cacheList.back().key);
+				m_cacheList.pop_back();
+			}
+			// 插入新节点到链表头部，并且在 map 中增加该节点
+			m_cacheList.push_front(CacheNode(key, value));
+			m_cacheMap[key] = m_cacheList.begin();
+		}
+		else
+		{
+			// 更新节点的值，把当前访问的节点移到链表头部，并且更新 map 中该节点的地址
+			m_cacheMap[key]->value = value;
+			m_cacheList.splice(m_cacheList.begin(), m_cacheList, m_cacheMap[key]);
+			m_cacheMap[key] = m_cacheList.begin();
+		}
+	}
+
+private:
+	list<CacheNode> m_cacheList;
+	unordered_map<int, list<CacheNode>::iterator> m_cacheMap;
+	int m_capacity;
+};
+```
+
+**时间复杂度：O*(*1)**
+
+**空间复杂度：O*(*1)**
 
 ## 148.排序链表
 
@@ -366,8 +827,6 @@ lRUCache.get(4);    // 返回 4
 
 示例 1：
 
-![img](https://assets.leetcode.com/uploads/2020/09/14/sort_list_1.jpg)
-
 ```cpp
 输入：head = [4,2,1,3]
 输出：[1,2,3,4]
@@ -375,8 +834,6 @@ lRUCache.get(4);    // 返回 4
 
 
 示例 2：
-
-![img](https://assets.leetcode.com/uploads/2020/09/14/sort_list_2.jpg)
 
 ```cpp
 输入：head = [-1,5,3,4,0]
@@ -390,17 +847,98 @@ lRUCache.get(4);    // 返回 4
 输出：[]
 ```
 
+**题解：自底向上归并排序**
 
+```cpp
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) 
+    {
+        if (head == nullptr) 
+        {
+            return head;
+        }
+        int length = 0;
+        ListNode* node = head;
+        while (node != nullptr) 
+        {
+            length++;
+            node = node->next;
+        }
+        ListNode* dummyHead = new ListNode(0, head);
+        for (int subLength = 1; subLength < length; subLength <<= 1) 
+        {
+            ListNode* prev = dummyHead, *curr = dummyHead->next;
+            while (curr != nullptr) 
+            {
+                ListNode* head1 = curr;
+                for (int i = 1; i < subLength && curr->next != nullptr; i++) 
+                {
+                    curr = curr->next;
+                }
+                ListNode* head2 = curr->next;
+                curr->next = nullptr;
+                curr = head2;
+                for (int i = 1; i < subLength && curr != nullptr && curr->next != nullptr; i++) 
+                {
+                    curr = curr->next;
+                }
+                ListNode* next = nullptr;
+                if (curr != nullptr) 
+                {
+                    next = curr->next;
+                    curr->next = nullptr;
+                }
+                ListNode* merged = merge(head1, head2);
+                prev->next = merged;
+                while (prev->next != nullptr) 
+                {
+                    prev = prev->next;
+                }
+                curr = next;
+            }
+        }
+        return dummyHead->next;
+    }
 
+    ListNode* merge(ListNode* head1, ListNode* head2) 
+    {
+        ListNode* dummyHead = new ListNode(0);
+        ListNode* temp = dummyHead, *temp1 = head1, *temp2 = head2;
+        while (temp1 != nullptr && temp2 != nullptr) 
+        {
+            if (temp1->val <= temp2->val) 
+            {
+                temp->next = temp1;
+                temp1 = temp1->next;
+            } 
+            else 
+            {
+                temp->next = temp2;
+                temp2 = temp2->next;
+            }
+            temp = temp->next;
+        }
+        if (temp1 != nullptr) 
+        {
+            temp->next = temp1;
+        } 
+        else if (temp2 != nullptr) 
+        {
+            temp->next = temp2;
+        }
+        return dummyHead->next;
+    }
+};
+```
 
+**时间复杂度：O*(*n*log*n)**
 
-
+**空间复杂度：O(1)**
 
 ## 152.乘积最大数组
 
 给你一个整数数组 nums ，请你找出数组中乘积最大的连续子数组（该子数组中至少包含一个数字），并返回该子数组所对应的乘积。
-
- 
 
 示例 1:
 
@@ -418,13 +956,27 @@ lRUCache.get(4);    // 返回 4
 解释: 结果不能为 2, 因为 [-2,-1] 不是子数组。
 ```
 
+**题解：动态规划**
 
+```cpp
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) 
+    {
+        vector <int> maxF(nums), minF(nums);
+        for (int i = 1; i < nums.size(); ++i) 
+        {
+            maxF[i] = max(maxF[i - 1] * nums[i], max(nums[i], minF[i - 1] * nums[i]));
+            minF[i] = min(minF[i - 1] * nums[i], min(nums[i], maxF[i - 1] * nums[i]));
+        }
+        return *max_element(maxF.begin(), maxF.end());
+    }
+};
+```
 
+**时间复杂度：O*(*n)**
 
-
-
-
-
+**空间复杂度：O(1)**
 
 
 ## 155.最小栈
@@ -459,6 +1011,11 @@ minStack.getMin();   --> 返回 -2.
 
 
 
+```cpp
+```
+
+
+
 ## 160.相交链表
 
 给你两个单链表的头节点 headA 和 headB ，请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。
@@ -469,11 +1026,9 @@ minStack.getMin();   --> 返回 -2.
 
 注意，函数返回结果后，链表必须 保持其原始结构 。
 
- ![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png)
+ ![img](./Image/160_leetcode_1.png)
 
 示例 1：
-
-![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_1.png)
 
 ```cpp
 输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
@@ -486,8 +1041,6 @@ minStack.getMin();   --> 返回 -2.
 
 示例 2：
 
-![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_2.png)
-
 ```cpp
 输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
 输出：Intersected at '2'
@@ -499,8 +1052,6 @@ minStack.getMin();   --> 返回 -2.
 
 示例 3：
 
-![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_3.png)
-
 ```cpp
 输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
 输出：null
@@ -509,11 +1060,28 @@ minStack.getMin();   --> 返回 -2.
 这两个链表不相交，因此返回 null 。
 ```
 
+**题解：双指针**
 
+```cpp
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        if (headA == nullptr || headB == nullptr) {
+            return nullptr;
+        }
+        ListNode *pA = headA, *pB = headB;
+        while (pA != pB) {
+            pA = pA == nullptr ? headB : pA->next;
+            pB = pB == nullptr ? headA : pB->next;
+        }
+        return pA;
+    }
+};
+```
 
+**时间复杂度：O*(*m + n)**
 
-
-
+**空间复杂度：O(1)**
 
 ## 198.打家劫舍
 
@@ -539,7 +1107,10 @@ minStack.getMin();   --> 返回 -2.
      偷窃到的最高金额 = 2 + 9 + 1 = 12 。
 ```
 
+**题解：动态规划**
 
+```cpp
+```
 
 
 
@@ -577,7 +1148,7 @@ minStack.getMin();   --> 返回 -2.
 输出：3
 ```
 
-**深度优先搜索**
+**题解：深度优先搜索**
 
 我们可以将二维网格看成一个无向图，竖直或水平相邻的 11 之间有边相连。
 
@@ -629,8 +1200,6 @@ public:
 
 示例 1：
 
-![img](https://assets.leetcode.com/uploads/2021/02/19/rev1ex1.jpg)
-
 ```cpp
 输入：head = [1,2,3,4,5]
 输出：[5,4,3,2,1]
@@ -638,8 +1207,6 @@ public:
 
 
 示例 2：
-
-![img](https://assets.leetcode.com/uploads/2021/02/19/rev1ex2.jpg)
 
 ```cpp
 输入：head = [1,2]
@@ -653,7 +1220,32 @@ public:
 输出：[]
 ```
 
+**题解：迭代**
 
+```cpp
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) 
+    {
+        if (head == nullptr)
+        {
+            return head;
+        }
+        ListNode* cur = head;
+        ListNode* pre = nullptr;
+        ListNode* next = nullptr;
+        while (cur)
+        {
+            next = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+};
+```
 
+**时间复杂度：O*(*n)**
 
-
+**空间复杂度：O(1)**
