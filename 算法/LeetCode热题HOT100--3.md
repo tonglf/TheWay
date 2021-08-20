@@ -1009,12 +1009,52 @@ minStack.top();      --> 返回 0.
 minStack.getMin();   --> 返回 -2.
 ```
 
-
+**题解：辅助栈**
 
 ```cpp
+class MinStack {
+public:
+    MinStack() { }
+    
+    void push(int val) 
+    {
+        if (dataS.empty())
+        {
+            dataS.push(val);
+            minS.push(val);
+        }
+        else
+        {
+            dataS.push(val);
+            int minVal = min(val, minS.top());
+            minS.push(minVal);
+        }
+    }
+    
+    void pop() 
+    {
+        dataS.pop();
+        minS.pop();
+    }
+    
+    int top() 
+    {
+        return dataS.top();
+    }
+    
+    int getMin() {
+        return minS.top();
+    }
+
+private:
+    stack<int> dataS;		// 保存真实数据
+    stack<int> minS;		// 保存最小值
+};
 ```
 
+**时间复杂度：O*(*1)**
 
+**空间复杂度：O(n)**
 
 ## 160.相交链表
 
@@ -1110,9 +1150,29 @@ public:
 **题解：动态规划**
 
 ```cpp
+class Solution {
+public:
+    int rob(vector<int>& nums) 
+    {
+        if (nums.size() <= 2)
+        {
+            return *max_element(nums.begin(), nums.end());
+        }
+        vector<int> dp(nums.size(), 0);
+        dp[0] = nums[0];
+        dp[1] = max(nums[0], nums[1]);
+        for (int i = 2; i < nums.size(); ++i)
+        {
+            dp[i] = max(dp[i - 1], dp[i - 2] + nums[i]);
+        }
+        return dp[nums.size() - 1];
+    }
+};
 ```
 
+**时间复杂度：O*(*n)**
 
+**空间复杂度：O(n)**
 
 ## 200.岛屿数量
 
@@ -1159,7 +1219,8 @@ public:
 ```cpp
 class Solution {
 public:
-    int numIslands(vector<vector<char>>& grid) {
+    int numIslands(vector<vector<char>>& grid) 
+    {
         int count = 0;
         int r = grid.size();
         int c = grid[0].size();
@@ -1192,7 +1253,9 @@ public:
 };
 ```
 
+**时间复杂度：O(MN)**
 
+**空间复杂度：O(MN)**
 
 ## 206.反转链表
 
