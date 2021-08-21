@@ -84,6 +84,9 @@
 - [Linux 常用工具](./Linux杂谈/Linux系统编程/02_Linux常用工具.md)
 - [GDB 与 Makefile](./Linux杂谈/Linux系统编程/03_GDB与Makefile.md)
 - [系统函数：open、close、read、write](./Linux杂谈/Linux系统编程/04_系统函数.md)
+- [进程](./Linux杂谈/Linux系统编程/05_进程.md)
+- [进程间通信](./Linux杂谈/Linux系统编程/06_进程间通信.md)
+- [线程](./Linux杂谈/Linux系统编程/07_线程.md)
 
 ### Linux 网络编程
 

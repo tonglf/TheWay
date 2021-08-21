@@ -25,9 +25,58 @@
 解释：总共有 2 门课程。学习课程 1 之前，你需要先完成课程 0 ；并且学习课程 0 之前，你还应先完成课程 1 。这是不可能的。
 ```
 
+**题解：广度优先搜索**
 
+```cpp
+class Solution {
+private:
+    vector<vector<int>> edges;
+    vector<int> indeg;
 
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) 
+    {
+        edges.resize(numCourses);
+        indeg.resize(numCourses);
+        for (const auto& info: prerequisites) 
+        {
+            edges[info[1]].push_back(info[0]);
+            ++indeg[info[0]];
+        }
 
+        queue<int> q;
+        for (int i = 0; i < numCourses; ++i) 
+        {
+            if (indeg[i] == 0) 
+            {
+                q.push(i);
+            }
+        }
+
+        int visited = 0;
+        while (!q.empty()) 
+        {
+            ++visited;
+            int u = q.front();
+            q.pop();
+            for (int v: edges[u]) 
+            {
+                --indeg[v];
+                if (indeg[v] == 0) 
+                {
+                    q.push(v);
+                }
+            }
+        }
+
+        return visited == numCourses;
+    }
+};
+```
+
+**时间复杂度: O*(*n*+*m)**
+
+**空间复杂度: *O*(*n*+*m*)**
 
 ## 208.实现 Trie （前缀树）
 
@@ -59,11 +108,59 @@ trie.insert("app");
 trie.search("app");     // 返回 True
 ```
 
+**题解：字典树**
 
+```cpp
+class Trie {
+private:
+    vector<Trie*> children;
+    bool isEnd;
 
+    Trie* searchPrefix(string prefix) 
+    {
+        Trie* node = this;
+        for (char ch : prefix) 
+        {
+            ch -= 'a';
+            if (node->children[ch] == nullptr) 
+            {
+                return nullptr;
+            }
+            node = node->children[ch];
+        }
+        return node;
+    }
 
+public:
+    Trie() : children(26), isEnd(false) {}
 
+    void insert(string word) 
+    {
+        Trie* node = this;
+        for (char ch : word) 
+        {
+            ch -= 'a';
+            if (node->children[ch] == nullptr) 
+            {
+                node->children[ch] = new Trie();
+            }
+            node = node->children[ch];
+        }
+        node->isEnd = true;
+    }
 
+    bool search(string word) 
+    {
+        Trie* node = this->searchPrefix(word);
+        return node != nullptr && node->isEnd;
+    }
+
+    bool startsWith(string prefix) 
+    {
+        return this->searchPrefix(prefix) != nullptr;
+    }
+};
+```
 
 ## 215.数组中的第 K 个最大元素
 
@@ -85,9 +182,105 @@ trie.search("app");     // 返回 True
 输出: 4
 ```
 
+**题解一：基于快速排序的选择方法**
 
+```cpp
+class Solution {
+public:
+    int quickSelect(vector<int>& a, int l, int r, int index) 
+    {
+        int q = randomPartition(a, l, r);
+        if (q == index) 
+        {
+            return a[q];
+        } 
+        else 
+        {
+            return q < index ? quickSelect(a, q + 1, r, index) : quickSelect(a, l, q - 1, index);
+        }
+    }
 
+    inline int randomPartition(vector<int>& a, int l, int r) 
+    {
+        int i = rand() % (r - l + 1) + l;
+        swap(a[i], a[r]);
+        return partition(a, l, r);
+    }
 
+    inline int partition(vector<int>& a, int l, int r) 
+    {
+        int x = a[r], i = l - 1;
+        for (int j = l; j < r; ++j) 
+        {
+            if (a[j] <= x) 
+            {
+                swap(a[++i], a[j]);
+            }
+        }
+        swap(a[i + 1], a[r]);
+        return i + 1;
+    }
+
+    int findKthLargest(vector<int>& nums, int k) 
+    {
+        srand(time(0));
+        return quickSelect(nums, 0, nums.size() - 1, nums.size() - k);
+    }
+};
+```
+
+**时间复杂度：*O*(*n*)**
+
+**空间复杂度：*O*(log*n*)**
+
+**题解二：基于堆排序的选择方法**
+
+```cpp
+class Solution {
+public:
+    void maxHeapify(vector<int>& a, int i, int heapSize) 
+    {
+        int l = i * 2 + 1, r = i * 2 + 2, largest = i;
+        if (l < heapSize && a[l] > a[largest]) 
+        {
+            largest = l;
+        } 
+        if (r < heapSize && a[r] > a[largest]) 
+        {
+            largest = r;
+        }
+        if (largest != i) 
+        {
+            swap(a[i], a[largest]);
+            maxHeapify(a, largest, heapSize);
+        }
+    }
+
+    void buildMaxHeap(vector<int>& a, int heapSize) 
+    {
+        for (int i = heapSize / 2; i >= 0; --i) 
+        {
+            maxHeapify(a, i, heapSize);
+        } 
+    }
+
+    int findKthLargest(vector<int>& nums, int k) 
+    {
+        int heapSize = nums.size();
+        buildMaxHeap(nums, heapSize);
+        for (int i = nums.size() - 1; i >= nums.size() - k + 1; --i) 
+        {
+            swap(nums[0], nums[i]);
+            --heapSize;
+            maxHeapify(nums, 0, heapSize);
+        }
+        return nums[0];
+    }
+};
+```
+
+**时间复杂度：*O*(*n*log*n*)**  建堆的时间代价是 O(n)，删除的总代价是 O(klogn)，因为 k<n，故渐进时间复杂为 O(n+klogn)=O(nlogn)。
+**空间复杂度：O(logn)**，即递归使用栈空间的空间代价。
 
 ## 221.最大正方形
 
@@ -145,9 +338,31 @@ trie.search("app");     // 返回 True
      / \    / \
     9   6  3   1
 
+**题解：递归**
 
+```cpp
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) 
+    {
+        if (root == nullptr) 
+        {
+            return nullptr;
+        }
+        TreeNode* left = invertTree(root->left);
+        TreeNode* right = invertTree(root->right);
+        
+        root->left = right;
+        root->right = left;
+        
+        return root;
+    }
+};
+```
 
+**时间复杂度：*O*(*N*)**
 
+**空间复杂度：*O*(*N*)**
 
 
 ## 234.回文链表
@@ -171,9 +386,55 @@ trie.search("app");     // 返回 True
 进阶：
 你能否用 O(n) 时间复杂度和 O(1) 空间复杂度解决此题？
 
+**题解：快慢指针——翻转后半部分的链表**
 
+```cpp
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) 
+    {
+        ListNode* slow = head;
+        ListNode* fast = head;
+        while (fast && fast->next)
+        {
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+        ListNode* p1 = head;
+        ListNode* p2 = reverseList(slow);
 
+        while (p1 && p2)
+        {
+            if (p1->val != p2->val)
+            {
+                return false;
+            }
+            p1 = p1->next;
+            p2 = p2->next;
+        }
+        return true;
+    }
 
+    ListNode* reverseList(ListNode* head)
+    {
+        ListNode* cur = head;
+        ListNode* pre = nullptr;
+        ListNode* next = nullptr;
+        while (cur)
+        {
+            next = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+};
+```
+
+**时间复杂度：*O*(*N*)**
+
+**空间复杂度：*O*(*1*)**
 
 ## 236.二叉树的最近公共祖先
 
@@ -183,7 +444,7 @@ trie.search("app");     // 返回 True
 
 示例 1：
 
-![img](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
+![img](./Image/236_leetcode.png)
 
 ```c++
 输入：root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
@@ -192,8 +453,6 @@ trie.search("app");     // 返回 True
 ```
 
 示例 2：
-
-![img](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
 
 ```cpp
 输入：root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
@@ -209,11 +468,31 @@ trie.search("app");     // 返回 True
 输出：1
 ```
 
+**题解：递归**
 
+```cpp
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) 
+    {
+        if (root == q || root == p || root == NULL) 
+            return root;
+        
+        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+        
+        if (left != NULL && right != NULL) 
+            return root;
+        if (left == NULL) 
+            return right;
+        return left;
+    }
+};
+```
 
+**时间复杂度：*O*(*N*)**
 
-
-
+**空间复杂度：*O*(*N*)**
 
 ## 238.除自身以外数组的乘积
 
@@ -234,7 +513,42 @@ trie.search("app");     // 返回 True
 进阶：
 你可以在常数空间复杂度内完成这个题目吗？（ 出于对空间复杂度分析的目的，输出数组不被视为额外空间。）
 
+**题解：**
 
+```cpp
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) 
+    {
+        int length = nums.size();
+        vector<int> answer(length);
+
+        // answer[i] 表示索引 i 左侧所有元素的乘积
+        // 因为索引为 '0' 的元素左侧没有元素， 所以 answer[0] = 1
+        answer[0] = 1;
+        for (int i = 1; i < length; i++) 
+        {
+            answer[i] = nums[i - 1] * answer[i - 1];
+        }
+
+        // R 为右侧所有元素的乘积
+        // 刚开始右边没有元素，所以 R = 1
+        int R = 1;
+        for (int i = length - 1; i >= 0; i--) 
+        {
+            // 对于索引 i，左边的乘积为 answer[i]，右边的乘积为 R
+            answer[i] = answer[i] * R;
+            // R 需要包含右边所有的乘积，所以计算下一个结果时需要将当前值乘到 R 上
+            R *= nums[i];
+        }
+        return answer;
+    }
+};
+```
+
+**时间复杂度：*O*(*N*)**
+
+**空间复杂度：*O*(*1*)**
 
 ## 239.滑动窗口最大值
 
@@ -290,11 +604,64 @@ trie.search("app");     // 返回 True
 输出：[4]
 ```
 
+**题解：单调栈**
 
+```cpp
+class Solution {
+private:
+    class MyQueue { //单调队列（从大到小）
+    public:
+        deque<int> que; // 使用deque来实现单调队列
+        // 每次弹出的时候，比较当前要弹出的数值是否等于队列出口元素的数值，如果相等则弹出。
+        // 同时pop之前判断队列当前是否为空。
+        void pop(int value) 
+        {
+            if (!que.empty() && value == que.front()) 
+            {
+                que.pop_front();
+            }
+        }
+        // 如果push的数值大于入口元素的数值，那么就将队列后端的数值弹出，直到push的数值小于等于队列入口元素的数值为止。
+        // 这样就保持了队列里的数值是单调从大到小的了。
+        void push(int value) 
+        {
+            while (!que.empty() && value > que.back()) 
+            {
+                que.pop_back();
+            }
+            que.push_back(value);
 
+        }
+        // 查询当前队列里的最大值 直接返回队列前端也就是front就可以了。
+        int front() 
+        {
+            return que.front();
+        }
+    };
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) 
+    {
+        MyQueue que;
+        vector<int> result;
+        for (int i = 0; i < k; i++) 	// 先将前k的元素放进队列
+        { 
+            que.push(nums[i]);
+        }
+        result.push_back(que.front()); // result 记录前k的元素的最大值
+        for (int i = k; i < nums.size(); i++) 
+        {
+            que.pop(nums[i - k]); 		// 滑动窗口移除最前面元素
+            que.push(nums[i]); 			// 滑动窗口前加入最后面的元素
+            result.push_back(que.front()); // 记录对应的最大值
+        }
+        return result;
+    }
+};
+```
 
+**时间复杂度：*O*(*N*)**
 
-
+**空间复杂度：*O*(*K*)**
 
 ## 240.搜索二维矩阵 II
 
@@ -305,7 +672,7 @@ trie.search("app");     // 返回 True
 
 示例 1：
 
-![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/11/25/searchgrid2.jpg)
+![img](./Image/240_leetcode_1.jpg)
 
 ```cpp
 输入：matrix = [[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]], target = 5
@@ -315,24 +682,110 @@ trie.search("app");     // 返回 True
 
 示例 2：
 
-![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/11/25/searchgrid.jpg)
-
 ```cpp
 输入：matrix = [[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]], target = 20
 输出：false
 ```
 
+**题解：**
 
+```cpp
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) 
+    {
+        int m = matrix.size();
+        int n = matrix[0].size();
 
+        int i = 0, j = n - 1;
+        while (i < m && j >= 0)
+        {
+            if (target == matrix[i][j])
+            {
+                return true;
+            }
+            else if (target > matrix[i][j])
+            {
+                i++;
+            }
+            else
+            {
+                j--;
+            }
+        }
+        return false;
+    }
+};
+```
 
+**时间复杂度：*O*(*N* + *M*)**
 
-
-
-
+**空间复杂度：*O*(*1*)**
 
 ## 253.会议室 II
 
+给你一个会议时间安排的数组 intervals ，每个会议时间都会包括开始和结束的时间 intervals[i] = [starti, endi] ，为避免会议冲突，同时要考虑充分利用会议室资源，请你计算至少需要多少间会议室，才能满足这些会议安排。
 
+示例 1：
+
+```cpp
+输入：intervals = [[0,30],[5,10],[15,20]]
+输出：2
+```
+
+
+示例 2：
+
+```cpp
+输入：intervals = [[7,10],[2,4]]
+输出：1
+```
+
+
+
+```cpp
+class Solution {
+public:
+    int minMeetingRooms(vector<vector<int>>& intervals) 
+    {
+    	if (intervals.size() == 0) 
+        {
+      		return 0;
+    	}
+
+    	vector<int> start(intervals.size());
+    	vector<int> end(intervals.size());
+
+    	for (int i = 0; i < intervals.size(); i++) 
+    	{
+      		start[i] = intervals[i][0];
+      		end[i] = intervals[i][1];
+    	}
+
+ 		sort(start.begin(), start.end());
+ 		sort(end.begin(), end.end());
+
+    	int startPointer = 0, endPointer = 0;
+    	int usedRooms = 0;
+
+    	while (startPointer < intervals.size()) 
+        {
+      		if (start[startPointer] >= end[endPointer]) 
+        	{
+        		usedRooms -= 1;
+        		endPointer += 1;
+      		}
+      		usedRooms += 1;
+      		startPointer += 1;
+    	}
+    	return usedRooms;
+	}
+};
+```
+
+**时间复杂度: *O*(*N* log*N*)** 
+
+**时间复杂度: *O*(*N*)** 
 
 ## 279.完全平方数
 
@@ -438,7 +891,7 @@ trie.search("app");     // 返回 True
 
 示例 1：
 
-<img src="https://assets.leetcode.com/uploads/2020/09/15/serdeser.jpg" alt="img" style="zoom:50%;" />
+<img src="./Image/297_leetcode.jpg" alt="img" style="zoom:50%;" />
 
 ```cpp
 输入：root = [1,2,3,null,null,4,5]
@@ -639,7 +1092,33 @@ coins =  3*1*5    +   3*5*8   +  1*3*8  + 1*8*1 = 167
 输出：2
 ```
 
+**题解：动态规划——完全背包**
 
+```cpp
+lass Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) 
+    {
+        vector<int> dp(amount + 1, INT_MAX);
+        dp[0] = 0;
+        for (int i = 1; i <= amount; i++) 			// 遍历背包
+        {  
+            for (int j = 0; j < coins.size(); j++) 	// 遍历物品
+            { 
+                if (i - coins[j] >= 0 && dp[i - coins[j]] != INT_MAX ) 
+                {
+                    dp[i] = min(dp[i - coins[j]] + 1, dp[i]);
+                }
+            }
+        }
+        if (dp[amount] == INT_MAX) 
+            return -1;
+        return dp[amount];
+    }
+};
+```
 
+**时间复杂度：*O*(Sn)**		S : amount       n : coins.size()
 
+**空间复杂度：*O*(*S*)**
 
