@@ -811,11 +811,30 @@ public:
 解释：13 = 4 + 9
 ```
 
+**题解：动态规划——完全背包**
 
+```cpp
+class Solution {
+public:
+    int numSquares(int n) 
+    {
+        vector<int> dp(n + 1, INT_MAX);
+        dp[0] = 0;
+        for (int i = 0; i <= n; i++) 			// 遍历背包
+        { 
+            for (int j = 1; j * j <= i; j++) 	// 遍历物品
+            { 
+                dp[i] = min(dp[i - j * j] + 1, dp[i]);
+            }
+        }
+        return dp[n];
+    }
+};
+```
 
+**时间复杂度:  O( n sqrt{n} )**
 
-
-
+**时间复杂度: *O*(*N*)** 
 
 ## 283.移动零
 
@@ -834,7 +853,30 @@ public:
 必须在原数组上操作，不能拷贝额外的数组。
 尽量减少操作次数。
 
+**题解：双指针**
 
+```cpp
+class Solution {
+public:
+    void moveZeroes(vector<int>& nums) 
+    {
+        int n = nums.size(), left = 0, right = 0;
+        while (right < n) 
+        {
+            if (nums[right]) 
+            {
+                swap(nums[left], nums[right]);
+                left++;
+            }
+            right++;
+        }
+    }
+};
+```
+
+**时间复杂度：*O*(*N*)**
+
+**空间复杂度：*O*(*1*)**
 
 ## 287.寻找重复数
 
@@ -875,11 +917,41 @@ public:
 输出：1
 ```
 
+**题解：二分查找**
 
+```cpp
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) 
+    {
+        int n = nums.size();
+        int l = 1, r = n - 1, ans = -1;
+        while (l <= r) 
+        {
+            int mid = (l + r) >> 1;
+            int cnt = 0;
+            for (int i = 0; i < n; ++i) 
+            {
+                cnt += nums[i] <= mid;
+            }
+            if (cnt <= mid) 
+            {
+                l = mid + 1;
+            } 
+            else 
+            {
+                r = mid - 1;
+                ans = mid;
+            }
+        }
+        return ans;
+    }
+};
+```
 
+**时间复杂度：*O*(*N*)**
 
-
-
+**空间复杂度：*O*(*1*)**
 
 ## 297.二叉树的序列化与反序列化
 
@@ -921,11 +993,75 @@ public:
 输出：[1,2]
 ```
 
+**题解：深度优先搜索**
 
+```cpp
+class Codec {
+public:
+    void rserialize(TreeNode* root, string& str) 
+    {
+        if (root == nullptr) {
+            str += "None,";
+        } 
+        else 
+        {
+            str += to_string(root->val) + ",";
+            rserialize(root->left, str);
+            rserialize(root->right, str);
+        }
+    }
 
+    string serialize(TreeNode* root) 
+    {
+        string ret;
+        rserialize(root, ret);
+        return ret;
+    }
 
+    TreeNode* rdeserialize(list<string>& dataArray) 
+    {
+        if (dataArray.front() == "None") 
+        {
+            dataArray.erase(dataArray.begin());
+            return nullptr;
+        }
 
+        TreeNode* root = new TreeNode(stoi(dataArray.front()));
+        dataArray.erase(dataArray.begin());
+        root->left = rdeserialize(dataArray);
+        root->right = rdeserialize(dataArray);
+        return root;
+    }
 
+    TreeNode* deserialize(string data) 
+    {
+        list<string> dataArray;
+        string str;
+        for (auto& ch : data) 
+        {
+            if (ch == ',') 
+            {
+                dataArray.push_back(str);
+                str.clear();
+            } 
+            else 
+            {
+                str.push_back(ch);
+            }
+        }
+        if (!str.empty()) 
+        {
+            dataArray.push_back(str);
+            str.clear();
+        }
+        return rdeserialize(dataArray);
+    }
+};
+```
+
+**时间复杂度：*O*(*N*)**
+
+**空间复杂度：*O*(*N*)**
 
 ## 300.最长递增子序列
 
@@ -956,11 +1092,32 @@ public:
 输出：1
 ```
 
+**题解：动态规划**
 
+```cpp
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) 
+    {
+        vector<int> dp(nums.size(), 1);
+        for (int i = 1; i < nums.size(); ++i)
+        {
+            for (int j = 0; j < i; ++j)
+            {
+                if (nums[j] < nums[i])
+                {
+                    dp[i] = max(dp[i], dp[j] + 1);                    
+                }
+            }
+        }
+        return *max_element(dp.begin(), dp.end());
+    }
+};
+```
 
+**时间复杂度：O(N^2)**
 
-
-
+**空间复杂度：*O*(*N*)**
 
 ## 301.删除无效的括号
 
@@ -990,11 +1147,96 @@ public:
 输出：[""]
 ```
 
+**题解：回溯**
 
+```cpp
+public class Solution {
+private 
+    int len;
+    char[] charArray;
+    Set<String> validExpressions = new HashSet<>();
+    
+    void dfs(int index, int leftCount, int rightCount, 
+             int leftRemove, int rightRemove, StringBuilder path) 
+    {
+        if (index == len) 
+        {
+            if (leftRemove == 0 && rightRemove == 0) 
+            {
+                validExpressions.add(path.toString());
+            }
+            return;
+        }
 
+        char character = charArray[index];
+        // 可能的操作 1：删除当前遍历到的字符
+        if (character == '(' && leftRemove > 0) 
+        {
+            // 由于 leftRemove > 0，并且当前遇到的是左括号，因此可以尝试删除当前遇到的左括号
+            dfs(index + 1, leftCount, rightCount, leftRemove - 1, rightRemove, path);
+        }
+        if (character == ')' && rightRemove > 0) 
+        {
+            // 由于 rightRemove > 0，并且当前遇到的是右括号，因此可以尝试删除当前遇到的右括号
+            dfs(index + 1, leftCount, rightCount, leftRemove, rightRemove - 1, path);
+        }
 
+        // 可能的操作 2：保留当前遍历到的字符
+        path.append(character);
+        if (character != '(' && character != ')') 
+        {
+            // 如果不是括号，继续深度优先遍历
+            dfs(index + 1, leftCount, rightCount, leftRemove, rightRemove, path);
+        } 
+        else if (character == '(') 
+        {
+            // 考虑左括号
+            dfs(index + 1, leftCount + 1, rightCount, leftRemove, rightRemove, path);
+        } 
+        else if (rightCount < leftCount) 
+        {
+            // 考虑右括号
+            dfs(index + 1, leftCount, rightCount + 1, leftRemove, rightRemove, path);
+        }
+        path.deleteCharAt(path.length() - 1);
+    }
+    
+public:
+    List<String> removeInvalidParentheses(String s) {
+        this.len = s.length();
+        this.charArray = s.toCharArray();
 
+        // 第 1 步：遍历一次，计算多余的左右括号
+        int leftRemove = 0;
+        int rightRemove = 0;
+        for (int i = 0; i < len; i++) 
+        {
+            if (charArray[i] == '(') 
+            {
+                leftRemove++;
+            } 
+            else if (charArray[i] == ')') 
+            {
+                // 遇到右括号的时候，须要根据已经存在的左括号数量决定
+                if (leftRemove == 0) 
+                {
+                    rightRemove++;
+                }
+                if (leftRemove > 0) 
+                {
+                    // 关键：一个右括号出现可以抵销之前遇到的左括号
+                    leftRemove--;
+                }
+            }
+        }
 
+        // 第 2 步：回溯算法，尝试每一种可能的删除操作
+        StringBuilder path = new StringBuilder();
+        dfs(0, 0, 0, leftRemove, rightRemove, path);
+        return new ArrayList<>(this.validExpressions);
+    }
+};
+```
 
 ## 309.最佳买卖股票时机含冷冻期
 
@@ -1012,11 +1254,30 @@ public:
 解释: 对应的交易状态为: [买入, 卖出, 冷冻期, 买入, 卖出]
 ```
 
+**题解：动态规划**
 
+```cpp
+public:
+    int maxProfit(vector<int>& prices) 
+    {
+        int n = prices.size();
+        vector<vector<int>> dp(n, vector<int>(4, 0));
+        dp[0][0] -= prices[0]; // 持股票
+        for (int i = 1; i < n; i++) 
+        {
+            dp[i][0] = max(dp[i - 1][0], max(dp[i - 1][3], dp[i - 1][1]) - prices[i]);	// 买入
+            dp[i][1] = max(dp[i - 1][1], dp[i - 1][3]); // 不买不卖
+            dp[i][2] = dp[i - 1][0] + prices[i];	// 卖出
+            dp[i][3] = dp[i - 1][2];				// 冷冻期
+        }
+        return max(dp[n - 1][3],max(dp[n - 1][1], dp[n - 1][2]));
+    }
+};
+```
 
+**时间复杂度：O(N)**
 
-
-
+**空间复杂度：*O*(*N*)**
 
 ## 312.戳气球
 
@@ -1044,11 +1305,41 @@ coins =  3*1*5    +   3*5*8   +  1*3*8  + 1*8*1 = 167
 输出：10
 ```
 
+**题解：动态规划**
 
+```cpp
+class Solution {
+public:
+    int maxCoins(vector<int>& nums) 
+    {
+        int n = nums.size();
+        vector<vector<int>> rec(n + 2, vector<int>(n + 2));
+        vector<int> val(n + 2);
+        val[0] = val[n + 1] = 1;
+        for (int i = 1; i <= n; i++) 
+        {
+            val[i] = nums[i - 1];
+        }
+        for (int i = n - 1; i >= 0; i--) 
+        {
+            for (int j = i + 2; j <= n + 1; j++) 
+            {
+                for (int k = i + 1; k < j; k++) 
+                {
+                    int sum = val[i] * val[k] * val[j];
+                    sum += rec[i][k] + rec[k][j];
+                    rec[i][j] = max(rec[i][j], sum);
+                }
+            }
+        }
+        return rec[0][n + 1];
+    }
+};
+```
 
+**时间复杂度：O(N^3)**
 
-
-
+**空间复杂度：*O*(*N*^2)**
 
 ## 322.零钱兑换
 
