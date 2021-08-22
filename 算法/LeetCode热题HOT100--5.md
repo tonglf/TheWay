@@ -28,9 +28,35 @@
     输出: 9
     解释: 小偷一晚能够盗取的最高金额 = 4 + 5 = 9. 
 
+**题解：动态规划**
 
+```cpp
+class Solution {
+public:
+    int rob(TreeNode* root) 
+    {
+        vector<int> result = robTree(root);
+        return max(result[0], result[1]);
+    }
+    // 长度为2的数组，0：不偷，1：偷
+    vector<int> robTree(TreeNode* cur) 
+    {
+        if (cur == NULL) 
+            return vector<int>{0, 0};
+        vector<int> left = robTree(cur->left);
+        vector<int> right = robTree(cur->right);
+        // 偷cur
+        int val1 = cur->val + left[0] + right[0];
+        // 不偷cur
+        int val2 = max(left[0], left[1]) + max(right[0], right[1]);
+        return {val2, val1};
+    }
+};
+```
 
+**时间复杂度：O(n)** 
 
+**空间复杂度：O(logn)**
 
 
 ## 338.比特位计数
@@ -59,7 +85,53 @@
 要求算法的空间复杂度为O(n)。
 你能进一步完善解法吗？要求在C++或任何其他语言中不使用任何内置函数（如 C++ 中的 __builtin_popcount）来执行此操作。
 
+**题解：**
 
+```cpp
+class Solution {
+public:
+    vector<int> countBits(int n) 
+    {
+        vector<int> result(n + 1);
+        for (int i = 0; i <= n; ++i)
+        {
+            int count = 0;
+            int num = i;
+            while (num)
+            {
+                num &= (num - 1);
+                count++;
+            }
+            result[i] = count;
+        }
+        return result;
+    }
+};
+```
+
+**时间复杂度：O(logn)** 
+
+**空间复杂度：O(1)**
+
+**题解二：动态规划**
+
+```cpp
+class Solution {
+public:
+    vector<int> countBits(int n) {
+        vector<int> bits(n + 1);
+        for (int i = 1; i <= n; i++) 
+        {
+            bits[i] = bits[i & (i - 1)] + 1;
+        }
+        return bits;
+    }
+};
+```
+
+**时间复杂度：O(n)** 
+
+**空间复杂度：O(1)**
 
 ## 347.前 K 个高频元素
 
@@ -79,11 +151,57 @@
 输出: [1]
 ```
 
+**题解：堆**
 
+```cpp
+class Solution {
+public:
+    // 小顶堆
+    class mycomparison {
+    public:
+        bool operator()(const pair<int, int>& lhs, const pair<int, int>& rhs) 
+        {
+            return lhs.second > rhs.second;
+        }
+    };
+    
+    vector<int> topKFrequent(vector<int>& nums, int k) 
+    {
+        // 要统计元素出现频率
+        unordered_map<int, int> map; // map<nums[i],对应出现的次数>
+        for (int i = 0; i < nums.size(); i++) 
+        {
+            map[nums[i]]++;
+        }
 
+        // 对频率排序
+        // 定义一个小顶堆，大小为 k
+        priority_queue<pair<int, int>, vector<pair<int, int>>, mycomparison> pri_que;
 
+        // 用固定大小为k的小顶堆，扫面所有频率的数值
+        for (unordered_map<int, int>::iterator it = map.begin(); it != map.end(); it++) 
+        {
+            pri_que.push(*it);
+            if (pri_que.size() > k) 	// 如果堆的大小大于了K，则队列弹出，保证堆的大小一直为k
+            { 
+                pri_que.pop();
+            }
+        }
 
+        // 找出前K个高频元素，因为小顶堆先弹出的是最小的，所以倒叙来输出到数组
+        vector<int> result(k);
+        for (int i = k - 1; i >= 0; i--) 
+        {
+            result[i] = pri_que.top().first;
+            pri_que.pop();
+        }
+        return result;
+    }
+};
+```
 
+**时间复杂度：O(nlogk)**
+**空间复杂度：O(n)**
 
 ## 394.字符串解码
 
@@ -126,11 +244,80 @@
 输出："abccdcdcdxyz"
 ```
 
+**题解：栈**
 
+```cpp
+class Solution {
+public:
+    string getDigits(string &s, size_t &ptr) 
+    {
+        string ret = "";
+        while (isdigit(s[ptr])) 
+        {
+            ret.push_back(s[ptr++]);
+        }
+        return ret;
+    }
 
+    string getString(vector<string> &v) 
+    {
+        string ret;
+        for (const auto &s: v) 
+        {
+            ret += s;
+        }
+        return ret;
+    }
 
+    string decodeString(string s) 
+    {
+        vector<string> stk;
+        size_t ptr = 0;
 
+        while (ptr < s.size()) 
+        {
+            char cur = s[ptr];
+            if (isdigit(cur)) 
+            {
+                // 获取一个数字并进栈
+                string digits = getDigits(s, ptr);
+                stk.push_back(digits);
+            } 
+            else if (isalpha(cur) || cur == '[') 
+            {
+                // 获取一个字母并进栈
+                stk.push_back(string(1, s[ptr++])); 
+            } 
+            else 
+            {
+                ++ptr;
+                vector <string> sub;
+                while (stk.back() != "[") 
+                {
+                    sub.push_back(stk.back());
+                    stk.pop_back();
+                }
+                reverse(sub.begin(), sub.end());
+                // 左括号出栈
+                stk.pop_back();
+                // 此时栈顶为当前 sub 对应的字符串应该出现的次数
+                int repTime = stoi(stk.back()); 
+                stk.pop_back();
+                string t, o = getString(sub);
+                // 构造字符串
+                while (repTime--) 
+                    t += o; 
+                // 将构造好的字符串入栈
+                stk.push_back(t);
+            }
+        }
+        return getString(stk);
+    }
+};
+```
 
+**时间复杂度：O(n)**
+**空间复杂度：O(n)**
 
 ## 399.除法求值
 
@@ -169,7 +356,10 @@
 输出：[0.50000,2.00000,-1.00000,-1.00000]
 ```
 
+**题解：并查集**
 
+```cpp
+```
 
 
 
@@ -200,7 +390,33 @@
 输出：[[4,0],[5,0],[2,2],[3,2],[1,4],[6,0]]
 ```
 
+**题解：贪心**
 
+```cpp
+class Solution {
+public:
+    static bool cmp(const vector<int> a, const vector<int> b) 
+    {
+        if (a[0] == b[0]) return a[1] < b[1];
+        return a[0] > b[0];
+    }
+    vector<vector<int>> reconstructQueue(vector<vector<int>>& people) 
+    {
+        sort (people.begin(), people.end(), cmp);
+        vector<vector<int>> que;
+        for (int i = 0; i < people.size(); i++) 
+        {
+            int position = people[i][1];
+            que.insert(que.begin() + position, people[i]);
+        }
+        return que;
+    }
+};
+```
+
+**时间复杂度O(nlogn + n^2)**
+
+**空间复杂度O(n)**
 
 ## 416.分割等和子集
 
@@ -223,7 +439,35 @@
 解释：数组不能分割成两个元素和相等的子集。
 ```
 
+**题解：动态规划——01背包**
 
+```cpp
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) 
+    {
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        if (sum % 2)
+        {
+            return false;
+        }
+        int mid = sum / 2;
+        vector<int> dp(mid + 1, 0);
+        for (int i = 0; i < nums.size(); ++i)
+        {
+            for (int j = mid; j >= nums[i]; --j)
+            {
+                dp[j] = max(dp[j], dp[j - nums[i]] + nums[i]);
+            }
+        }
+        return dp[mid] == mid;
+    }
+};
+```
+
+**时间复杂度O(n^2)**
+
+**空间复杂度O(n)**
 
 ## 437.路径总和 III
 
@@ -237,7 +481,7 @@
 
 示例：
 
-
+<img src="./Image/437_leetcode.jpg" style="zoom: 67%;" />
 
 ```cpp
 root = [10,5,-3,3,2,null,11,3,-2,null,1], sum = 8
@@ -256,7 +500,40 @@ root = [10,5,-3,3,2,null,11,3,-2,null,1], sum = 8
 3.  -3 -> 11
 ```
 
+**题解：回溯**
 
+```cpp
+class Solution {
+private:
+    unordered_map<int, int> prefix;         // <前缀和，其出现次数>
+    void dfs(TreeNode* root, int sum, int cur_sum, int& res)
+    {
+        if (!root) 
+            return;
+        cur_sum += root->val;               // 更新前缀和
+        // 当前路径中存在以当前节点为终点的和为sum的子路径
+        if (prefix.find(cur_sum - sum) != prefix.end())
+            res += prefix[cur_sum - sum];
+        
+        prefix[cur_sum]++;                  // 将当前节点加入路径
+        dfs(root->left, sum, cur_sum, res); // 在其左子树中递归寻找
+        dfs(root->right, sum, cur_sum, res);// 在其右子树中递归寻找
+        prefix[cur_sum]--;                  // 回溯
+    }
+public:
+    int pathSum(TreeNode* root, int sum) 
+    {
+        int res = 0;    // 满足条件的路径数量
+        prefix[0] = 1;  // 前缀和为0的路径只有一条：哪个节点都不选
+        dfs(root, sum, 0, res);
+        return res;
+    }
+};
+```
+
+**时间复杂度O(n)**
+
+**空间复杂度O(n)**
 
 
 ## 438.找到字符串中所有字母异或位词
@@ -298,11 +575,40 @@ s: "abab" p: "ab"
 起始索引等于 2 的子串是 "ab", 它是 "ab" 的字母异位词。
 ```
 
+**题解：滑动窗口**
 
+```cpp
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) 
+    {
+        int n = s.size(), m = p.size();
+        if(m > n)
+            return {};
+        vector<int> ans, cnt_s(26), cnt_p(26);
+        int i;
+        for(i = 0; i < m; i++)
+        {
+            cnt_p[p[i] - 'a']++;
+            cnt_s[s[i] - 'a']++;
+        }
+        if(cnt_p == cnt_s)
+            ans.push_back(0);
+        for( ; i < n; i++)
+        {
+            cnt_s[s[i] - 'a']++;
+            cnt_s[s[i - m] - 'a']--;
+            if(cnt_p == cnt_s)
+                ans.push_back(i - m + 1);
+        }
+        return ans;
+    }
+};
+```
 
+**时间复杂度O(n)**
 
-
-
+**空间复杂度O(n)**
 
 ## 448.找到所有数组中消失的数字
 
@@ -319,9 +625,34 @@ s: "abab" p: "ab"
 输出：[2]
 ```
 
+**题解：**
 
+```cpp
+class Solution {
+public:
+    vector<int> findDisappearedNumbers(vector<int>& nums) {
+        int n = nums.size();
+        for (auto& num : nums) 
+        {
+            int x = (num - 1) % n;
+            nums[x] += n;
+        }
+        vector<int> ret;
+        for (int i = 0; i < n; i++) 
+        {
+            if (nums[i] <= n) 
+            {
+                ret.push_back(i + 1);
+            }
+        }
+        return ret;
+    }
+};
+```
 
+**时间复杂度O(n)**
 
+**空间复杂度O(1)**
 
 ## 461.汉明距离
 
@@ -345,7 +676,28 @@ s: "abab" p: "ab"
 输出：1
 ```
 
+**题解：**
 
+```cpp
+class Solution {
+public:
+    int hammingDistance(int x, int y) 
+    {
+        int n = x ^ y;		// 异或
+        int count = 0;
+        while (n)
+        {
+            n &= (n - 1);	// 与
+            count++;
+        }
+        return count;
+    }
+};
+```
+
+**时间复杂度：*O*(log*N*)**
+
+**空间复杂度：*O*(1)**
 
 ## 494.目标和
 
@@ -373,7 +725,36 @@ s: "abab" p: "ab"
 输出：1
 ```
 
+**题解：**
 
+```cpp
+class Solution {
+public:
+    int findTargetSumWays(vector<int>& nums, int target) 
+    {
+        int sum = accumulate(nums.begin(), nums.end(), 0);
+        if (sum < target) 
+            return 0;
+        if ((sum + target) % 2 == 1)
+            return 0;
+        int bagsize = (sum + target ) / 2;
+        vector<int> dp(bagsize + 1, 0);
+        dp[0] = 1;
+        for (int i = 0; i < nums.size(); ++i)
+        {
+            for (int j = bagsize; j >= nums[i]; --j)
+            {
+                dp[j] += dp[j - nums[i]];
+            }
+        }
+        return dp[bagsize];
+    }
+};
+```
+
+**时间复杂度O(n * m)**
+
+**空间复杂度：O(m)**
 
 ## 538.把二叉搜素树转换为累加树
 
@@ -417,9 +798,45 @@ s: "abab" p: "ab"
 输出：[7,9,4,10]
 ```
 
+**题解：保存前一个指针**
 
+```cpp
+class Solution {
+public:
+    TreeNode* convertBST(TreeNode* root) 
+    {
+        if (root == nullptr)
+            return root;
+        TreeNode* cur = root;
+        TreeNode* pre =nullptr;
+        stack<TreeNode*> s;
+        while (!s.empty() || cur)
+        {
+            if (cur)
+            {
+                s.push(cur);
+                cur = cur->right;
+            }
+            else
+            {
+                cur = s.top();
+                s.pop();
+                if (pre)
+                {
+                    cur->val += pre->val;
+                }
+                pre = cur;
+                cur = cur->left;
+            }
+        }
+        return root;
+    }
+};
+```
 
+**时间复杂度O(n)**
 
+**空间复杂度O(n)**
 
 ## 543.二叉树的直径
 
@@ -437,7 +854,34 @@ s: "abab" p: "ab"
 ```
 返回 3, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
 
+**题解：**
 
+```cpp
+class Solution {
+    int ans;
+    int depth(TreeNode* rt)
+    {
+        if (rt == NULL) 
+        {
+            return 0; 	// 访问到空节点了，返回 0
+        }
+        int L = depth(rt->left); 		// 左儿子为根的子树的深度
+        int R = depth(rt->right); 		// 右儿子为根的子树的深度
+        ans = max(ans, L + R + 1); 		// 计算 d_node 即 L+R+1 并更新 ans
+        return max(L, R) + 1; 			// 返回该节点为根的子树的深度
+    }
+public:
+    int diameterOfBinaryTree(TreeNode* root) {
+        ans = 1;
+        depth(root);
+        return ans - 1;
+    }
+};
+```
+
+**时间复杂度：*O*(*N*)**
+
+**空间复杂度：O(Height)**
 
 ## 560.和为 K 的子数组
 
@@ -448,6 +892,11 @@ s: "abab" p: "ab"
 ```cpp
 输入:nums = [1,1,1], k = 2
 输出: 2 , [1,1] 与 [1,1] 为两种不同的情况。
+```
+
+**题解：**
+
+```cpp
 ```
 
 
@@ -482,6 +931,11 @@ s: "abab" p: "ab"
 输出：0
 ```
 
+**题解：**
+
+```cpp
+```
+
 
 
 ## 617.合并二叉树
@@ -509,7 +963,10 @@ s: "abab" p: "ab"
 	 5   4   7
 ```
 
+**题解：**
 
+```cpp
+```
 
 
 
@@ -555,7 +1012,10 @@ s: "abab" p: "ab"
      A -> B -> C -> A -> D -> E -> A -> F -> G -> A -> (待命) -> (待命) -> A -> (待命) -> (待命) -> A
 ```
 
+**题解：**
 
+```cpp
+```
 
 
 
@@ -584,6 +1044,11 @@ s: "abab" p: "ab"
 解释：6个回文子串: "a", "a", "a", "aa", "aa", "aaa"
 ```
 
+**题解：**
+
+```cpp
+```
+
 
 
 ## 739.每日温度
@@ -593,4 +1058,9 @@ s: "abab" p: "ab"
 例如，给定一个列表 temperatures = [73, 74, 75, 71, 69, 72, 76, 73]，你的输出应该是 [1, 1, 4, 2, 1, 1, 0, 0]。
 
 提示：气温 列表长度的范围是 [1, 30000]。每个气温的值的均为华氏度，都是在 [30, 100] 范围内的整数。
+
+**题解：**
+
+```cpp
+```
 
