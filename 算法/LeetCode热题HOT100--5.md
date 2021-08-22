@@ -897,9 +897,30 @@ public:
 **题解：**
 
 ```cpp
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) 
+    {
+        unordered_map<int, int> mp;
+        mp[0] = 1;
+        int count = 0, pre = 0;
+        for (auto& x : nums) 
+        {
+            pre += x;
+            if (mp.find(pre - k) != mp.end()) 
+            {
+                count += mp[pre - k];
+            }
+            mp[pre]++;
+        }
+        return count;
+    }
+};
 ```
 
+**时间复杂度：*O*(*N*)**
 
+**空间复杂度：*O*(*N*)**
 
 ## 581.最短无序连续子数组
 
@@ -934,9 +955,34 @@ public:
 **题解：**
 
 ```cpp
+class Solution {
+public:
+    int findUnsortedSubarray(vector<int>& nums) 
+    {
+        if (is_sorted(nums.begin(), nums.end()))
+        {
+            return 0;
+        }
+        vector<int> numsSorted(nums);
+        sort(numsSorted.begin(), numsSorted.end());
+        int left = 0;
+        while (nums[left] == numsSorted[left])
+        {
+            left++;
+        }
+        int right = nums.size() - 1;
+        while (nums[right] == numsSorted[right])
+        {
+            right--;
+        }
+        return right - left + 1;
+    }
+};
 ```
 
+**时间复杂度：*O*(log*N*)**
 
+**空间复杂度：*O*(N)**
 
 ## 617.合并二叉树
 
@@ -963,14 +1009,30 @@ public:
 	 5   4   7
 ```
 
-**题解：**
+**题解：递归**
 
 ```cpp
+class Solution {
+public:
+    TreeNode* mergeTrees(TreeNode* root1, TreeNode* root2) 
+    {
+        if (root1 == nullptr)
+            return root2;
+        if (root2 == nullptr)
+            return root1;
+        
+        root1->val += root2->val;
+        root1->left = mergeTrees(root1->left, root2->left);
+        root1->right = mergeTrees(root1->right, root2->right);
+        
+        return root1;
+    }
+};
 ```
 
+**时间复杂度：*O*(min(*m*,*n*))**
 
-
-
+**空间复杂度：*O*(min(*m*,*n*))**
 
 ## 621.任务调度器
 
@@ -1019,8 +1081,6 @@ public:
 
 
 
-
-
 ## 647.回文子串
 
 给定一个字符串，你的任务是计算这个字符串中有多少个回文子串。
@@ -1044,12 +1104,68 @@ public:
 解释：6个回文子串: "a", "a", "a", "aa", "aa", "aaa"
 ```
 
-**题解：**
+**题解一：动态规划**
 
 ```cpp
+class Solution {
+public:
+    int countSubstrings(string s) 
+    {
+        vector<vector<bool>> dp(s.size(), vector<bool>(s.size(), false));
+        int result = 0;
+        for (int i = s.size() - 1; i >= 0; i--) 
+        {
+            for (int j = i; j < s.size(); j++) 
+            {
+                if (s[i] == s[j] && (j - i <= 1 || dp[i + 1][j - 1])) 
+                {
+                    result++;
+                    dp[i][j] = true;
+                }
+            }
+        }
+        return result;
+    }
+};
 ```
 
+**时间复杂度：O(n^2)**
 
+**空间复杂度：O(n^2)**
+
+**题解二：双指针**
+
+```cpp
+class Solution {
+public:
+    int countSubstrings(string s) 
+    {
+        int result = 0;
+        for (int i = 0; i < s.size(); i++) 
+        {
+            result += extend(s, i, i, s.size()); // 以i为中心
+            result += extend(s, i, i + 1, s.size()); // 以i和i+1为中心
+        }
+        return result;
+    }
+    
+    int extend(const string& s, int i, int j, int n) 
+    {
+        int res = 0;
+        while (i >= 0 && j < n && s[i] == s[j]) 
+        {
+            i--;
+            j++;
+            res++;
+        }
+        return res;
+    }
+};
+```
+
+**时间复杂度：O(n^2)**
+
+**空间复杂度：O(n^2)**
 
 ## 739.每日温度
 
@@ -1059,8 +1175,31 @@ public:
 
 提示：气温 列表长度的范围是 [1, 30000]。每个气温的值的均为华氏度，都是在 [30, 100] 范围内的整数。
 
-**题解：**
+**题解：单调栈**
 
 ```cpp
+class Solution {
+public:
+    vector<int> dailyTemperatures(vector<int>& temperatures) 
+    {
+        int n = temperatures.size();
+        vector<int> ans(n);
+        stack<int> s;
+        for (int i = 0; i < n; ++i) 
+        {
+            while (!s.empty() && temperatures[i] > temperatures[s.top()]) 
+            {
+                int previousIndex = s.top();
+                ans[previousIndex] = i - previousIndex;
+                s.pop();
+            }
+            s.push(i);
+        }
+        return ans;
+    }
+};
 ```
 
+**时间复杂度：O(n)**
+
+**空间复杂度：O(n)**
