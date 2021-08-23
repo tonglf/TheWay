@@ -241,9 +241,8 @@ double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2)
     } 
     else 
     {
-        int midIndex1 = totalLength / 2 - 1, midIndex2 = totalLength / 2;
-        double median = (getKthElement(nums1, nums2, midIndex1 + 1) 
-                         + getKthElement(nums1, nums2, midIndex2 + 1)) / 2.0;
+        double median = (getKthElement(nums1, nums2, totalLength / 2) 
+                         + getKthElement(nums1, nums2, totalLength / 2 + 1)) / 2.0;
         return median;
     }
 }
@@ -252,7 +251,6 @@ int getKthElement(vector<int>& nums1, vector<int>& nums2, int k)
 {
     int length1 = nums1.size(), length2 = nums2.size();
     int index1 = 0, index2 = 0;
-    int kthElement = 0;
 	while (true) 
     {
         // 边界情况
@@ -1418,8 +1416,8 @@ public:
             int index1 = ans;
             int index2 = ans;
             while (index1 > 0 && nums[--index1] == target);	// 左扩散
-            if (index1 == 0 && nums[index1] == target)		// 判断第一个数是否为 target
-                result[0] = 0;
+            if (nums[index1] == target)		// 判断第一个数是否为 target
+                result[0] = index1;
             else
                 result[0] = index1 + 1;
             
