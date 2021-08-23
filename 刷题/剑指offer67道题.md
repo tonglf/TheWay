@@ -818,7 +818,7 @@ ListNode* Merge(ListNode* pHead1, ListNode* pHead2)
 }
 ```
 
-## ***No17、树的子结构
+## No17、树的子结构
 
 [牛客网原题链接](https://www.nowcoder.com/practice/6e196c44c7004d15b1610b9afca8bd88?tpId=13&&tqId=11170&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
