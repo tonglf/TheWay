@@ -38,8 +38,6 @@
 
 ## No1、二维数组中的查找
 
-[牛客网原题链接](https://www.nowcoder.com/practice/abc3fe2ce8e146608e868a70efebf62e?tpId=13&&tqId=11154&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
@@ -97,7 +95,7 @@ false
 不存在3，返回 false
 ```
 
-**1、第一种方法**
+**题解：**
 
 **右上角**逐渐逼近**左下角** 很好
 
@@ -143,7 +141,8 @@ bool Find(int target, vector<vector<int> > array) {
 ```cpp
 class Solution {
 public:
-    string replaceSpace(string s) {
+    string replaceSpace(string s) 
+    {
         int count = 0;
         int n = s.size();
         for (int i = 0; i < n; ++i)
@@ -152,17 +151,20 @@ public:
                 count++;
         }
         s.resize(n + count * 2);		// 重点
-        for (int i = n - 1, j = s.size() - 1; i >= 0; --i, --j)
+        int index1 = n - 1;
+        int index2 = s.size() - 1;
+        while (index1 >= 0)
         {
-            if (s[i] == ' ')
+            if (s[index1] == ' ')
             {
-                s[j--] = '0';
-                s[j--] = '2';
-                s[j] = '%'; 
+                s[index2--] = '0';
+                s[index2--] = '2';
+                s[index2--] = '%';
+                index1--;
             }
             else
             {
-                s[j] = s[i];
+                s[index2--] = s[index1--];
             }
         }
         return s;
@@ -172,8 +174,6 @@ public:
 
 ## No3、从尾到头打印链表
 
-[牛客网原题链接](https://www.nowcoder.com/practice/d0267f7f55b3412ba93bd35cfa8e8035?tpId=13&&tqId=11156&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 输入一个链表，按链表从尾到头的顺序返回一个 ArrayList。
@@ -181,7 +181,8 @@ public:
 - 方法一：顺序遍历存入 vector ，然后使用 reverse 取反，或者返回尾迭代器，核心代码如下
 
 ```cpp
-reverse(result.begin(),result.end());	return result;
+reverse(result.begin(),result.end());	
+	return result;
 // 或
 return vector<int>(result.rbegin(),result.rend());
 ```
@@ -190,7 +191,6 @@ return vector<int>(result.rbegin(),result.rend());
 
 ```cpp
 s.push(node->val);
-
 std::cout << s.top() << " ";
 a.pop();
 ```
@@ -198,22 +198,27 @@ a.pop();
 - 方法三：使用递归
 
 ```cpp
-vector<int> printListFromTailToHead(ListNode* head)
-{
-    vector<int> result;
-    while(head != nullptr)
+class Solution {
+public:
+    vector<int> reversePrint(ListNode* head) 
     {
-        if (head->next != nullptr)
-            head = head->next;
-        
-        result.push_back(head->val);		// 最后进入数组
+        vector<int> result;
+        reversePrint(head, result);
+        return result;
     }
-}
+
+    void reversePrint(ListNode* head, vector<int>& result)
+    {
+        if (head)
+        {
+            reversePrint(head->next, result);
+            result.push_back(head->val);
+        }
+    }
+};
 ```
 
 ## No4、重建二叉树
-
-[牛客网原题链接](https://www.nowcoder.com/practice/8a19cbe657394eeaac2f6ea9b0f6fcf6?tpId=13&&tqId=11157&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -224,7 +229,31 @@ vector<int> printListFromTailToHead(ListNode* head)
 - **前序遍历**与**中序遍历**重建二叉树
 
 ```cpp
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) 
+    {
+        return buildTree(preorder.begin(), preorder.end(), inorder.begin(), inorder.end());
+    }
 
+    using Itor = vector<int>::iterator;
+    TreeNode* buildTree(Itor preFirst, Itor preLast, Itor inFirst, Itor inLast)
+    {
+        if (preFirst >= preLast || inFirst >= inLast)
+        {
+            return nullptr;
+        }
+
+        TreeNode* root = new TreeNode(*preFirst);
+        auto postion = find(inFirst, inLast, *preFirst);
+        int dis = distance(inFirst, postion);
+
+        root->left = buildTree(preFirst + 1, preFirst + dis  + 1, inFirst, inFirst + dis);
+        root->right = buildTree(preFirst + dis + 1, preLast, inFirst + dis + 1, inLast);
+
+        return root;
+    }
+};
 ```
 
 - **中序遍历**与**后序遍历**重建二叉树
@@ -276,8 +305,6 @@ private:
 
 ## No6、旋转数组
 
-[牛客网原题连接](https://www.nowcoder.com/practice/9f3231a991af4f55b95579b44b7a01ba?tpId=13&&tqId=11159&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。
@@ -305,29 +332,33 @@ int minNumberInRotateArray(vector<int> rotateArray) {
 **2、二分法**
 
 ```cpp
-int minNumberInRotateArray(vector<int> rotateArray) 
-{
-    if (rotateArray.size() == 0) 
-        return 0;
-    int low = 0, high = rotateArray.size() - 1;
-    
-    while (low + 1 < high) 
-    {
-        int mid = low + (high - low) / 2;
-        if (rotateArray[mid] < rotateArray[high]) 
-            high = mid;
-        else if (rotateArray[mid] == rotateArray[high]) 
-            high = high-1;
-        else 
-            low = mid;
+class Solution {
+public:
+    int minArray(vector<int>& numbers) {
+        int l = 0;
+        int r = numbers.size() - 1;
+        while (l < r)
+        {
+            int mid = (l + r) / 2;
+            if (numbers[mid] > numbers[r])
+            {
+                l = mid + 1;
+            }
+            else if (numbers[mid] < numbers[r])
+            {
+                r = mid;
+            }
+            else
+            {
+                r--;
+            }
+        }
+        return numbers[l];
     }
-    return min(rotateArray[low], rotateArray[high]);
-}
+};
 ```
 
 ## No7、斐波那契数列
-
-[牛客网原题链接](https://www.nowcoder.com/practice/c6c7742f5ba7442aada113136ddea0c3?tpId=13&&tqId=11160&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -345,7 +376,8 @@ int Fibonacci(int n)
     F[0] = 0;
     F[1] = 1;
     int ret = 0;
-    for (int i = 2; i <= n; ++i) {
+    for (int i = 2; i <= n; ++i) 
+    {
         ret = F[0] + F[1];
         F[0] = F[1];
         F[1] = ret;
@@ -365,48 +397,47 @@ int Fibonacci(int n)
 }
 ```
 
-## No8、 跳台阶
-
-[牛客网原题链接](https://www.nowcoder.com/practice/8c82a5b80378478f9484d87d1c5f12a4?tpId=13&&tqId=11161&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
+## No8、跳台阶
 
 **题目描述**
 
 一只青蛙一次可以跳上1级台阶，也可以跳上2级。求该青蛙跳上一个n级的台阶总共有多少种跳法（先后次序不同算不同的结果）。
 
-**1、递归做法，真的很耗时**
+**1、递归：超时**
 
 ```cpp
 int jumpFloor(int number) 
 {
-    if(number <= 2) 
-            return number;   
+    if (number < 2)
+        return 1;
+
     return jumpFloor(number - 1) + jumpFloor(number - 2);
 }
 ```
 
-**2、直接循环会好很多**
+**2、循环**
 
 ```cpp
-int jumpFloor(int number) 
-{
-    if (number <= 2) 
-        return number;
-    
-    int first = 1;
-    int second = 2;
-    for (int i = 3; i <= number; ++i) 
-    {
-        int third = first + second;
-        first = second;
-        second = third;
+class Solution {
+public:
+    int numWays(int n) {
+        if (n < 2)
+            return 1;
+        int a = 1;
+        int b = 1;
+        int c = 1;
+        for (int i = 2; i <= n; ++i)
+        {
+            c = (a + b) % 1000000007;
+            a = b;
+            b = c;
+        }
+        return c;
     }
-    return second;        
-}
+};
 ```
 
 ## No9、变态跳台阶
-
-[牛客网原题链接](https://www.nowcoder.com/practice/22243d016f6b47f2a6928b4313c85387?tpId=13&&tqId=11162&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -462,8 +493,6 @@ int jumpFloorII(int number)
 
 ## No10、矩阵覆盖
 
-[牛客网原题链接](https://www.nowcoder.com/practice/72a5a919508a4251859fb2cfb987a0e6?tpId=13&&tqId=11163&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 我们可以用 2*1 的小矩形横着或者竖着去覆盖更大的矩形。
@@ -486,8 +515,6 @@ int rectCover(int number)
 ```
 
 ## No11、二进制中1的个数
-
-[牛客网原题链接](https://www.nowcoder.com/practice/8ee967e43c2c4ec193b040ea7fbb10b8?tpId=13&&tqId=11164&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -4100,8 +4127,6 @@ int StrToInt(string str) {
 
 ## No50、数组中重复的数字
 
-[牛客网原题链接](https://www.nowcoder.com/practice/623a5ac0ea5b4e5f95552655361ae0a8?tpId=13&&tqId=11203&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 在一个长度为n的数组里的所有数字都在0到n-1的范围内。 数组中某些数字是重复的，但不知道有几个数字是重复的。也不知道每个数字重复几次。请找出数组中第一个重复的数字。 例如，如果输入长度为7的数组{2,3,1,0,2,5,3}，那么对应的输出是第一个重复的数字2。
@@ -4112,114 +4137,41 @@ int StrToInt(string str) {
 
 如果数组中有重复的数字，把重复的数字放到参数duplication[0]中。（ps:duplication已经初始化，可以直接赋值使用。）
 
-**1、用unordered_map保存即可**
+**题解：**
+
+1. 用 unordered_map 保存：遍历数组，检查逐个元素是否在 map 中，若不在，则插入，若在，则找到重复的元素，将其返回。
+2. 在原数组中修改，利用 `长度为 n 的数组里的所有数字都在 0 到 n-1 的范围内` 的特性，即数字 i 应该放在数组的第 i 个位置上
 
 ```cpp
-bool duplicate(int numbers[], int length, int* duplication) {
-    unordered_map<int, int> unmp;
-    unmp.reserve(length);
-    for (int i = 0; i < length; ++i) {
-        if (unmp.find(numbers[i]) == unmp.end()) {
-            unmp.insert({ numbers[i],1 });
-        }
-        else
+class Solution {
+public:
+    int findRepeatNumber(vector<int>& nums) 
+    {
+        int index = 0;
+        while (index < nums.size())
         {
-            *duplication = numbers[i];
-            return true;
+            if (nums[index] == index)		// 数字 i 放在数组的第 i 个位置上, index++
+            {
+                index++;
+            }
+            else							// 数字 i 不在数组的第 i 个位置上， 则需交换
+            {
+                if (nums[index] == nums[nums[index]])	// 若交换两个数相等， 则重复
+                {
+                    return nums[index];
+                }
+                else
+                {
+                    swap(nums[index], nums[nums[index]]);	// 交换
+                }
+            }
         }
+        return nums[index];
     }
-    return false;
-}Copy to clipboardErrorCopied
+};
 ```
-
-**2、减少内存，降低内存复杂度**
-
-用 vector<char>来存
-
-```cpp
-bool duplicate(int numbers[], int length, int* duplication) {
-    vector<bool> result(length,false);
-    for (int i = 0; i < length; ++i) {
-        if (result[numbers[i]] == false) {
-            result[numbers[i]] = true;
-        }
-        else
-        {
-            duplication[0] = numbers[i];
-            return true;
-        }
-    }
-    return false;
-}Copy to clipboardErrorCopied
-```
-
-**3、不占用任何空间的一种做法**
-
-题目里写了数组里数字的范围保证在0 ~ n-1 之间，所以可以利用现有数组设置标志，当一个数字被访问过后，可以设置对应位上的数 + n，之后再遇到相同的数时，会发现对应位上的数已经大于等于n了，那么直接返回这个数即可。
-
-```cpp
-bool duplicate(int numbers[], int length, int* duplication) {
-    for (int i = 0; i < length; ++i) {
-        int index = numbers[i];
-        if (index >= length) index -= length;
-        if (numbers[index] >= length) {
-            duplication[0] = index;
-            return true;
-        }
-        numbers[index] += length;
-    }
-    return false;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、常规做法就是哈希表，使用一个vector的bool型数组会节约不少空间**
-
-运行时间：2ms 占用内存：508k
-
-```cpp
-bool duplicate(int numbers[], int length, int* duplication) {
-    vector<bool> result(length,false);
-    for (int i = 0; i < length; ++i) {
-        if (result[numbers[i]] == false) {
-            result[numbers[i]] = true;
-        }
-        else
-        {
-            duplication[0] = numbers[i];
-            return true;
-        }
-    }
-    return false;
-    }Copy to clipboardErrorCopied
-```
-
-**2、另一种原地做法**
-
-运行时间：2ms 占用内存：476k
-
-```cpp
-bool duplicate(int numbers[], int length, int* duplication) {
-    for(int i = 0;i < length; ++i){//这个方法妙在对于依次遍历过的每个数，都能在数组里记忆它出现过了。
-        //比如{2,2,1,0}，第一次循环index = 2,a[2]=a[2] + 4 = 5,这样，a[2]=5 > 数组长度4,就说明2这个数字出现过了。
-        int index = numbers[i]%length;
-        if( numbers[index] >= length){
-            duplication[0] = index;
-            return true;
-        }
-        numbers[index] += length;
-    }
-
-    return false;
-}Copy to clipboardErrorCopied
-```
-
-注释：和Top100中 [448](https://leetcode-cn.com/problems/find-all-numbers-disappeared-in-an-array/) 很像，做法差不多
 
 ## No51、构建乘积数组
-
-[牛客网原题链接](https://www.nowcoder.com/practice/94a4d381a68b47b7a8bed86f2975db46?tpId=13&&tqId=11204&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
