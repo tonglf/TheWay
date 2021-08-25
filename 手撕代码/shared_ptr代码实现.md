@@ -24,7 +24,7 @@ public:
 	}
 
 private:
-	T *ptr;				// 底层真实的指针
+	T *ptr;						// 底层真实的指针
 	unsigned *use_count;		// 保存当前对象被多少指针引用计数
 };
 
@@ -32,7 +32,8 @@ template <typename T>
 SmartPtr<T>::SmartPtr(T *p)
 {
 	ptr = p;
-	try {
+	try 
+    {
 		use_count = new unsigned(1);
 	}
 	catch (...)
