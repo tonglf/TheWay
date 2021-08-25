@@ -1,12 +1,12 @@
 # 剑指 offer 67 道题
 
-**前言**
-
-> 以下所有题目均来自于《何海涛. 剑指 Offer[M]. 电子工业出版社, 2012.》一书中
-
-刷题网站推荐：[力扣网](https://www.nowcoder.com/ta/coding-interviews?from=cyc_github)、[牛客网](https://leetcode-cn.com/problemset/lcof/)
-
 ## 分类
+
+### 重点题目
+
+- [ ] No65、矩阵中的路径
+- [ ] No66、机器人的运动范围
+- [ ] 
 
 ### 数组
 
@@ -31,6 +31,10 @@
 ### 动态规划
 
 - [ ] 7、8、9、10、30、64、65、66
+
+### 回溯
+
+- [ ] 65、66
 
 ### 其他
 
@@ -262,7 +266,7 @@ public:
 
 ```
 
-## No5、 用两个栈来实现一个队列
+## No5、用两个栈来实现一个队列
 
 [牛客网原题链接](https://www.nowcoder.com/practice/54275ddae22f475981afa2244dd448c6?tpId=13&&tqId=11158&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
@@ -1951,7 +1955,7 @@ int MoreThanHalfNum_Solution(vector<int> numbers) {
     }Copy to clipboardErrorCopied
 ```
 
-## 29、最小的K个数
+## No29、最小的K个数
 
 [牛客网原题链接](https://www.nowcoder.com/practice/6a296eb82cf844ca8539b57c23e6e9bf?tpId=13&&tqId=11182&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
@@ -6075,183 +6079,66 @@ vector<int> maxInWindows(const vector<int>& num, unsigned int size)
 
 ## No65、矩阵中的路径
 
-[牛客网原题链接](https://www.nowcoder.com/practice/c61c6999eecb4b8f88a98f66b273a3cc?tpId=13&&tqId=11218&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 请设计一个函数，用来判断在一个矩阵中是否存在一条包含某字符串所有字符的路径。路径可以从矩阵中的任意一个格子开始，每一步可以在矩阵中向左，向右，向上，向下移动一个格子。如果一条路径经过了矩阵中的某一个格子，则该路径不能再进入该格子。
 
-**示例1**
+例如，在下面的 3×4 的矩阵中包含单词 "ABCCED"（单词中的字母已标出）。
 
-**输入**
-
-```
-"ABCESFCSADEE",3,4,"ABCCED"Copy to clipboardErrorCopied
-```
-
-**返回值**
-
-```
-trueCopy to clipboardErrorCopied
-```
-
-**示例2**
-
-**输入**
-
-```
-"ABCESFCSADEE",3,4,"ABCB"Copy to clipboardErrorCopied
-```
-
-**返回值**
-
-```
-falseCopy to clipboardErrorCopied
-```
-
-**1、DFS**
-
-这道题是典型的深度优先遍历DFS的应用，原二维数组就像是一个迷宫，可以 //上下左右四个方向行走 我们的二维数组board中每个数都作为起点和给定的字符串做匹配，我们需要 一个和原二维数组board等大小的visited数组，是bool型的，用来记录当前位置 是否被访问过。因为题目要求一个cell只能被访问一次。 如果二维数组的当前字符和目标字符串str对应的字符相等，则对其上下左右四个邻字 符串分别调用dfs的递归函数，只要有一个返回true，那么就表示找到对应的字符串
+示例 1：
 
 ```cpp
-bool dfs(vector<vector<char>> &board, char* str, int index, int x, int y,
-    vector<vector<bool>>& visited) 
-
-{
-    if (index == strlen(str)) return true;//搜寻超过路径长度，符合条件，返回true，//此时已经超过最大程度了 strlen返回不带 ‘\0’的长度，此时str[k]已经越界了，所以这个判断一定要放在函数开头，如果放在if之后，str[k]会越界
-    if ((x < 0) || (y < 0) || (x >= board.size()) || (y >= board[0].size()))
-        return false;//访问越界，终止，返回false
-    if (visited[x][y]) return false;//之前访问过，剪枝
-    if (board[x][y] != str[index]) return false;//不相等，剪枝
-    visited[x][y] = true;
-    if (dfs(board, str, index + 1, x, y - 1, visited) || //上
-        dfs(board, str, index + 1, x, y + 1, visited) ||     //下
-        dfs(board, str, index + 1, x - 1, y, visited) ||     //左
-        dfs(board, str, index + 1, x + 1, y, visited))      //右
-        return true; //有符合要求的
-
-    visited[x][y] = false;//记得此处改回false，以方便下一次遍历搜索。
-    return false;
-}
-
-bool hasPath(char* matrix, int rows, int cols, char* str)
-{
-    if (str == NULL || rows <= 0 || cols <= 0)
-        return false;
-    vector<vector<char>> board(rows, vector<char>(cols));
-    for (int i = 0; i < rows; ++i) {//将matrix装入二维数组board中
-        for (int j = 0; j < cols; ++j) {
-            board[i][j] = matrix[i * cols + j];
-        }
-    }
-    vector<vector<bool>> visited(rows, vector<bool>(cols, false));
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            if (dfs(board, str, 0, i, j, visited) == true)
-                return true;//以矩阵board中的每个字符为起点进行广度优先搜索
-            //找到一个符合条件的即返回true.
-        }
-    }
-    return false;//遍历完都没找到匹配的路径，返回false
-}
-Copy to clipboardErrorCopied
+输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+输出：true
 ```
 
-**2、回溯法 写法非常的好啊**
+
+示例 2：
 
 ```cpp
-/*参数说明  k 字符串索引初始为0即先判断字符串的第一位*/
-bool judge(char* matrix, int rows, int cols, int i, int j, char* str, int k, bool* flag)
-{
-    //因为是一维数组存放二维的值，index值就是相当于二维数组的（i，j）在一维数组的下标
-    int index = i * cols + j;
-    //flag[index]==true,说明被访问过了，那么也返回true;
-    if (i < 0 || i >= rows || j < 0 || j >= cols || matrix[index] != str[k] || flag[index] == true)
-        return false;
-    //字符串已经查找结束，说明找到该路径了
-    if (str[k + 1] == '\0') return true;
-    //向四个方向进行递归查找,向左，向右，向上，向下查找
-    flag[index] = true;//标记访问过 //要走的第一个位置置为true，表示已经走过了0
+输入：board = [["a","b"],["c","d"]], word = "abcd"
+输出：false
+```
 
-      //回溯，递归寻找，每次找到了就给k加一，找不到，还原
-    if (judge(matrix, rows, cols, i - 1, j, str, k + 1, flag)
-        || judge(matrix, rows, cols, i + 1, j, str, k + 1, flag)
-        || judge(matrix, rows, cols, i, j - 1, str, k + 1, flag)
-        || judge(matrix, rows, cols, i, j + 1, str, k + 1, flag))
+**题解：回溯法**
+
+```cpp
+class Solution {
+public:
+    bool exist(vector<vector<char>>& board, string word) 
     {
-        return true;
-    }
-
-    //走到这，说明这一条路不通，还原，再试其他的路径
-    flag[index] = false;
-    return false;
-}
-
-bool hasPath(char* matrix, int rows, int cols, char* str)
-{
-    if (matrix == NULL || rows < 1 || cols < 1 || str == NULL) return false;
-    bool* flag = new bool[rows * cols];
-    memset(flag, false, rows * cols);
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < cols; j++)
+        vector<vector<bool>> used(board.size(), vector<bool>(board[0].size(), false));
+        for(int i = 0; i < board.size(); i++) 
         {
-            if (judge(matrix, rows, cols, i, j, str, 0, flag))
+            for(int j = 0; j < board[0].size(); j++) 
             {
-                return true;
+                if(dfs(board, word, i, j, 0, used)) 
+                    return true;
             }
         }
+        return false;
     }
-    delete[] flag;
-    return false;
-}Copy to clipboardErrorCopied
+private:
+    bool dfs(const vector<vector<char>>& board, const string& word, int i, int j, int index, vector<vector<bool>>& used) 
+    {
+        if(i >= board.size() || i < 0 || j >= board[0].size() || j < 0 || board[i][j] != word[index] || used[i][j] == true) 
+            return false;
+        if(index == word.size() - 1) 
+            return true;
+
+        used[i][j] = true;
+
+        bool res = dfs(board, word, i + 1, j, index + 1, used) || dfs(board, word, i - 1, j, index + 1, used) || 
+                      dfs(board, word, i, j + 1, index + 1, used) || dfs(board, word, i , j - 1, index + 1, used);
+
+        used[i][j] = false;
+        return res;
+    }
+};
+
 ```
-
-**二刷：**
-
-**1、很经典的题目**
-
-```cpp
-bool hasPathCore(vector<vector<char>>& matrix, char* str, int row, int col,int index , vector<vector<bool>> &visit) {
-
-    if (str[index] == '\0') return true;
-    if (row<0 || row >= matrix.size() || col<0 || col >= matrix[0].size() || visit[row][col] == true || str[index] != matrix[row][col]) return false;
-    visit[row][col] = true;
-
-    if (hasPathCore(matrix, str, row + 1, col, index + 1,visit) ||
-        hasPathCore(matrix, str, row - 1, col, index + 1, visit) ||
-        hasPathCore(matrix, str, row, col + 1, index + 1, visit) ||
-        hasPathCore(matrix, str, row, col - 1, index + 1, visit))
-        return true;
-
-    visit[row][col] = false;
-    return false;
-}
-
-bool hasPath(char* matrix, int rows, int cols, char* str)
-{
-    vector<vector<char>> matri(rows, vector<char>(cols, ' '));
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            matri[i][j] = matrix[i * cols + j];
-        }
-    }
-
-    vector<vector<bool>> visit(rows, vector<bool>(cols, false));
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; ++j) {
-            if (hasPathCore(matri, str, i, j, 0,visit)) return true;
-        }
-    }
-    return false;
-}Copy to clipboardErrorCopied
-```
-
-
 
 ## No66、机器人的运动范围
-
-[牛客网原题链接](https://www.nowcoder.com/practice/6e5207314b5241fb83f2329e89fdecc8?tpId=13&&tqId=11219&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -6262,180 +6149,56 @@ bool hasPath(char* matrix, int rows, int cols, char* str)
 **输入**
 
 ```
-5,10,10Copy to clipboardErrorCopied
+5,10,10
 ```
 
 **返回值**
 
 ```
-21Copy to clipboardErrorCopied
+21
 ```
 
-**1、借助标记法，看的解释，其实很好理解和明白**
-
-```cpp
-bool canReach(int threshold, int x, int y) {
-    int sum = 0;
-    while (x > 0) {
-        sum += x % 10;
-        x /= 10;
-    }
-    while (y > 0) {
-        sum += y % 10;
-        y /= 10;
-    }
-    return sum <= threshold;
-}
-
-int movingCountCore(int threshold, int i, int rows,int j ,int cols, vector<vector<bool>>&visit) {
-    if (i < 0 || i >= rows || j < 0 || j >= cols || !canReach(threshold, i, j) || visit[i][j] == true) return 0;
-    //边界值不满足，不能到达或者已经走过了，也到达不了，返回0
-    visit[i][j] = true; // 当前已经走过了，并且满足要求，所有后续return 要加上1
-
-    return movingCountCore(threshold, i - 1, rows, j, cols, visit) + //分别是上下左右各个方向判断一下
-        movingCountCore(threshold, i + 1, rows, j, cols, visit) +
-        movingCountCore(threshold, i , rows, j-1, cols, visit) +
-        movingCountCore(threshold, i, rows, j+1, cols, visit) + 1;
-
-}
-int movingCount(int threshold, int rows, int cols)
-{
-    vector<vector<bool>> visit(rows,vector<bool>(cols,false));
-    return movingCountCore(threshold, 0,  rows, 0, cols, visit);
-
-}Copy to clipboardErrorCopied
-```
-
-**2、标注借助法的简化版**
-
-递归只要俩行就够了，helper(threshold, rows, cols, flags, i + 1, j) + helper(threshold, rows, cols, flags, i, j + 1) + 1，不需要往回走，然后前面的判断i，j也不会小于零了
+**题解：回溯法**
 
 因为是从（0 0 ），开始走的，所以只需要判断向上和向右的情况即可
 
 ```cpp
-bool canReach(int threshold, int x, int y) {
-    int sum = 0;
-    while (x > 0) {
-        sum += x % 10;
-        x /= 10;
-    }
-    while (y > 0) {
-        sum += y % 10;
-        y /= 10;
-    }
-    return sum <= threshold;
-}
-
-int movingCountCore(int threshold, int i, int rows,int j ,int cols, vector<vector<bool>>&visit) {
-    if (i >= rows || j >= cols || !canReach(threshold, i, j) || visit[i][j] == true) return 0;
-    //边界值不满足，不能到达或者已经走过了，也到达不了，返回0
-    visit[i][j] = true; // 当前已经走过了，并且满足要求，所有后续return 要加上1
-
-    return  movingCountCore(threshold, i + 1, rows, j, cols, visit) +
-        movingCountCore(threshold, i, rows, j+1, cols, visit) + 1;
-
-}
-int movingCount(int threshold, int rows, int cols)
-{
-    vector<vector<bool>> visit(rows,vector<bool>(cols,false));
-    return movingCountCore(threshold, 0,  rows, 0, cols, visit);
-
-}Copy to clipboardErrorCopied
-```
-
-**3、BFS**
-
-```cpp
-bool canReach(int threshold, int x, int y) {
-    int sum = 0;
-    while (x > 0) {
-        sum += x % 10;
-        x /= 10;
-    }
-    while (y > 0) {
-        sum += y % 10;
-        y /= 10;
-    }
-    return sum <= threshold;
-}
-
-int movingCount(int threshold, int rows, int cols)
-{
-    vector<vector<bool>> grid(rows,vector<bool>(cols,false));
-    queue<pair<int, int>> que;
-    if (canReach(threshold, 0, 0)) {
-        que.push(make_pair(0, 0));
-        grid[0][0] = true;
-    }
-    int cnt = 0;
-    while (!que.empty()) {
-        ++cnt;
-        int x, y;
-        tie(x, y) = que.front();
-        que.pop();
-        if (x + 1 < rows && !grid[x + 1][y] && canReach(threshold, x + 1, y)) {
-            grid[x + 1][y] = true;
-            que.push(make_pair(x + 1, y));
-        }
-        if (y + 1 < cols && !grid[x][y + 1] && canReach(threshold, x, y + 1)) {
-            grid[x][y + 1] = true;
-            que.push(make_pair(x, y + 1));
-        }
-    }
-    return cnt;
-
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、还是比较经典的方法**
-
-运行时间：4ms 占用内存：504k
-
-```cpp
-int getValue(int row, int col) {
-    int sum = 0;
-    while (row != 0)
+class Solution {
+public:
+	bool canReach(int k, int x, int y) 
     {
-        sum += row % 10;
-        row = row / 10;
-    }
+    	int sum = 0;
+    	while (x > 0) 
+    	{
+        	sum += x % 10;
+        	x /= 10;
+    	}
+    	while (y > 0) 
+    	{
+        	sum += y % 10;
+       		y /= 10;
+    	}
+    	return sum <= k;
+	}
 
-    while (col != 0)
-    {
-        sum += col % 10;
-        col = col / 10;
-    }
-    return sum;
-}
+	int movingCountCore(int k, int i, int m,int j ,int n, vector<vector<bool>>& visit) 
+	{
+    	if (i >= m || j >= n || !canReach(k, i, j) || visit[i][j] == true) 
+        	return 0;
 
-void movingCountCore(int threshold, int rows, int cols, vector<vector<bool>>& visit, int row, int col, int &count) {
-    if (row < 0 || col < 0 || row >= rows || col >= cols || visit[row][col] == true) return;
-    if (getValue(row, col) > threshold) {
-        visit[row][col] = true;
-        return;
-    }
-    visit[row][col] = true;
-    count++;
+    	visit[i][j] = true; // 当前已经走过了，并且满足要求，所有后续 return 要加上1
 
-    movingCountCore(threshold, rows, cols, visit, row + 1, col, count);
-    movingCountCore(threshold, rows, cols, visit, row - 1, col, count);
-    movingCountCore(threshold, rows, cols, visit, row, col + 1, count);
-    movingCountCore(threshold, rows, cols, visit, row, col - 1, count);
+    	return  1 + movingCountCore(k, i + 1, m, j, n, visit) +
+        	movingCountCore(k, i, m, j + 1, n, visit);
 
-}
+	}
 
-
-int movingCount(int threshold, int rows, int cols)
-{
-    if (rows < 0 || cols < 0) return 0;
-    vector<vector<bool>> visit(rows, vector<bool>(cols, false));
-    int count = 0;
-    movingCountCore(threshold, rows, cols, visit, 0, 0, count);
-    return count;
-
-}Copy to clipboardErrorCopied
+	int movingCount(int m, int n, int k) 
+	{
+    	vector<vector<bool>> visit(m,vector<bool>(n,false));
+    	return movingCountCore(k, 0,  m, 0, n, visit);
+	}
+};
 ```
 
 ## No67、剪绳子
