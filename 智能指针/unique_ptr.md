@@ -145,7 +145,9 @@ int main()
     // 使用匹配这些参数的构造函数
     std::unique_ptr<Vec3> v2 = std::make_unique<Vec3>(0, 1, 2);
     // 创建指向 5 个元素数组的 unique_ptr 
-    std::unique_ptr<Vec3[]> v3 = std::make_unique<Vec3[]>(5);#include <iostream>
+    std::unique_ptr<Vec3[]> v3 = std::make_unique<Vec3[]>(5);
+
+#include <iostream>
 #include <memory>
  
 struct Vec3
