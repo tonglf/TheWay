@@ -560,8 +560,6 @@ int rectCover(int number)
 
 ## No12、数值的整数次方
 
-[牛客网原题链接](https://www.nowcoder.com/practice/1a834e5e3e1a4b7ba251417554e07c00?tpId=13&&tqId=11165&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 给定一个 double 类型的浮点数 base 和 int 类型的整数 exponent。求 base 的 exponent 次方。
@@ -610,33 +608,37 @@ int rectCover(int number)
 0.25000		// 2 的 -2 次方等于 1/4 = 0.25
 ```
 
-**注意正负数的情况，要分开**
+**题解：二分法**
 
 ```cpp
-    double Power(double base, int exponent) {
-        if( exponent == 0) return 1.0;
-        if( base == 0.0 ) return 0.0;	// 保证不同时为0，先处理各自为0的情况
-
-        bool flag = false;		// 判断指数是否为负
-        if( exponent < 0) {
-            flag = true;
-            exponent *=-1;		// 如果为负数，则将指数转正
+class Solution {
+public:
+    double myPow(double x, long n) 
+    {
+        if (!n) 
+            return 1;
+        
+        if (n < 0) 
+        {
+            n = -n;
+            x = 1 / x;  
         }
-        double res = base; 
-        for(int i = 2;i <= exponent; ++i){
-            res *= base;		// 逐渐递乘
+        double result = 1.0;
+        while (n > 0) 
+        {
+            if (n % 2 == 1) 
+            {
+                result *= x;
+            }
+            x *= x;
+            n /= 2;
         }
-
-        if(flag) 	
-            return 1.0 / res;
-        else
-            return res;
+        return result;
     }
+};
 ```
 
 ## No13、调整数组顺序使奇数位于偶数前面
-
-[牛客网原题链接](https://www.nowcoder.com/practice/beb5aa231adc45b2a5dcc5b62c93f593?tpId=13&&tqId=11166&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -703,8 +705,6 @@ void reOrderArray(vector<int> &array)
 
 ## No14、 链表中倒数第k个结点
 
-[牛客网原题链接](https://www.nowcoder.com/practice/529d3ae5a407492994ad2a246518148a?tpId=13&&tqId=11167&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 输入一个链表，输出该链表中倒数第k个结点。
@@ -737,8 +737,6 @@ public:
 
 ## No15、反转链表
 
-[牛客网原题链接](https://www.nowcoder.com/practice/75e878df47f24fdc9dc3e400ec6058ca?tpId=13&&tqId=11168&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 输入一个链表，反转链表后，输出新链表的表头。
@@ -770,8 +768,6 @@ ListNode* reverseList(ListNode* head) {
 ```
 
 ## No16、合并两个有序链表
-
-[牛客网原题链接](https://www.nowcoder.com/practice/d8b6b4358f774294a89de2a6ac4d9337?tpId=13&&tqId=11169&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -842,8 +838,6 @@ ListNode* Merge(ListNode* pHead1, ListNode* pHead2)
 ```
 
 ## No17、树的子结构
-
-[牛客网原题链接](https://www.nowcoder.com/practice/6e196c44c7004d15b1610b9afca8bd88?tpId=13&&tqId=11170&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -4947,13 +4941,13 @@ TreeLinkNode* GetNext(TreeLinkNode* pNode)
 **输入**
 
 ```
-{8,6,6,5,7,7,5}Copy to clipboardErrorCopied
+{8,6,6,5,7,7,5}
 ```
 
 **返回值**
 
 ```
-trueCopy to clipboardErrorCopied
+true
 ```
 
 **示例2**
@@ -4961,13 +4955,13 @@ trueCopy to clipboardErrorCopied
 **输入**
 
 ```
-{8,6,9,5,7,7,5}Copy to clipboardErrorCopied
+{8,6,9,5,7,7,5}
 ```
 
 **返回值**
 
 ```
-falseCopy to clipboardErrorCopied
+falseied
 ```
 
 **1、递归法比较好做，也很方便**
