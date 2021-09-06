@@ -6,6 +6,9 @@
 
 - [ ] No65、矩阵中的路径
 - [ ] No66、机器人的运动范围
+- [ ] No52、正则表达式匹配
+- [ ] No53、表示数值的字符串
+- [ ] No17、树的子结构
 - [ ] 
 
 ### 数组
@@ -644,63 +647,37 @@ public:
 
 输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，所有的偶数位于数组的后半部分，并保证奇数和奇数，偶数和偶数之间的相对位置不变。
 
-**1、暴力解法，新开辟一个数组保存数据**
+**题解：双指针**
 
 ```cpp
-void reOrderArray(vector<int>& array) 
-{
-    vector<int> temp(array.size(), 0);
-    int low = 0;
-    for (int i = 0; i < array.size(); ++i) {
-        if ((array[i] & 1) == 1) 
-            temp[low++] = array[i]; 
-    }
-
-    for (int i = 0; i < array.size(); ++i) {
-        if ((array[i] & 1) == 0) 
-            temp[low++] = array[i]; 
-    }
-    array.assign(temp.begin(), temp.end());
-}
-```
-
-**2、一种很巧妙的解法，空间复杂度o1的做法，时间复杂度是on^2**
-
-```cpp
-void reOrderArray(vector<int>& array) 
-{
-    for (int i = 0; i < array.size(); i++)
+class Solution {
+public:
+    vector<int> exchange(vector<int>& nums) 
     {
-        for (int j = array.size() - 1; j > i; j--)
+        int l = 0, r = nums.size() - 1;
+        while (l < r)
         {
-            //前偶后奇就进行交换，这样一趟下来可以将第一个奇数放在首位
-            if (array[j] % 2 == 1 && array[j-1] % 2 == 0) 
+            while (l < r && !isEven(nums[l]))		// 是奇数
             {
-                swap(array[j], array[j - 1]);
+                l++;
+            }
+            while (l < r && isEven(nums[r]))		// 是偶数
+            {
+                r--;
+            }
+            if (l < r)
+            {
+                swap(nums[l], nums[r]);
             }
         }
+        return nums;
     }
-}
-```
 
-**3、第三种解法，但是并不是原地解法，至少比第一种要好一点，只保存偶数数据**
-
-```cpp
-void reOrderArray(vector<int> &array) 
-{
-	int evenIndex = 0, oddIndex = 0;       
-    vector<int> temp(array.size() / 2 + 1,0);
-    for (int i = 0; i < array.size(); ++i) 
+    bool isEven(int n)
     {
-        if ( (array[i] & 1) == 1)  
-            array[oddIndex++] = array[i];
-        else
-            temp[evenIndex++] = array[i];	// 将偶数另外保存起来
+        return (n & 1) == 0;
     }
-
-    for(int j = 0;j < evenIndex; ++j)
-        array[j + oddIndex] = temp[j];
-}
+};
 ```
 
 ## No14、 链表中倒数第k个结点
@@ -714,10 +691,12 @@ void reOrderArray(vector<int> &array)
 ```cpp
 class Solution {
 public:
-    ListNode* FindKthToTail(ListNode* pListHead, unsigned int k) {
+    ListNode* FindKthToTail(ListNode* pListHead, int k) 
+    {
         if (!pListHead || k <= 0) 
             return nullptr;
-        auto slow = pListHead, fast = pListHead;
+        ListNode* slow = pListHead;
+        ListNode* fast = pListHead;
  
         while (k--) 
         {
@@ -726,7 +705,8 @@ public:
             else
                 return nullptr; 	// 如果单链表长度 < K,直接返回
         }
-        while (fast) {
+        while (fast) 
+        {
             slow = slow->next;
             fast = fast->next;
         }
@@ -741,22 +721,16 @@ public:
 
 输入一个链表，反转链表后，输出新链表的表头。
 
-**1、头插法 很经典的做法啊**
+**题解**
 
 ```cpp
-struct ListNode {
-    int val;
-    struct ListNode* next;
-    ListNode(int x) :
-        val(x), next(NULL) {
-    }
-}; 
-
-ListNode* reverseList(ListNode* head) {
+ListNode* reverseList(ListNode* head) 
+{
     ListNode* temp; 			// 保存cur的下一个节点
     ListNode* cur = head;
 	ListNode* pre = NULL;
-    while(cur) {
+    while(cur) 
+    {
         temp = cur->next;  		// 保存一下 cur的下一个节点，因为接下来要改变cur->next
         cur->next = pre; 		// 翻转操作
             
@@ -778,14 +752,15 @@ ListNode* reverseList(ListNode* head) {
 ```cpp
 class Solution {
 public:
-    ListNode* Merge(ListNode* pHead1, ListNode* pHead2) {
+    ListNode* Merge(ListNode* pHead1, ListNode* pHead2) 
+    {
         if (pHead1 == nullptr)
             return pHead2;
         if (pHead2 == nullptr)
             return pHead1;
-        ListNode *p = new ListNode(-1);
-        ListNode *p1 = new ListNode(-1);
-        p1->next = p;
+        ListNode *dummy = new ListNode(-1);
+        ListNode *p = dummy;
+        
         while (pHead1 && pHead2)
         {
             if (pHead1->val < pHead2->val)
@@ -809,7 +784,7 @@ public:
         {
             p->next = pHead2;
         }
-        return p1->next->next;
+        return dummy->next;
     }
 };
 ```
@@ -857,34 +832,35 @@ ListNode* Merge(ListNode* pHead1, ListNode* pHead2)
 true
 ```
 
-**1、解析见[力扣-14 树 - medium - 面试题26](https://leetcode-cn.com/problems/shu-de-zi-jie-gou-lcof/)，讲得很好**
+**题解：递归**
 
 ```cpp
 bool HasSubtreeCore(TreeNode* pRoot1, TreeNode* pRoot2)			// 对比函数
 {
-    if(pRoot2 == nullptr)  
+    if (pRoot2 == nullptr)  
         return true;
-    if(pRoot1 == nullptr) 
+    if (pRoot1 == nullptr) 
         return false;
-    if(pRoot1->val == pRoot2->val)
+    
+    if (pRoot1->val == pRoot2->val)
+    {
         return HasSubtreeCore(pRoot1->left, pRoot2->left) 
         	&& HasSubtreeCore(pRoot1->right, pRoot2->right);
+    }
     else
         return false;
 }
 bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2)
 {
-   if(pRoot1 == nullptr || pRoot2 == nullptr)
+   if (pRoot1 == nullptr || pRoot2 == nullptr)
        return false;
-   return HasSubtree(pRoot1->left,pRoot2) 
-       || HasSubtree(pRoot1->right,pRoot2) 
-       || HasSubtreeCore(pRoot1,pRoot2);
+    
+   return HasSubtree(pRoot1->left,pRoot2) || HasSubtree(pRoot1->right,pRoot2) 
+       			|| HasSubtreeCore(pRoot1, pRoot2);
 }
 ```
 
 ## No18、二叉树的镜像
-
-[牛客网原题链接](https://www.nowcoder.com/practice/564f4c26aa584921bc75623e48ca3011?tpId=13&&tqId=11171&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -892,7 +868,7 @@ bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2)
 
 **输入描述:** 二叉树的镜像定义：源二叉树
 
-```
+```cpp
             8
            /  \
           6   10
@@ -4270,176 +4246,58 @@ vector<int> multiply(const vector<int>& A) {
 true
 ```
 
-**1、太他吗难了，不会不会，老子不会**
+**题解：动态规划**
 
 ```cpp
-//字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配
-bool match(char* str, char* pattern)
-{
-    int len1 = strlen(str), len2 = strlen(pattern);
-    int low1 = 0, low2 = 0;
-    while (low1 < len1 && low2 < len2) {
-        if (str[low1] == pattern[low2]) {
-
-            if (low2 + 1 < len2 && pattern[low2 + 1] == '*') {
-                while (str[low1] == pattern[low2]) { low1++; }
-                low2++;//跳过 * 
-            }
-            else {
-                low1++;
-                low2++;
-            }
-
-        }
-        else if (str[low1] != pattern[low2]) {
-            cout << "111" << endl;
-            if (pattern[low2] == '.' && low2 + 1 < len2 && pattern[low2 + 1] != '*') { low1++; low2++; }
-            else if (pattern[low2] == '.' && low2 + 1 < len2 && pattern[low2 + 1] == '*')  return true;
-            else if (low2 + 1 < len2 && pattern[low2 + 1] == '*') {//出现 aa 与 ab*a这样的情况
-                low2+=2;
-            }
-                return false;
-        }
-    }
-    return low1 == len1 && low2 == len2;
-}Copy to clipboardErrorCopied
-```
-
-**2、看的思路**
-
- 解这题需要把题意仔细研究清楚，反正我试了好多次才明白的。
-
- 首先，**考虑特殊情况**： 1>两个字符串都为空，返回true 2>当第一个字符串不空，而第二个字符串空了，返回false（因为这样，就无法 匹配成功了,而如果第一个字符串空了，第二个字符串非空，还是可能匹配成 功的，比如第二个字符串是“aaaa”,由于‘’之前的元素可以出现0次， 所以有可能匹配成功） 之后就开始匹配第一个字符，这里有两种可能：**匹配成功或匹配失败**。
-
- 但考虑到pattern 下一个字符可能是‘’， 这里我们分两种情况讨论：pattern下一个字符为‘’或 不为‘’： 1>pattern下一个字符不为‘’：这种情况比较简单，直接匹配当前字符。如果 匹配成功，继续匹配下一个；如果匹配失败，直接返回false。
-
- 注意这里的 “匹配成功”，除了两个字符相同的情况外，还有一种情况，就是pattern的 当前字符为‘.’,同时str的当前字符不为‘\0’。 2>pattern下一个字符为‘’时，稍微复杂一些，因为‘’可以代表0个或多个。
-
- 这里把这些情况都考虑到： a>当‘’匹配0个字符时，str当前字符不变，pattern当前字符后移两位， 跳过这个‘’符号； b>当‘’匹配1个或多个时，str当前字符移向下一个，pattern当前字符 不变。
-
-（这里匹配1个或多个可以看成一种情况，因为：当匹配一个时， 由于str移到了下一个字符，而pattern字符不变，就回到了上边的情况a； 当匹配多于一个字符时，相当于从str的下一个字符继续开始匹配） 之后再写代码就很简单了。
-
-```cpp
- bool match(char* str, char* pattern)
+class Solution {
+public:
+    bool isMatch(string s, string p) 
     {
-        if (*str == '\0' && *pattern == '\0')
-            return true;
-        if (*str != '\0' && *pattern == '\0')
-            return false;
-        //if the next character in pattern is not '*'
-        if (*(pattern+1) != '*')
+        int m = s.size();
+        int n = p.size();
+
+        auto matches = [&](int i, int j) 
         {
-            if (*str == *pattern || (*str != '\0' && *pattern == '.'))
-                return match(str+1, pattern+1);
-            else
+            if (i == 0) 
+            {
                 return false;
-        }
-        //if the next character is '*'
-        else
+            }
+            if (p[j - 1] == '.') 
+            {
+                return true;
+            }
+            return s[i - 1] == p[j - 1];
+        };
+
+        vector<vector<int>> f(m + 1, vector<int>(n + 1));
+        f[0][0] = true;
+        for (int i = 0; i <= m; ++i) 
         {
-            if (*str == *pattern || (*str != '\0' && *pattern == '.'))
-                return match(str, pattern+2) || match(str+1, pattern);
-            else
-                return match(str, pattern+2);
+            for (int j = 1; j <= n; ++j) 
+            {
+                if (p[j - 1] == '*') 
+                {
+                    f[i][j] |= f[i][j - 2];
+                    if (matches(i, j - 1)) 
+                    {
+                        f[i][j] |= f[i - 1][j];
+                    }
+                }
+                else 
+                {
+                    if (matches(i, j)) 
+                    {
+                        f[i][j] |= f[i - 1][j - 1];
+                    }
+                }
+            }
         }
-    }Copy to clipboardErrorCopied
-```
-
-**讲解:**
-
-首先能够匹配的情况就是两种：1、两者相等，2、s!='\0' && p=='.'
-
-只有这两种情况
-
-1、p[1] != * ,那么可能是 ba与.a 或者 ba ba这两种形式，那就直接s+1 p+1，递归到下一层，否则就是false了
-
-2、p[1] == *,有 \* 过来捣乱，如果匹配的话也就是两者相等或者**s!=‘\0’并且p==‘.’的话，前者比如 abc 与 a****abc直接 s p+2 ，要跳过pattern的匹配部分，因为有个 星号 \* 后者就是aaabc 与 .*bc这样，直接s+1,p，s向前走一步逐渐递归到下次
-
-如果不匹配的话那就是 abc b*abc这样的，p向前走两步，走到后面的p再去匹配
-
-**3、另一种写法**
-
-```cpp
-/*
-要分为几种情况：（状态机）
-匹配只可能是：两者相等 或者  S！=‘\0’ && p == .
-
-（1）当第二个字符不为‘*’时：匹配就是将字符串和模式的指针都下移一个，不匹配就直接返回false
-（2）当第二个字符为'*'时：
-        匹配：
-                a.字符串下移一个，模式不动  abc  a*bc
-                c.字符串不动，模式下移两个   abc  .*abc或者 .*bc
-        不匹配：字符串下移不动，模式下移两个   abc  b*abc
-搞清楚这几种状态后，用递归实现即可：
-*/
-class Solution {
-public:
-    bool match(char* str, char* pattern){
-        if(str[0]=='\0'&&pattern[0]=='\0')
-            return true;
-        else if(str[0]!='\0'&&pattern[0]=='\0')
-            return false;
-        if(pattern[1]!='*'){
-            if(str[0]==pattern[0]||(pattern[0]=='.'&&str[0]!='\0'))
-                return match(str+1,pattern+1);
-            else
-                return false;
-        }
-        else{
-            if(str[0]==pattern[0]||(pattern[0]=='.'&&str[0]!='\0'))
-                return match(str,pattern+2)||match(str+1,pattern);
-            else
-                return match(str,pattern+2);
-        }
+        return f[m][n];
     }
-};Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、很好，依然不会，哈哈，递归的方法**
-
-运行时间：3ms 占用内存：492k
-
-```cpp
-/*
-要分为几种情况：（状态机）
-匹配只可能是：两者相等 或者  S！=‘\0’ && p == .
-
-（1）当第二个字符不为‘*’时：匹配就是将字符串和模式的指针都下移一个，不匹配就直接返回false
-（2）当第二个字符为'*'时：
-        匹配：
-                a.字符串下移一个，模式不动  abc  a*bc
-                c.字符串不动，模式下移两个   abc  .*abc或者 .*bc
-        不匹配：字符串下移不动，模式下移两个   abc  b*abc
-搞清楚这几种状态后，用递归实现即可：
-*/
-class Solution {
-public:
-    bool match(char* str, char* pattern){
-        if(str[0]=='\0'&&pattern[0]=='\0')
-            return true;
-        else if(str[0]!='\0'&&pattern[0]=='\0')
-            return false;
-        if(pattern[1]!='*'){
-            if(str[0]==pattern[0]||(pattern[0]=='.'&&str[0]!='\0'))
-                return match(str+1,pattern+1);
-            else
-                return false;
-        }
-        else{
-            if(str[0]==pattern[0]||(pattern[0]=='.'&&str[0]!='\0'))
-                return match(str,pattern+2)||match(str+1,pattern);
-            else
-                return match(str,pattern+2);
-        }
-    }
-};Copy to clipboardErrorCopied
+};
 ```
 
 ## No53、表示数值的字符串
-
-[牛客网原题链接](https://www.nowcoder.com/practice/6f8c901d091949a5837e24bb82a731f2?tpId=13&&tqId=11206&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -4473,82 +4331,58 @@ true
 false
 ```
 
-**1、看的写法，很好**
+**题解**
 
 ```cpp
-bool isNumeric(char* string)
-{
-    // 正反标记符号、小数点、e是否出现过
-    bool sign = false, decimal = false, hasE = false;
-    for (int i = 0; i < strlen(string); ++i) {
-        if (string[i] == 'e' || string[i] == 'E') {
-            if (i == strlen(string) - 1) return false; // e后面一定要接数字
-            if (hasE) return false;  // 不能同时存在两个e
-            hasE = true;
-        }
-        else if (string[i] == '+' || string[i] == '-') {
-            // 第二次出现+-符号，则必须紧接在e之后
-            if (sign && string[i - 1] != 'e' && string[i - 1] != 'E') return false;
-            // 第一次出现+-符号，且不是在字符串开头，则也必须紧接在e之后
-            if (!sign && i > 0 && string[i - 1] != 'e' && string[i - 1] != 'E') return false;
-            sign = true;
-        }
-        else if (string[i] == '.') {
-            // e后面不能接小数点，小数点不能出现两次
-            if (hasE || decimal) return false;
-            decimal = true;
-        }
-        else if (string[i] < '0' || string[i] > '9') // 不合法字符
-            return false;
-    }
-    return true;
+class Solution {
+public:
+    bool isNumber(string s) 
+    {
+        bool ret = true, e = false, xs = false, dg = false;
 
-}Copy to clipboardErrorCopied
-```
+        while (s.back() == ' ') 				// 去除后面的空格
+            s.pop_back();
+        int i = 0, n = s.length();
+        while (i < n && s[i] == ' ') 			// 去除前面的空格
+            i++;
 
-**二刷：**
+        if (i < n && s[i] == '+' || s[i] == '-') 
+            i++;
 
-**1、还是不会**
-
-运行时间：2ms 占用内存：380k
-
-1、e后面必须是数字 只能有一个e
-
-2、正负号只能出现一次，即使出现第二次了，那他的前面也要是 e/ E ,出现第一次的话必须在开头或者在E的后面
-
-3、小数点也只能出现一次，且不能再E的后面
-
-4、合法字符的判断 除了 e +- . 以及数字之外 其余的字符都是错的。
-
-```cpp
-bool isNumeric(char* string)
-{
-    bool sign = false, decimal = false,hasE = false;//正负号 小数点 e
-    int len = strlen(string);
-    for(int i = 0; i < len; ++i){
-        if(string[i] == 'e' || string[i] == 'E'){
-            if( i == len - 1) return false;//e 的后面必须要出现数字 对应 12e
-            if(hasE) return false;//只能有一个e
-            hasE = true;
-
-        }else if(string[i] == '+' || string[i] == '-'){                
-            if(!sign && i>0 && string[i-1] !='e' && string[i-1] != 'E')// 12e+5 如果第一次出现，且不是在开头，那么也要紧跟在e/E之后
+        for (; i < n; i++) 
+        {
+            if (isdigit(s[i])) 
+            {
+                dg = true; 
+                continue;
+            }
+            if (s[i] == '.') 
+            {
+                if (xs || e) 
+                    return false;
+                xs = true;
+            } 
+            else if (s[i] == 'e' || s[i] == 'E') 
+            {
+                if (e) 
+                    return false;
+                e = true;
+                if (!dg) 
+                    return false;
+                dg = false;
+                if (++i < n && (s[i] == '+' || s[i] == '-')) 
+                    continue;
+                else 
+                    --i;
+            } 
+            else 
+            {
                 return false;
-            if(sign && string[i-1] !='e' && string[i-1] !='E')// +5e-6  第二次出现，那也要跟在 e/E之后
-                return false;
-            sign = true;
-        }else if(string[i] == '.'){
-            if(decimal) return false; 
-            if(hasE) return false;// E后面不能跟小数点  12e+4.3
-
-            decimal = true;
-
-        }else if(string[i] < '0' || string[i] > '9')//不合法字符
-            return false;
-
+            }
+        }
+        return dg;
     }
-    return true;
-}Copy to clipboardErrorCopied
+};
 ```
 
 ## No54、字符流中第一个不重复的字符
@@ -4677,8 +4511,6 @@ public:
 
 ## No55、链表中环的入口结点
 
-[牛客网原题链接](https://www.nowcoder.com/practice/253d2c59ec3e4bc68da16833f79a38e4?tpId=13&&tqId=11208&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
@@ -4688,7 +4520,8 @@ public:
 ```cpp
 ListNode* EntryNodeOfLoop(ListNode* pHead)
 {
-    if (pHead == nullptr) return NULL;
+    if (pHead == nullptr) 
+        return NULL;
     unordered_map<ListNode*, int> unmp;	// 注意是ListNode*，不是ListNode
     while (pHead != NULL) {
 
@@ -4701,24 +4534,6 @@ ListNode* EntryNodeOfLoop(ListNode* pHead)
 }
 ```
 
-借助set其实也可以，但是set和map底层其实差不多，而且set里的两个元素类型相同，sizeof（listnode）肯定比 sizeof要大
-
-```cpp
-ListNode* EntryNodeOfLoop(ListNode* pHead)
-{
-    set<ListNode*> s;
-    ListNode* node = pHead;
-    while(node!=NULL)
-    {
-        if(s.insert(node).second)
-            node = node->next;
-        else
-            return node;
-    }
-    return node;
-}
-```
-
 **2、快慢指针**
 
 先说个定理：两个指针一个 fast、一个 slow 同时从一个链表的头部出发 fast一次走2步，slow 一次走一步，如果该链表有环，两个指针必然在环内相遇 此时只需要把其中的一个指针重新指向链表头部，另一个不变（还在环内）， 这次两个指针一次走一步，相遇的地方就是入口节点。 这个定理可以自己去网上看看证明。
@@ -4726,7 +4541,8 @@ ListNode* EntryNodeOfLoop(ListNode* pHead)
 ```C++
 class Solution {
 public:
-    ListNode *detectCycle(ListNode *head) {
+    ListNode *detectCycle(ListNode *head) 
+    {
         ListNode* slow = head;
         ListNode* fast = head;
         while (fast && fast->next)
@@ -4750,8 +4566,6 @@ public:
 ```
 
 ## No56、删除链表中的重复结点
-
-[牛客网原题链接](https://www.nowcoder.com/practice/fc533c45b73a41b0b44ccba763f866ef?tpId=13&&tqId=11209&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -4815,8 +4629,6 @@ public:
 ```
 
 ## No57、二叉树的下一个结点
-
-[牛客网原题链接](https://www.nowcoder.com/practice/9023a0c988684a53960365b889ceaf5e?tpId=13&&tqId=11210&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -4961,7 +4773,7 @@ true
 **返回值**
 
 ```
-falseied
+false
 ```
 
 **1、递归法比较好做，也很方便**
