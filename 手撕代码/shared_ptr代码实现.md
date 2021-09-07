@@ -11,9 +11,9 @@ public:
 	SmartPtr& operator=(const SmartPtr<T>& rhs);// q = p;
 	~SmartPtr();
 
-	T& operator*();						// 为了能把智能指针当成普通指针操作定义解引用操作
+	T& operator*();							// 为了能把智能指针当成普通指针操作定义解引用操作
 	T* operator->();						// 定义取成员操作
-	T* operator+(int i);				// 定义指针加一个常数
+	T* operator+(int i);					// 定义指针加一个常数
 
 	template <typename T>
 	friend int operator-(SmartPtr<T>& t1, SmartPtr<T>& t2);
@@ -120,6 +120,4 @@ int main()
 	SmartPtr<int> b(new int(9));
 	std::cout << b - p << std::endl;			// 3
 }
-
 ```
-
