@@ -663,8 +663,8 @@ select max(sal),deptno from emp group by deptno;
 
 ```mysql
 select max(sal),deptno from emp group by deptno having max(sal) > 2900;  #  这种方式效率低。
-# 效率较高，建议能够使用where过滤的尽量使用where。
 
+# 效率较高，建议能够使用where过滤的尽量使用where。
 select max(sal),deptno from emp where sal > 2900 group by deptno; 
 ```
 
@@ -1267,7 +1267,7 @@ truncate table 表名;	# 表被截断，不可回滚。永久丢失。
 **删除表：**
 
 ```mysql
-drop table 表名；（通用）  或  drop table if exists 表名;
+drop table 表名;（通用）  或  drop table if exists 表名;
 ```
 
 ## 12、表结构的修改
@@ -1425,7 +1425,7 @@ create table t_user(
 );
 ```
 
-*** mysql 提供主键值自增： (非常重要)**
+**mysql 提供主键值自增： (非常重要)**
 
  ```mysql
  drop table if exists t_user;
@@ -1561,11 +1561,13 @@ CREATE TABLE t_x (
 
 ​    存储引擎这个名字只有在 mysql 中存在。(Oracle 中有对应的机制，但不叫做存储引擎。Oracle 中没有特殊的名字，就是"表的存储方式")
 
-​    mysql 支持很多存储引擎，每个存储引擎都对应了一种不同的存储方式。    每一个存储引擎都有自己的优缺点，需要在合适的时机选择合适的存储引擎。
+​    mysql 支持很多存储引擎，每个存储引擎都对应了一种不同的存储方式。    
+
+​	每一个存储引擎都有自己的优缺点，需要在合适的时机选择合适的存储引擎。
 
 ###   2.3、查看当前mysql支持的存储引擎？
 
-```mys
+```mysql
 show engines \G
 ```
 
@@ -1797,7 +1799,7 @@ savepoint b;
 
 …操作3
 
-bollback a;
+rollback a;
 ```
 
 回滚到节点a，则a之前的操作1保存，a节点后的操作2和操作3失效。
@@ -1828,7 +1830,7 @@ set global transaction isolation level repeatable read;
 set global transaction isolation level serializable;
 ```
 
-  *mysql远程登录：mysql -h192.168.151.18 -uroot -p444
+  mysql远程登录：mysql -h192.168.151.18 -uroot -p444
 
 ## 4、索引
 
@@ -2011,18 +2013,18 @@ source D:\bjpowernode.sql   	# 导入数据库
  t_student学生表     
 
 | sno(pk) | sname |
-| ------- | :---: |
-| 1       | 张三  |
-| 2       | 李四  |
-| 3       | 王五  |
+| :-----: | :---: |
+|    1    | 张三  |
+|    2    | 李四  |
+|    3    | 王五  |
 
 t_teacher  讲师表         
 
-| tno(pk) | tname     |
-| ------- | --------- |
-| 1       | 王老师    |
-| 2       | 张老师    |
-| 3       | 李老师 \| |
+| tno(pk) | tname  |
+| :-----: | :----: |
+|    1    | 王老师 |
+|    2    | 张老师 |
+|    3    | 李老师 |
 
 t_student_teacher_relation 学生讲师关系表
 
