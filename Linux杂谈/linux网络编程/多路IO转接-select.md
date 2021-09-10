@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 		{
             if (FD_ISSET(i, &rset)) 
             {
-                if ((n = read(i, buf, sizeof(buf))) == 0)      // 当client关闭链接时,服务器端也关闭对应链接 
+                if ((n = read(i, buf, sizeof(buf))) == 0))     // 当client关闭链接时,服务器端也关闭对应链接 
 				{
                     close(i);
                     FD_CLR(i, &allset);                        // 解除select对此文件描述符的监控 
