@@ -976,7 +976,8 @@ class Solution {
 public:
 	vector<int> spiralOrder(vector<vector<int>>& matrix) {
         vector <int> res;
-        if(matrix.empty()) return res;
+        if(matrix.empty()) 
+            return res;
         int rl = 0, rh = matrix.size() - 1;    // 记录待打印的矩阵上下边缘
         int cl = 0, ch = matrix[0].size() - 1; // 记录待打印的矩阵左右边缘
         while(1)
@@ -1050,7 +1051,7 @@ public:
 };
 ```
 
-**1、只用一个栈**
+**2、只用一个栈**
 
 ```cpp
 class Solution {
@@ -1087,8 +1088,6 @@ public:
 
 ## No21、栈的压入弹出序列
 
-[牛客网原题链接](https://www.nowcoder.com/practice/d77d11405cc7470d82554cb392585106?tpId=13&&tqId=11174&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述** 输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否可能为该栈的弹出顺序。假设压入栈的所有数字均不相等。例如序列1,2,3,4,5是某栈的压入顺序，序列4,5,3,2,1是该压栈序列对应的一个弹出序列，但4,3,5,1,2就不可能是该压栈序列的弹出序列。（注意：这两个序列的长度是相等的）
 
 **示例1**
@@ -1113,9 +1112,10 @@ bool IsPopOrder(vector<int> pushV,vector<int> popV)
 	if(pushV.size() == 0) 
         return false;
 	vector<int> v;
-    for(int i = 0,j = 0 ;i < pushV.size();){
+    for(int i = 0, j = 0; i < pushV.size();)
+    {
         v.push_back(pushV[i++]);
-        while(j < popV.size() && v.back() == popV[j])
+        while(j < popV.size() && !v.empty() && v.back() == popV[j])
         {
             v.pop_back();
             j++;
@@ -1126,8 +1126,6 @@ bool IsPopOrder(vector<int> pushV,vector<int> popV)
 ```
 
 ## No22、从上往下打印二叉树
-
-[牛客网原题链接](https://www.nowcoder.com/practice/7fe2212963db4790b57431d9ed259701?tpId=13&&tqId=11175&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -1160,26 +1158,23 @@ vector<int> PrintFromTopToBottom(TreeNode* root)
 
 ## No23、二叉搜索树的后序遍历序列
 
-[牛客网原题链接](https://www.nowcoder.com/practice/a861533d45854474ac791d90e447bafd?tpId=13&&tqId=11176&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历的结果。如果是则返回true,否则返回false。假设输入的数组的任意两个数字都互不相同。（ps：我们约定空树不是二叉搜索树）
 
-**1、递归写法，树主要的做法就是递归**
+**题解：递归主要的做法就是递归**
 
 ```cpp
-bool VerifySquenceOfBST(vector<int> sequence) {
-    if (sequence.empty())  
-        return false;
-    if (sequence.size() == 1) 
-        return true;
+bool VerifySquenceOfBST(vector<int> sequence) 
+{
     return VerifySquenceOfBSTCore(sequence, 0, sequence.size() - 1);
 }
 
-bool VerifySquenceOfBSTCore(vector<int>& sequence, int start, int end) {
+bool VerifySquenceOfBSTCore(vector<int>& sequence, int start, int end) 
+{
     if (start >= end) 
         return true;
+    
     int low = start;
     while (low < end && sequence[low] < sequence[end])  // end 为根节点
         ++low;
@@ -1196,8 +1191,6 @@ bool VerifySquenceOfBSTCore(vector<int>& sequence, int start, int end) {
 ```
 
 ## No24、二叉树中和为某一值的路径
-
-[牛客网原题链接](https://www.nowcoder.com/practice/b736e784e3e34731af99065031301bca?tpId=13&&tqId=11177&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
