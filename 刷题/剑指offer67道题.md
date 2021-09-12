@@ -1224,140 +1224,46 @@ bool VerifySquenceOfBSTCore(vector<int>& sequence, int start, int end)
 []
 ```
 
-**1、带有回溯性质的解法**
+**题解：回溯**
 
 ```cpp
-void FindPathCore(vector<vector<int>>&result, vector<int>  &temp, TreeNode* root, int sum) {
-    if (root == nullptr) return;
-    temp.push_back(root->val);
-    if (root->left == nullptr && root->left == nullptr && sum == root->val) {
-        result.push_back(temp);
-    }
-    else { 
-        if (root->left) {
-            FindPathCore(result, temp, root->left, sum-root->val);
-        }
-        if (root->right) {
-            FindPathCore(result, temp, root->right, sum - root->val);
-        }
-    }
-    temp.pop_back();//走到这里了，说明当前节点不满足要求，pop掉，返回其父亲节点
-
-}
-vector<vector<int> > FindPath(TreeNode* root, int expectNumber) {
-    vector<vector<int>>  result;
-    vector<int>  temp;
-    FindPathCore(result, temp, root, expectNumber);
-    return result;
-}
-```
-
-但这题是要求按照字典序返回结果的，所以最后应该是将result进行排序，优先返回那些长度较长的路径。所以最后应该再判断一下，可以用lambda表达式或者重载一个 （） 也可以
-
-```cpp
-void FindPathCore(vector<vector<int>>&result, vector<int>  temp, TreeNode* root, int sum) {
-    if (root == nullptr) return;
-    temp.push_back(root->val);
-    if (root->left == nullptr && root->left == nullptr && sum == root->val) {
-        result.push_back(temp);
-    }
-    else { 
-        if (root->left) {
-            FindPathCore(result, temp, root->left, sum-root->val);
-        }
-        if (root->right) {
-            FindPathCore(result, temp, root->right, sum - root->val);
-        }
-    }
-    temp.pop_back();//走到这里了，说明当前节点不满足要求，pop掉，返回其父亲节点
-
-}
-vector<vector<int> > FindPath(TreeNode* root, int expectNumber) {
-    vector<vector<int>>  result;
-    vector<int>  temp;
-    FindPathCore(result, temp, root, expectNumber);
-    sort(result.begin(),result.end(),[&](vector<int> v1,vector<int>v2){ return v1.size()>v2.size();});
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-或者重载 （）
-
-```cpp
-struct compare {
-
-    bool operator()(vector<int>& left, vector<int>& right) {
-        return left.size() > right.size();
-    }
-
-};
-
-void FindPathCore(vector<vector<int>>&result, vector<int>  temp, TreeNode* root, int sum) {
-    if (root == nullptr) return;
-    temp.push_back(root->val);
-    if (root->left == nullptr && root->left == nullptr && sum == root->val) {
-        result.push_back(temp);
-    }
-    else { 
-        if (root->left) {
-            FindPathCore(result, temp, root->left, sum-root->val);
-        }
-        if (root->right) {
-            FindPathCore(result, temp, root->right, sum - root->val);
-        }
-    }
-    temp.pop_back();//走到这里了，说明当前节点不满足要求，pop掉，返回其父亲节点
-
-}
-vector<vector<int> > FindPath(TreeNode* root, int expectNumber) {
-    vector<vector<int>>  result;
-    vector<int>  temp;
-    FindPathCore(result, temp, root, expectNumber);
-    sort(result.begin(),result.end(),compare());
-    return result;
-}
-```
-
-**二刷：**
-
-**二刷也不太会，哭了，仔细想想其实也不太难，哎还是太菜了**
-
-运行时间：2ms 占用内存：484k
-
-```cpp
-void FindPathCore(TreeNode*root,vector<vector<int>>&result,vector<int>temp,int sumNum){//这一这里 temp是引用方式传值，所以当前节点不符合，还要删除掉
-        if(root == nullptr) return;
-        temp.push_back(root->val);
-        if(root->left == nullptr && root->right == nullptr &&  sumNum == root->val)
-        {
-            result.push_back(temp);
-        }
-        else{
-            if(root->left)  
-                FindPathCore(root->left,result,temp,sumNum-root->val);
-            if(root->right)  
-                FindPathCore(root->right,result,temp,sumNum-root->val);
-
-        }
-        temp.pop_back();//如果不是引用方式，而是值传递，这一步是可以删掉的，是引用方式就必须要pop掉
-
-    }
-    vector<vector<int> > FindPath(TreeNode* root,int expectNumber) {
-        if(root == nullptr) return vector<vector<int>>();
-
-        vector<vector<int>> result;
-        vector<int>temp;
-        FindPathCore(root,result,temp,expectNumber);
-
-        sort(result.begin(),result.end(),[](const vector<int>&a,const vector<int>&b){ return a.size()>b.size();});
+class Solution {
+    vector<vector<int>> result;
+    vector<int> path;
+public:
+    vector<vector<int>> pathSum(TreeNode* root, int target) {
+        if (root == nullptr)
+            return result;
+        traversal(root, target);
         return result;
+    }
 
-    }Copy to clipboardErrorCopied
+    void traversal(TreeNode* cur, int target)
+    {
+        path.push_back(cur->val);
+        if (cur->left == nullptr && cur->right == nullptr)
+        {
+            if (accumulate(path.begin(), path.end(), 0) == target)
+            {
+                result.push_back(path);
+            }
+            return ;
+        }
+        if (cur->left)
+        {
+            traversal(cur->left, target);
+            path.pop_back();
+        }
+        if (cur->right)
+        {
+            traversal(cur->right, target);
+            path.pop_back();
+        }
+    }
+};
 ```
 
 ## No25、复杂链表的复制
-
-[牛客网原题链接](https://www.nowcoder.com/practice/f836b2c43afc4b35ad6adc41ec941dba?tpId=13&&tqId=11178&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述** 输入一个复杂链表（每个节点中有节点值，以及两个指针，一个指向下一个节点，另一个特殊指针random指向一个随机节点），请对此链表进行深拷贝，并返回拷贝后的头结点。（注意，输出结果中请不要返回参数中的节点引用，否则判题程序会直接返回空）
 
@@ -1438,8 +1344,6 @@ public:
 
 ## No26、二叉搜索树与双向链表
 
-[牛客网原题链接](https://www.nowcoder.com/practice/947f6eb80d944a84850b0538bf0ec3a5?tpId=13&&tqId=11179&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的双向链表。要求不能创建任何新的结点，只能调整树中结点指针的指向。
@@ -1471,7 +1375,7 @@ TreeNode* Convert(vector<TreeNode*>& result) {
         result[i+1]->left = result[i];
 }
     return result[0];
-}Copy to clipboardErrorCopied
+}
 ```
 
 **0-1借助栈和数组类进行数据保存，最后修改指针指向**
