@@ -1418,152 +1418,44 @@ public:
 ["ab","ba"]
 ```
 
-**1、一个很奇特的函数next_permutation**
-
-返回全排列，使用方法如下所示，必须要进行排序才可以：
-
-执行用时：52 ms, 在所有 C++ 提交中击败了91.01%的用户
-
-内存消耗：17.9 MB, 在所有 C++ 提交中击败了100.00%的用户
+**题解：回溯**
 
 ```cpp
+class Solution {
+vector<string> result;
+string str;
+public:
     vector<string> permutation(string s) {
-
-    if(s.size()==0) return vector<string>();
-
-    vector<string> result;
-    sort(s.begin(), s.end());
-    do {
-        result.push_back(s);
-    } while (next_permutation(s.begin(),s.end()));
-
-    return  result;
-    }Copy to clipboardErrorCopied
-#include <stdio.h>
-#include <algorithm>
-using namespace std;
-int main(){
-    int n;
-    while(scanf("%d",&n)&&n){
-        int a[1000];
-        for(int i=0;i<n;i++){
-            scanf("%d",&a[i]);
-        }
-        sort(a,a+n);
-        do{
-            for(int i=0;i<n;i++)
-                printf("%d ",a[i]);
-            printf("\n");
-        }while(next_permutation(a,a+n));
+        vector<bool> used(s.size(), false);
+        sort(s.begin(), s.end());
+        backtracking(s, used);
+        return result;
     }
-    return 0;
-}Copy to clipboardErrorCopied
-```
-
-例如输入
-
-```
-3
-1 0 2Copy to clipboardErrorCopied
-```
-
-如果有sort()
-
-输出为
-
-```
-0 1 2
-0 2 1
-1 0 2
-1 2 0
-2 0 1
-2 1 0Copy to clipboardErrorCopied
-```
-
-若无
-
-则输出为
-
-```
-1 0 2
-1 2 0
-2 0 1
-2 1 0Copy to clipboardErrorCopied
-```
-
-发现函数next_permutation()是按照字典序产生排列的，并且是从数组中当前的字典序开始依次增大直至到最大字典序
-
-**2、DFS+回溯算法 还没有完全理解**
-
-```cpp
-class Solution {
-public:
-    vector<string>  result;
-    void PermutationCore(string &s,int begin,int end){
-        if(begin == end){
-            result.push_back(s);
+    void backtracking(const string& s, vector<bool>& used)
+    {
+        if (str.size() == s.size())
+        {
+            result.push_back(str);
             return ;
         }
-        unordered_map<int,int> visited;
-        for(int i = begin; i<= end; ++i){
-            if(visited[s[i]] == 1) continue;
-            swap(s[i],s[begin]);
-            PermutationCore(s,begin+1,end);
-            swap(s[i],s[begin]);
-            visited[s[i]] =1;
 
+        for (int i = 0; i < s.size(); ++i)
+        {
+            if (i > 0 && s[i] == s[i - 1] && used[i - 1] == false)
+                continue;
+            if (used[i] == true)
+                continue;
+            str.push_back(s[i]);
+            used[i] = true;
+            backtracking(s, used);
+            used[i] = false;
+            str.pop_back();
         }
-
     }
-
-    vector<string> Permutation(string str) {
-    if(str.size()==0) return vector<string>();
-
-    PermutationCore(str,0,str.size()-1);
-    sort(result.begin(),result.end());
-    return  result;
-    }
-};Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、好题，不开玩笑，最后还要排序，要求是按照字典序输出的**
-
-```cpp
-class Solution {
-public:
-    vector<string>  result;
-    void PermutationCore(string &s,int begin,int end){
-        if(begin == end){
-            result.push_back(s);
-            return ;
-        }
-        unordered_map<int,int> visited;
-        for(int i = begin; i<= end; ++i){
-            if(visited[s[i]] == 1) continue;
-            swap(s[i],s[begin]);
-            PermutationCore(s,begin+1,end);
-            swap(s[i],s[begin]);
-            visited[s[i]] =1;
-
-        }
-
-    }
-
-    vector<string> Permutation(string str) {
-    if(str.size()==0) return vector<string>();
-
-    PermutationCore(str,0,str.size()-1);
-    sort(result.begin(),result.end());
-    return  result;
-    }
-};Copy to clipboardErrorCopied
+};
 ```
 
 ## No28、数组中出现次数超过一半的数字
-
-[牛客网原题链接](https://www.nowcoder.com/practice/e8a1b01a2df14cb2b228b30ee6a92163?tpId=13&&tqId=11181&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -4824,8 +4716,6 @@ vector<vector<int> > Print(TreeNode* pRoot) {
 
 ## No61、序列化二叉树
 
-[牛客网原题链接](https://www.nowcoder.com/practice/cf7e25aa97c04cc1a68c8f040e71fb84?tpId=13&&tqId=11214&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 请实现两个函数，分别用来序列化和反序列化二叉树
@@ -4836,169 +4726,71 @@ vector<vector<int> > Print(TreeNode* pRoot) {
 
 例如，我们可以把一个只有根节点为1的二叉树序列化为"1,"，然后通过自己的函数来解析回这个二叉树。
 
-**1、看的大神的写法，这种写法超级棒，代码逻辑非常好**
-
-但是牛客上并没有考虑到负数的情况，力扣上的题目有负数的限制
-
-```C++
-class Solution {
-private:
-    string SerializeCore(TreeNode* root) {
-        if (root == nullptr) {
-            return "#!";
-        }
-        string str;
-        str = to_string(root->val) + "!";
-        str += SerializeCore(root->left);
-        str += SerializeCore(root->right);
-        return str;
-    }
-
-    TreeNode* DeserializeCore(char*& str) {
-        if (*str == '#') {
-            str++;
-            return nullptr;
-        }
-        int num = 0;
-        while (*str != '!') {
-            num = num * 10 + *str - '0';
-            str++;
-        }
-        TreeNode* node = new TreeNode(num);
-        node->left = DeserializeCore(++str);
-        node->right = DeserializeCore(++str);
-        return node;
-    }
-public:
-    char* Serialize(TreeNode* root) {
-        string str = SerializeCore(root);
-        char* res = new char[str.size()];
-        for (int i = 0; i < str.size(); i++) {
-            res[i] = str[i];
-        }
-        return res;
-    }
-
-    TreeNode* Deserialize(char* str) {
-        return DeserializeCore(str);
-    }
-};Copy to clipboardErrorCopied
-```
-
-**力扣上的要求会有负数的限制**
+**题解**
 
 ```cpp
 class Codec {
 public:
+    void rserialize(TreeNode* root, string& str) 
+    {
+        if (root == nullptr) 
+        {
+            str += "None,";
+        } 
+        else 
+        {
+            str += to_string(root->val) + ",";
+            rserialize(root->left, str);
+            rserialize(root->right, str);
+        }
+    }
 
-    TreeNode* deserializeCore(string& data, int &i) {
-    if (data[i] == '#') {
-            i++;
+    string serialize(TreeNode* root) 
+    {
+        string ret;
+        rserialize(root, ret);
+        return ret;
+    }
+
+    TreeNode* rdeserialize(list<string>& dataArray) 
+    {
+        if (dataArray.front() == "None") 
+        {
+            dataArray.erase(dataArray.begin());
             return nullptr;
         }
-        int num = 0, negativeFlag=1;
-        if (data[i] == '-') {
-            negativeFlag = -1;
-            i++;
-        }
-        while (data[i] != '!') {        
-            num = num * 10 + data[i] - '0';
-            i++;
-        }
-        num = num * negativeFlag;
 
-
-        TreeNode* root = new TreeNode(num);
-        root->left = deserializeCore(data, ++i);
-        root->right = deserializeCore(data, ++i);
+        TreeNode* root = new TreeNode(stoi(dataArray.front()));
+        dataArray.erase(dataArray.begin());
+        root->left = rdeserialize(dataArray);
+        root->right = rdeserialize(dataArray);
         return root;
     }
 
-public:
-
-    // Encodes a tree to a single string.
-    string serialize(TreeNode* root) {
-        if (root == nullptr) return "#!";
-        string str = to_string(root->val) + '!';
-        str += serialize(root->left);
-        str += serialize(root->right);
-        return str;
-    }
-
-    // Decodes your encoded data to tree.
     TreeNode* deserialize(string data) {
-        int i = 0;
-        return deserializeCore(data, i);
-    }
-};Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、挺好，还是要再刷一下**
-
- 2ms 488KB
-
-```cpp
-/*
-struct TreeNode {
-    int val;
-    struct TreeNode *left;
-    struct TreeNode *right;
-    TreeNode(int x) :
-            val(x), left(NULL), right(NULL) {
+        list<string> dataArray;
+        string str;
+        for (auto& ch : data) 
+        {
+            if (ch == ',') 
+            {
+                dataArray.push_back(str);
+                str.clear();
+            } 
+            else 
+            {
+                str.push_back(ch);
+            }
+        }
+        if (!str.empty()) 
+        {
+            dataArray.push_back(str);
+            str.clear();
+        }
+        return rdeserialize(dataArray);
     }
 };
-*/
-class Solution {
-private:
-    string SerializeCore(TreeNode* root) {
-        if(root == nullptr) {
-            return "#!";
-        }
-
-        string str;
-        str +=to_string(root->val) + '!';
-        str +=SerializeCore(root->left);
-        str +=SerializeCore(root->right);
-        return str;
-    }
-
-    TreeNode* DeserializeCore(char*& str) {
-        if(*str == '#'){
-            str++;
-            return nullptr;
-        }
-        int num = 0;
-        while( *str != '!'){
-            num = num*10 + (*str)-'0';
-            str++;
-        }
-        TreeNode *node = new TreeNode(num);
-        node->left = DeserializeCore(++str);
-        node->right = DeserializeCore(++str);
-
-        return node;
-    }
-
-public:
-    char* Serialize(TreeNode* root) {
-        string str = SerializeCore(root);
-        char *chs = new char[str.size()];
-        for(int i = 0;i<str.size();++i){
-            chs[i] = str[i];
-        }
-        return chs;
-
-    }
-
-    TreeNode* Deserialize(char* str) {
-        return DeserializeCore(str);
-    }
-};Copy to clipboardErrorCopied
 ```
-
-
 
 ## No62、二叉搜索树的第K个节点
 
