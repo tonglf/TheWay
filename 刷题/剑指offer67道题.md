@@ -1466,58 +1466,48 @@ public:
 **输入**
 
 ```
-[1,2,3,2,2,2,5,4,2]Copy to clipboardErrorCopied
+[1,2,3,2,2,2,5,4,2]
 ```
 
 **返回值**
 
 ```
-2Copy to clipboardErrorCopied
+2
 ```
 
-**1、常规做法，哈希表**
+**题解**
 
 ```cpp
-int MoreThanHalfNum_Solution(vector<int> numbers) {
-
-    unordered_map<int, int>unmp;
-    int len = numbers.size();
-    for (int i = 0; i < len; ++i) {
-        unmp[numbers[i]]++;
-        if (unmp[numbers[i]] > len / 2) return numbers[i];
-    }
-    return 0;
-    }Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、摩尔投票法的变种，与力扣上[多数元素](https://leetcode-cn.com/problems/majority-element/)是差不多的做法，很高效的一种做法**
-
-运行时间：3ms 占用内存：464k
-
-```cpp
-    int MoreThanHalfNum_Solution(vector<int> numbers) {
-    //摩尔投票法，成立前提就是有出现超过一半的元素，所以最后我们需要判断找到的元素是否出现超过一半了
-    int cnt = 0, num = 0;
-    for (int i = 0; i < numbers.size(); ++i) {
-        if (cnt == 0) {
-            num = numbers[i];
-            cnt = 1;
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int result = nums[0];
+        int times = 1;
+        for (int i = 1; i < nums.size(); ++i)
+        {
+            if (result == nums[i])
+            {
+                times++;
+            }
+            else
+            {
+                if (times == 0)
+                {
+                    times = 1;
+                    result = nums[i];
+                }
+                else
+                {
+                    times--;
+                }
+            }
         }
-        else {
-            num == numbers[i] ? cnt++ : cnt--;
-        }
-
+        return result;
     }
-    cnt = count(numbers.begin(), numbers.end(), num);
-    return cnt > numbers.size() / 2 ? num : 0;
-    }Copy to clipboardErrorCopied
+};
 ```
 
 ## No29、最小的K个数
-
-[牛客网原题链接](https://www.nowcoder.com/practice/6a296eb82cf844ca8539b57c23e6e9bf?tpId=13&&tqId=11182&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -1526,138 +1516,112 @@ int MoreThanHalfNum_Solution(vector<int> numbers) {
 **示例1** **输入**
 
 ```
-[4,5,1,6,2,7,3,8],4Copy to clipboardErrorCopied
+[4,5,1,6,2,7,3,8],4
 ```
 
 **返回值**
 
 ```
 [1,2,3,4]
-Copy to clipboardErrorCopied
 ```
 
-**1、优先队列来做，最小，用大顶堆来做**
+**题解：优先队列**
 
 priority_queue<int,vector<int>,less<int>>
 
 ```cpp
-    vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
-    if(k > input.size()) return vector<int>();
-    priority_queue<int, vector<int>, greater<int>> pq;
-    for (auto a : input)
-        pq.push(a);
-    vector<int> result;
-    while (k--) {
-        result.push_back(pq.top());
-        pq.pop();
+// class Solution {
+// public:
+//     vector<int> getLeastNumbers(vector<int>& arr, int k) {
+//         priority_queue<int, vector<int>, greater<int>> pq;
+//         for (auto a : arr)
+//         {
+//             pq.push(a);
+//         }
+//         vector<int> result;
+//         while (k--)
+//         {
+//             result.push_back(pq.top());
+//             pq.pop();
+//         }
+//         return result;
+//     }
+// };
+
+class Solution {
+public:
+    vector<int> getLeastNumbers(vector<int>& arr, int k) {
+        //priority_queue<int, vector<int>, greater<int>> pq;	// 这样不行啊
+        priority_queue<int> pq;	
+        vector<int> result;
+        if (k == 0)
+            return result;
+
+        for (auto a : arr)
+        {
+            if (pq.size() < k)
+            {
+                pq.push(a);
+            }
+            else
+            {
+                if (a < pq.top())
+                {
+                    pq.pop();
+                    pq.push(a);
+                }
+            }
+        }
+
+        while (k--)
+        {
+            result.push_back(pq.top());
+            pq.pop();
+        }
+        return result;
     }
-    return result;
-    }Copy to clipboardErrorCopied
+};
 ```
 
 ## No30、连续子数组的最大和
-
-[牛客网原题链接](https://www.nowcoder.com/practice/459bd355da1549fa8a49e350bf3df484?tpId=13&&tqId=11183&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
-**题目描述**
-
-HZ偶尔会拿些专业问题来忽悠那些非计算机专业的同学。今天测试组开完会后,他又发话了:在古老的一维模式识别中,常常需要计算连续子向量的最大和,当向量全为正数的时候,问题很好解决。但是,如果向量中包含负数,是否应该包含某个负数,并期望旁边的正数会弥补它呢？例如:{6,-3,-2,7,-15,1,2,2},连续子向量的最大和为8(从第0个开始,到第3个为止)。给一个数组，返回它的最大连续子序列的和，你会不会被他忽悠住？(子向量的长度至少是1)
 
 **示例1**
 
 **输入**
 
 ```
-[1,-2,3,10,-4,7,2,-5]Copy to clipboardErrorCopied
+[1,-2,3,10,-4,7,2,-5]
 ```
 
 **返回值**
 
 ```
-18Copy to clipboardErrorCopied
+18
 ```
 
-**说明** 输入的数组为{1,-2,3,10,—4,7,2,一5}，和最大的子数组为{3,10,一4,7,2}，因此输出为该子数组的和 18。
+**说明** 输入的数组为{1, -2, 3, 10, -4, 7, 2, -5}，和最大的子数组为{3, 10, -4, 7, 2}，因此输出为该子数组的和 18。
 
-**1、直接在原数组上改，不借用任何内存**
-
-```cpp
-int FindGreatestSumOfSubArray(vector<int> array) {
-    for (int i = 1; i < array.size(); ++i) {
-        array[i] = max(0,array[i-1]) + array[i];
-    }
-    return *max_element(array.begin(),array.end());
-}Copy to clipboardErrorCopied
-```
-
-**2、两个数字保存中间结果 或者一个数字**
+**题解：动态规划**
 
 ```cpp
-int FindGreatestSumOfSubArray(vector<int> array) {
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int maxVal = nums[0];
 
-
-    int len = array.size();
-    int maxNum = array[0],result=maxNum;
-    for (int i = 1; i < len; ++i) {
-        if (maxNum + array[i] > array[i])
-            maxNum += array[i];
-        else
-            maxNum = array[i];
-        result = max(maxNum, result);
-    }
-    return result;
-}Copy to clipboardErrorCopied
-int FindGreatestSumOfSubArray(vector<int> array) {
-
-
-    int maxNum = array[0];
-    for (int i = 1; i <  array.size(); ++i) {
-        array[i] = max(0,array[i-1]) + array[i];
-        maxNum = max(maxNum, array[i]);
-    }
-    return maxNum;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、常规DP做法，其实这题是连续上升子序列的**
-
-```cpp
-    int FindGreatestSumOfSubArray(vector<int> array) {
-
-    if (array.size() == 0) return 0;
-    int maxNum = array[0];
-    vector<int> dp(array.size(), 0);
-    dp[0] = array[0];
-    for (int i = 1; i < array.size(); ++i) {
-        dp[i] = max(array[i], array[i] + dp[i - 1]);
-        maxNum = max(maxNum, dp[i]);
-    }
-    return maxNum;
-    }Copy to clipboardErrorCopied
-```
-
-**2、直接在原数组上进行修改，可以节约一点空间**
-
-运行时间：3ms 占用内存：376k
-
-```cpp
-    int FindGreatestSumOfSubArray(vector<int> array) {
-
-        if (array.size() == 0) return 0;
-        int maxNum = array[0];
-        for (int i = 1; i < array.size(); ++i) {
-            array[i] = max(array[i], array[i] + array[i - 1]);
-            maxNum = max(maxNum, array[i]);
+        vector<int> dp(nums.size());
+        dp[0] = nums[0];
+        for (int i = 1; i < nums.size(); ++i)
+        {
+            dp[i] = max(dp[i - 1] + nums[i], nums[i]);
+            maxVal = max(dp[i], maxVal);
         }
-        return maxNum;
-    }Copy to clipboardErrorCopied
+        return maxVal;
+    }
+};
 ```
 
 ## No31、整数中1出现的次数（ 从1 到 n 中1出现的次数 ）
-
-[牛客网原题链接](https://www.nowcoder.com/practice/bd7f978302044eee894445e244c7eee6?tpId=13&&tqId=11184&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -1670,20 +1634,18 @@ ACMer希望你们帮帮他,并把问题更加普遍化,可以很快的求出任�
 **输入**
 
 ```
-13Copy to clipboardErrorCopied
+13
 ```
 
 **返回值**
 
 ```
-6Copy to clipboardErrorCopied
+6
 ```
 
 **1、经典方法吗，真的想不到这种方法，我服了**
 
-执行用时：0 ms, 在所有 C++ 提交中击败了100.00%的用户
 
-内存消耗：5.8 MB, 在所有 C++ 提交中击败了100.00%的用户
 
 分两种情况，例如：1234和2234，high为最高位，pow为最高位权重 在每种情况下都将数分段处理，即0-999，1000-1999，...，剩余部分
 
@@ -1707,51 +1669,6 @@ case2：最高位不是1，则最高位的1的次数为pow（1000-1999） 每阶
 
     }Copy to clipboardErrorCopied
 ```
-
-**二刷：**
-
-**超级好的方法**
-
-运行时间：2ms 占用内存：376k
-
-```cpp
-    int NumberOf1Between1AndN_Solution(int n)
-    {
-        if(n <= 0) return 0;
-        if(n < 10) return 1;
-        int high = n,pow = 1;//首选求的最高位high和权重pow 10 还是100 还是 100 呢
-        while(high>=10){
-            high = high /10;
-            pow = pow * 10;
-        }
-        int last = n - high*pow;
-        int cut = (high == 1? last + 1:pow );
-        return cut + high*NumberOf1Between1AndN_Solution(pow - 1) + NumberOf1Between1AndN_Solution(last);
-    }Copy to clipboardErrorCopied
-```
-
-**三刷：**
-
-```cpp
-    int NumberOf1Between1AndN_Solution(int n)
-    {
-        if(n <= 0) return 0;
-        if(n< 10 ) return 1;
-        if(n == 10) return 2;
-        int pow = 1, high = n,last = 0;
-        while(high >= 10){
-            high = high/10;
-            pow *=10;
-        }
-        last = n - high*pow;// 除去最高位的数字，还剩下多少 0-999 1000- 1999 2000-2999 3000 3345
-        int cut = high == 1 ? last+1: pow;
-
-        return cut + high*NumberOf1Between1AndN_Solution(pow-1) + NumberOf1Between1AndN_Solution(last);
-
-    }Copy to clipboardErrorCopied
-```
-
-[力扣](https://leetcode-cn.com/problems/number-of-digit-one/submissions/)上有类似的题目
 
 ## No32、把数组排成最小的数
 
@@ -4899,221 +4816,6 @@ TreeNode* KthNode(TreeNode* pRoot, int k)
 
 ## No63、数据流中的中位数
 
-[牛No客网原题链接](https://www.nowcoder.com/practice/9be0172896bd43948f8a32fb954e1be1?tpId=13&&tqId=11216&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
-**题目描述**
-
-如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。我们使用Insert()方法读取数据流，使用GetMedian()方法获取当前读取数据的中位数。
-
-**1、自己的想法与做法**
-
-```cpp
-class Solution {
-public:
-    void Insert(int num)
-    {
-        result.push_back(num);
-    }
-
-    double GetMedian()
-    {
-        sort(result.begin(), result.end());
-        int len = result.size();
-        if (len % 2 == 0) 
-            return (result[len / 2] + result[-1 + len / 2]) / 2.0//注意这里是2.0 这样才能返回值为double
-        else
-            return result[len / 2];
-    }
-
-    vector<int> result;
-};Copy to clipboardErrorCopied
-```
-
-**2、借助两个堆，非常精妙的方法**
-
-这里讨论两种方法： 一：代码复杂：减少不必要插入，提高效率 二：代码大大简化：可能有不必要插入，效率有所降低 ==============思路解析================================= 思考：如何得到一个数据流中的中位数？ 如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。 如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。 一：代码复杂：
-
-- 分析：对于海量数据和流的数据，用最大堆和最小堆来管理
-- 我们希望 数据分为[小]|[大]两个部分，细化一点 [最大堆 | 左边最大 leftMax] 右边最小rightMin | 最小堆]
-
-- 定义一个规则：保证左边和右边个数相差不大于1，且左边小于右边
-- 1.数据是偶数的时候 insert的数据进入 [右边，最小堆]中
-- 1.1当插入的数字cur > leftMax时，直接插入到[右边，最小堆]中
-- 1.2当插入的数字cur < leftMax时，为了保证左边小于右边，
-- 先把cur插入[最大堆|左边最大leftMax]中，
-- 然后把leftMax放入[右边最小rightMin|最小堆]中
-- 就可以保证： 左边 < 右边
-- 2.数据是奇数的时候 insert的数据进入 [左边，最大堆]中
-- 2.1当插入的数字cur < rightMin时，直接插入到[左边，最小堆]中
-- 2.2当插入的数字cur > rightMin时，为了保证左边小于右边，
-- 先把cur插入[右边最小rightMin|最小堆]中，
-- 然后把rightMin放入[最大堆|左边最大leftMax]中
-- 就可以保证： 左边 < 右边
-- 最后：
-- 如果是偶数：中位数mid= (leftMax+right)/2
-- 如果是奇数：中位数mid= leftMax 因为先插入到左边，再插入到右边，为奇数时，中位数就是mid
-
-```cpp
-class Solution {
-
-public:
-void Insert(int num)
-    {
-    count += 1; //数据是奇数的时候 insert的数据进入 [左边，最大堆]中
-    if (count % 2 == 1)//奇数
-    {
-        if (big_heap.empty())  big_heap.push(num); //直接插入到[左边，最小堆]中
-        else {
-            int rightMin = small_heap.top();
-            if (num <= rightMin)  big_heap.push(num);
-            else {
-                small_heap.push(num);  //先把cur插入[右边最小rightMin|最小堆]中
-                big_heap.push(rightMin);  //然后把rightMin放入[最大堆|左边最大leftMax]中
-                small_heap.pop();
-            }
-        }
-    }
-    else {
-
-        if (small_heap.empty()) { //当第一个元素 比 第二个元素大的时候，会造成左边比右边大的情形，因此要加上判断
-//当第一个数据比第二个大的时候，比如[5,2,3,4,1,6,7,0,8]的情况，会造成最大堆的唯一数据，比最小堆的唯一数据大的情况，这跟思想就不同了，因此需要加上一层判断。
-            if (num > big_heap.top())
-            {
-                small_heap.push(num);
-            }
-            else
-            {
-                small_heap.push(big_heap.top());
-                big_heap.pop();
-                big_heap.push(num);
-            }
-        }
-        else {
-            int leftMax = big_heap.top();
-            if (num >= leftMax)  small_heap.push(num);//直接插入到[右边，最小堆]中
-            else {
-                big_heap.push(num);//先把cur插入[右边最小rightMin|最小堆]中，
-                small_heap.push(big_heap.top()); //然后把rightMin放入[最大堆|左边最大leftMax]中
-                big_heap.pop();
-            }
-        }
-    }        
-}
-
-double GetMedian()
-{
-    if (count & 0x1) {//看见这个0x你肯定知道这就是16进制表示了，而0x1就是最后一位肯定是1。偶数的二进制表示中最后一位肯定是0，
-        //如果是奇数那肯定是1，所以一个整数与0x1做按位与运算得到的结果是0或者1就可以判断出这个整数是偶数还是奇数。
-        return big_heap.top();
-    }
-    else {
-        return double((small_heap.top() + big_heap.top()) / 2.0);
-    }
-}
-private:
-    int count = 0;
-    priority_queue<int, vector<int>, less<int>> big_heap;        // 左边一个大顶堆
-    priority_queue<int, vector<int>, greater<int>> small_heap;   // 右边一个小顶堆
-};Copy to clipboardErrorCopied
-```
-
-**3、将上述代码优化**
-
-取消了判断过程，直接插入到对面的堆中，然后再转移到自己的堆中
-
-- 但是！！！时间复杂度提高，每次都插入时间复杂度O(log n)这是很可怕的
-- 定义一个规则：不要判断了，保证小顶堆中最小的数也大于大顶堆中的数据
-- 1.数据是偶数的时候 insert的数据进入 [右边，最小堆]中
-- 先把cur插入[最大堆|左边最大leftMax]中，
-- 然后把leftMax放入[右边最小rightMin|最小堆]中
-- 就可以保证： 左边 < 右边
-- 2.数据是奇数的时候 insert的数据进入 [左边，最大堆]中
-- 先把cur插入[右边最小rightMin|最小堆]中，
-- 然后把rightMin放入[最大堆|左边最大leftMax]中
-- 就可以保证： 左边 < 右边
-- 最后：
-- 如果是偶数：中位数mid= (leftMax+right)/2
-- 如果是奇数：中位数mid= leftMax
-
-```cpp
-class Solution {
-public:
-void Insert(int num)
-    {
-        count += 1;
-        // 元素个数是偶数时,将大顶堆堆顶放入小顶堆
-        if (count % 2 == 0) {
-            big_heap.push(num);
-            small_heap.push(big_heap.top());
-            big_heap.pop();
-        }
-        else {
-            small_heap.push(num);
-            big_heap.push(small_heap.top());
-            small_heap.pop();
-        }
-    }
-
-double GetMedian()
-{
-    if (count & 0x1) {//看见这个0x你肯定知道这就是16进制表示了，而0x1就是最后一位肯定是1。偶数的二进制表示中最后一位肯定是0，
-        //如果是奇数那肯定是1，所以一个整数与0x1做按位与运算得到的结果是0或者1就可以判断出这个整数是偶数还是奇数。那就返回左边大顶堆得最小值即可
-        return big_heap.top();
-    }
-    else {
-        return double((small_heap.top() + big_heap.top()) / 2.0);
-    }
-}
-private:
-    int count = 0;
-    priority_queue<int, vector<int>, less<int>> big_heap;        // 左边一个大顶堆
-    priority_queue<int, vector<int>, greater<int>> small_heap;   // 右边一个小顶堆
-    // 大顶堆所有元素均小于等于小顶堆的所有元素.
-};Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、很经典的大小堆方法**
-
-运行时间：3ms 占用内存：484k
-
-```cpp
-class Solution {
-private:
-    int count = 0;
-    priority_queue<int,vector<int>,less<int>> left_big;
-    priority_queue<int,vector<int>,greater<int>> right_small;
-public:
-    void Insert(int num)
-    {
-        count++;
-        if(count%2 == 1){ //奇数
-            right_small.push(num);
-            left_big.push(right_small.top());
-            right_small.pop();
-        }else{
-
-            left_big.push(num);
-            right_small.push(left_big.top());
-            left_big.pop();
-        }
-    }
-
-    double GetMedian()
-    { 
-
-        if(count %2 == 1) return left_big.top();
-        else{
-            return double((left_big.top() + right_small.top())/2.0);
-        }
-    }
-
-};Copy to clipboardErrorCopied
-```
-
-[剑指 Offer 41. 数据流中的中位数](https://leetcode-cn.com/problems/shu-ju-liu-zhong-de-zhong-wei-shu-lcof/)
-
 如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。
 
 例如，
@@ -5133,7 +4835,7 @@ public:
 输入：
 ["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"]
 [[],[1],[2],[],[3],[]]
-输出：[null,null,null,1.50000,null,2.00000]Copy to clipboardErrorCopied
+输出：[null,null,null,1.50000,null,2.00000]
 ```
 
 **示例 2：**
@@ -5142,58 +4844,52 @@ public:
 输入：
 ["MedianFinder","addNum","findMedian","addNum","findMedian"]
 [[],[2],[],[3],[]]
-输出：[null,null,2.00000,null,2.50000]Copy to clipboardErrorCopied
+输出：[null,null,2.00000,null,2.50000]
 ```
 
-执行用时：292 ms, 在所有 C++ 提交中击败了62.18%的用户
-
-内存消耗：41.9 MB, 在所有 C++ 提交中击败了25.00%的用户
+**题解：大顶堆 + 小顶堆：大顶堆所有元素均小于等于小顶堆的所有元素**
 
 ```cpp
-class MedianFinder {
+class Solution {
 public:
-    /** initialize your data structure here. */
-    MedianFinder() {
-        this->count = 0;
-    }
-
-    void addNum(int num) {
-
-        count++;
-        if(count %2 == 1){//奇数
-            right_small.push(num);
-            left_big.push(right_small.top());
-            right_small.pop();
-        }else{
-            left_big.push(num);
-            right_small.push(left_big.top());
-            left_big.pop();
+	void Insert(int num)
+    {
+        count += 1;
+        // 元素个数是偶数时,将大顶堆堆顶放入小顶堆
+        // 大顶堆所有元素均小于等于小顶堆的所有元素
+        if (count % 2 == 0) 
+        {
+            big_heap.push(num);
+            small_heap.push(big_heap.top());
+            big_heap.pop();
+        }
+        else 
+        {
+            small_heap.push(num);
+            big_heap.push(small_heap.top());
+            small_heap.pop();
         }
     }
 
-    double findMedian() {
-        if(count%2 == 1){//输入总数据为奇数，则在左边大顶堆中
-        return double(left_big.top());
-
-        }else{
-
-            return double( (left_big.top()+right_small.top())/2.0);
-        }
-    }
-
-    private:
-    int count;
-    priority_queue<int,vector<int>,less<int>> left_big;
-    priority_queue<int,vector<int>,greater<int>> right_small;
+	double GetMedian()
+	{
+    	if (count & 0x1) 
+    	{
+        	return big_heap.top();
+    	}
+    	else 
+    	{
+        	return double((small_heap.top() + big_heap.top()) / 2.0);
+    	}
+	}
+private:
+    int count = 0;
+    priority_queue<int, vector<int>, less<int>> big_heap;        // 左边一个大顶堆
+    priority_queue<int, vector<int>, greater<int>> small_heap;   // 右边一个小顶堆
 };
-Copy to clipboardErrorCopied
 ```
 
-
-
 ## No64、滑动窗口的最大值
-
-[牛客网原题链接](https://www.nowcoder.com/practice/1624bc35a45c42c0bc17d17fa0cba788?tpId=13&&tqId=11217&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
