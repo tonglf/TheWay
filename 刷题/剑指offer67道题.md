@@ -9,6 +9,7 @@
 - [ ] No52、正则表达式匹配
 - [ ] No53、表示数值的字符串
 - [ ] No17、树的子结构
+- [ ] No31、整数中1出现的次数（ 从1 到 n 中1出现的次数 ）
 - [ ] 
 
 ### 数组
@@ -1643,9 +1644,7 @@ ACMer希望你们帮帮他,并把问题更加普遍化,可以很快的求出任�
 6
 ```
 
-**1、经典方法吗，真的想不到这种方法，我服了**
-
-
+**题解：**
 
 分两种情况，例如：1234和2234，high为最高位，pow为最高位权重 在每种情况下都将数分段处理，即0-999，1000-1999，...，剩余部分
 
@@ -1654,26 +1653,28 @@ case1：最高位是1，则最高位的1的次数为last+1（1000-1234） 每阶
 case2：最高位不是1，则最高位的1的次数为pow（1000-1999） 每阶段除去最高位即0-999，1000-1999中1的次数为high*countDigitOne(pow-1) 剩余部分1的个数为countDigitOne(last) 发现两种情况仅差别在最高位的1的个数，因此单独计算最高位的1（cnt），合并处理两种情况
 
 ```cpp
- int NumberOf1Between1AndN_Solution(int n)
-    {
-    if (n <= 0) return 0;
-    if (n < 10) return 1;
-    int high = n, pow = 1;// // 取出最高位 以及 最高位的权重
-    while (high >= 10) {
-        high /= 10;
-        pow *= 10;
+class Solution {
+public:
+    int countDigitOne(int n) {
+        if (n <= 0)
+            return 0;
+        if (n < 10)
+            return 1;
+        int high = n, pow = 1;
+        while (high >= 10)
+        {
+            high /= 10;
+            pow *= 10;
+        }
+        int last = n - high * pow;
+        int cnt = high == 1 ? last + 1 : pow;
+        return cnt + high * countDigitOne(pow - 1) + countDigitOne(last);
     }
-    int last = n - high * pow;// 除最高位的数字
-    int cnt = high == 1 ? last + 1 : pow;// high是否为1，最高位的1个数不同
-    return cnt + high * NumberOf1Between1AndN_Solution(pow - 1) + NumberOf1Between1AndN_Solution(last);
-
-    }Copy to clipboardErrorCopied
+};
 ```
 
 ## No32、把数组排成最小的数
 
-[牛客网原题链接](https://www.nowcoder.com/practice/8fecd3f8ba334add803bf2a06af1b993?tpId=13&&tqId=11185&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
@@ -1683,118 +1684,45 @@ case2：最高位不是1，则最高位的1的次数为pow（1000-1999） 每阶
 **输入**
 
 ```
-[3,32,321]Copy to clipboardErrorCopied
+[3,32,321]
 ```
 
 **返回值**
 
 ```
-"321323"Copy to clipboardErrorCopied
+"321323"
 ```
 
-**1、很精妙绝伦的一种排序方法**
-
-执行用时：12 ms, 在所有 C++ 提交中击败了92.42%的用户
-
-内存消耗：11.5 MB, 在所有 C++ 提交中击败了100.00%的用户
+**题解：**
 
 ```cpp
-string minNumber(vector<int>& nums) {
-
+string minNumber(vector<int>& nums) 
+{
     vector<string> temp;
-    for (auto num : nums) {
+    for (auto num : nums) 
+    {
         temp.push_back(to_string(num));
     }
-
     sort(temp.begin(), temp.end(), [](const string& a, const string& b) { return a + b < b + a; });
-    string result;
-    for (auto& t : temp) {
-        result += t;
+    string str;
+    for (auto& s : temp) 
+    {
+        str += s;
     }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-**2、第二种做法，与第一种又有点不一样，但是速度比第一种要慢不少**
-
-sort函数要定义为静态或者全局函数
-
-sort中的比较函数compare要声明为静态成员函数或全局函数，不能作为普通成员函数，否则会报错。 因为：非静态成员函数是依赖于具体对象的，而std::sort这类函数是全局的，因此无法再sort中调用非静态成员函数。静态成员函数或者全局函数是不依赖于具体对象的, 可以独立访问，无须创建任何对象实例就可以访问。同时静态成员函数不可以调用类的非静态成员。
-
-执行用时：28 ms, 在所有 C++ 提交中击败了22.65%的用户
-
-内存消耗：11.5 MB, 在所有 C++ 提交中击败了100.00%的用户
-
-```cpp
-/*对vector容器内的数据进行排序，按照 将a和b转为string后
- 若 a＋b<b+a  a排在在前 的规则排序,
- 如 2 21 因为 212 < 221 所以 排序后为 21 2 
-  to_string() 可以将int 转化为string
-*/ class Solution {
- public:
-     static bool cmp(int a,int b){
-         string A=""，B="";
-         A+=to_string(a);
-         A+=to_string(b);
-         B+=to_string(b);
-         B+=to_string(a);      
-         return A<B;
-     }
-     string PrintMinNumber(vector<int> numbers) {
-         string  answer="";
-         sort(numbers.begin(),numbers.end(),cmp);
-         for(int i=0;i<numbers.size();i++){
-             answer+=to_string(numbers[i]);
-         }
-         return answer;
-     }
- };Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、超强比较方法**
-
-运行时间：2ms 占用内存：492k
-
-```cpp
-    string PrintMinNumber(vector<int> numbers) {
-
-    vector<string> temp;
-    for (auto a : numbers) {
-        temp.push_back(std::move(to_string(a)));
-    }
-
-    sort(temp.begin(), temp.end(), [](const string& a, const string& b) {return a + b < b + a; });
-    string result;
-    for (auto& s : temp) {
-        result += std::move(s);
-    }
-
-    return result;
-    }Copy to clipboardErrorCopied
+    return str;
+}
 ```
 
 ## No33、第N个丑数
 
-[牛客网原题链接](https://www.nowcoder.com/practice/6aa9e04fc3794f68acf8778237ba065b?tpId=13&&tqId=11186&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
+我们把只包含质因子 2、3 和 5 的数称作丑数（Ugly Number）。求按从小到大的顺序的第 n 个丑数。
 
-**题目描述**
+**示例:**
 
-输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
-
-**示例1**
-
-**输入**
-
-```
-[3,32,321]Copy to clipboardErrorCopied
-```
-
-**返回值**
-
-```
-"321323"Copy to clipboardErrorCopied
+```cpp
+输入: n = 10
+输出: 12
+解释: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 是前 10 个丑数。
 ```
 
 **1、三指针法 很经典**
@@ -1804,26 +1732,29 @@ sort中的比较函数compare要声明为静态成员函数或全局函数，不
 维护三个index，采用三index齐头并进的做法。
 
 ```cpp
-int GetUglyNumber_Solution(int index) {
-    if(index < 7) return index;
-    vector<int> result(index, 0);
-    result[0] = 1;
-    int indexTwo = 0, indexThree = 0,indexFive = 0;
-    for (int i = 1; i < index; ++i) {
-        int minNum = min(min(result[indexTwo] * 2, result[indexThree] * 3), result[indexFive] * 5);
-        if (minNum == result[indexTwo] * 2) indexTwo++;
-        if (minNum == result[indexThree] * 3) indexThree++;
-        if (minNum == result[indexFive] * 5) indexFive++;
-        result[i] = minNum;
+class Solution {
+public:
+    int nthUglyNumber(int n) {
+        vector<int> dp(n + 1);
+        dp[1] = 1;
+        int p2 = 1, p3 = 1, p5 = 1;
+        for (int i = 2; i <= n; i++) 
+        {
+            int num2 = dp[p2] * 2, num3 = dp[p3] * 3, num5 = dp[p5] * 5;
+            dp[i] = min(min(num2, num3), num5);
+            if (dp[i] == num2) 
+                p2++;
+            if (dp[i] == num3) 
+                p3++;
+            if (dp[i] == num5) 
+                p5++;
+        }
+        return dp[n];
     }
-    return result[index - 1];
-
-}Copy to clipboardErrorCopied
+};
 ```
 
 ## No34、第一个只出现一次的字符
-
-[牛客网原题链接](https://www.nowcoder.com/practice/1c82e8cf713b4bbeb2a5b31cf5b0417c?tpId=13&&tqId=11187&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
