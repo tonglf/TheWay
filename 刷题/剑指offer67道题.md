@@ -1725,11 +1725,7 @@ string minNumber(vector<int>& nums)
 解释: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 是前 10 个丑数。
 ```
 
-**1、三指针法 很经典**
-
-1-6之间都是丑数 1 2 3 4 5 6 直接返回即可
-
-维护三个index，采用三index齐头并进的做法。
+**题解：**
 
 ```cpp
 class Solution {
@@ -1756,80 +1752,47 @@ public:
 
 ## No34、第一个只出现一次的字符
 
-**题目描述**
+在字符串 s 中找出第一个只出现一次的字符。如果没有，返回一个单空格。 s 只包含小写字母。
 
-在一个字符串(0<=字符串长度<=10000，全部由字母组成)中找到第一个只出现一次的字符,并返回它的位置, 如果没有则返回 -1（需要区分大小写）.（从0开始计数）
-
-**示例1**
-
-**输入**
-
-```
-"google"
-```
-
-**返回值**
-
-```
-4
-```
-
-**1、挺简单的，想多了**
+示例 1:
 
 ```cpp
-    int FirstNotRepeatingChar(string str) {    
-vector < int > result(58,0);
-    for (int i = 0; i < str.size();++i) {
-        result[str[i] - 'A'] += 1;
-    }
-
-    for (int i = 0; i < str.size(); ++i) {
-        if(result[str[i] - 'A']==1)return i;
-    }
-    return -1;
-    }Copy to clipboardErrorCopied
+输入：s = "abaccdeff"
+输出：'b'
 ```
 
-**2、用unordered_map也行**
+
+示例 2:
 
 ```cpp
-    int FirstNotRepeatingChar(string str) {
-    unordered_map<char, int> mp;
-    for (int i = 0; i < str.size();++i) {
-        mp[str[i]] += 1;
-
-    }
-
-    for (int i = 0; i < str.size(); ++i) {
-        if(mp[str[i]]==1)return i;
-    }
-    return -1;
-    }Copy to clipboardErrorCopied
+输入：s = "" 
+输出：' '
 ```
 
-**二刷：**
-
-**1、unordered_map来做，其实用vector也可以**
+**题解：**
 
 ```cpp
-    int FirstNotRepeatingChar(string str) {
-
-        unordered_map<char,int> unmp;// char index
-
-        for( int i = 0;i < str.size(); ++i)
-            unmp[str[i]]++;
-
-        for(int i = 0;i < str.size(); ++i)
-            if(unmp[str[i]] == 1) return i;
-
-        return -1;
-
-    }Copy to clipboardErrorCopied
+class Solution {
+public:
+    char firstUniqChar(string s) {
+        unordered_map<char, int> map;
+        for (int i = 0; i < s.size(); ++i)
+        {
+            map[s[i]]++;
+        }
+        for (int i = 0; i < s.size(); ++i)
+        {
+            if (map[s[i]] == 1)
+            {
+                return s[i];
+            }
+        }
+        return ' ';
+    }
+};
 ```
 
 ## No35、数组中的逆排序
-
-[牛客网原题链接](https://www.nowcoder.com/practice/96bd6684e04a44eb80e6a68efc0ec6c5?tpId=13&&tqId=11188&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
