@@ -2209,7 +2209,7 @@ public:
 [[2,3,4],[4,5]]
 ```
 
-**题解：客解法，很厉害。类似于TCP滑动窗口**
+**题解：滑动窗口**
 
 ```cpp
 class Solution {
@@ -2296,8 +2296,6 @@ public:
 
 ## No43、左旋转字符串
 
-[牛客网原题链接](https://www.nowcoder.com/practice/12d959b108cb42b1ab72cef4d36af5ec?tpId=13&&tqId=11196&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，即“XYZdefabc”。是不是很简单？OK，搞定它！
@@ -2333,50 +2331,58 @@ public:
 
 ## No44、反转单词序列
 
-[牛客网原题链接](https://www.nowcoder.com/practice/3194a4f4cf814f63919d0790578d51f3?tpId=13&&tqId=11197&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
+输入一个英文句子，翻转句子中单词的顺序，但单词内字符的顺序不变。为简单起见，标点符号和普通字母一样处理。例如输入字符串"I am a student. "，则输出"student. a am I"。
 
-**题目描述**
-
-牛客最近来了一个新员工Fish，每天早晨总是会拿着一本英文杂志，写些句子在本子上。同事Cat对Fish写的内容颇感兴趣，有一天他向Fish借来翻看，但却读不懂它的意思。例如，“student. a am I”。后来才意识到，这家伙原来把句子单词的顺序翻转了，正确的句子应该是“I am a student.”。Cat对一一的翻转这些单词顺序可不在行，你能帮助他么？
-
-**示例1**
-
-**输入**
-
-```
-"nowcoder. a am I"
-```
-
-**返回值**
-
-```
-"I am a nowcoder."
-```
-
-**1、别想太多，能做出来就好**
+示例 1：
 
 ```cpp
-string ReverseSentence(string str) 
-{
-    string res = "", tmp = "";
-    for (unsigned int i = 0; i < str.size(); ++i) 
-    {
-        if (str[i] == ' ')
+输入: "the sky is blue"
+输出: "blue is sky the"
+```
+
+示例 2：
+
+```cpp
+输入: "  hello world!  "
+输出: "world! hello"
+解释: 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。
+```
+
+示例 3：
+
+```cpp
+输入: "a good   example"
+输出: "example good a"
+解释: 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。
+```
+
+**题解：**
+
+```cpp
+class Solution {
+public:
+    string reverseWords(string s) {
+        stringstream ss(s);
+        string str;
+        stack<string> st;
+        while (ss >> str)
         {
-            res = " " + tmp + res;
-            tmp = "";
+            st.push(str);
         }
-        else tmp += str[i];
+        string ans;
+        while(st.size() > 1)
+        {
+            ans += st.top() + " ";
+            st.pop();
+        }
+        if (!st.empty())
+            ans += st.top();
+        return ans;
     }
-    if (tmp.size()) 
-        res = tmp + res;
-    return res;
-}
+};
 ```
 
 ## No45、扑克牌顺子
-
-[牛客网原题链接](https://www.nowcoder.com/practice/762836f4d43d43ca9deb273b3de8e1f4?tpId=13&&tqId=11198&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -2704,70 +2710,37 @@ int LastRemaining_Solution(int n, int m)
 
 ## No47、求1+2+3+...+N
 
-[牛客网原题链接](https://www.nowcoder.com/practice/7a0da8fc483247ff8800059e12d7caf1?tpId=13&&tqId=11200&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
-求1+2+3+...+n，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。
+求1+2+3+...+n，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A ? B : C）。
 
 **示例1**
 
 **输入**
 
 ```
-5Copy to clipboardErrorCopied
+5
 ```
 
 **返回值**
 
 ```
-15Copy to clipboardErrorCopied
+15
 ```
 
-**1、他妈的，我服了**
+**题解：**
 
 ```cpp
-int Sum_Solution(int n) {
-    bool a[n][n+1];
-    return sizeof(a)>>1;
-}Copy to clipboardErrorCopied
-```
-
-因为bool类型的为1个字节，或者换为char的也行，他们都是一个字节，如果是short(2),int(4)就不行了
-
-**2、这个方法真的很妙**
-
-解题思路： 1.需利用逻辑与的短路特性实现递归终止。 2.当n == 0时，(n > 0) && ((sum += Sum_Solution(n - 1)) > 0)只执行前面的判断，为false，然后直接返回0； 3.当n > 0时，执行sum += Sum_Solution(n - 1)，实现递归计算Sum_Solution(n)。
-
-```cpp
-    int Sum_Solution(int n) {
-    int sumNum = n;
-    bool ans = (n > 0) && ((sumNum += Sum_Solution(n - 1)) > 0);
-    return sumNum;
-    }Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、很棒的方法啊**
-
-1.需利用逻辑与的短路特性实现递归终止。 2.当n == 0时，(n > 0) && ((sum += Sum_Solution(n - 1)) > 0)只执行前面的判断，为false，然后直接返回0； 3.当n > 0时，执行sum += Sum_Solution(n - 1)，实现递归计算Sum_Solution(n)。
-
-运行时间：3ms 占用内存：508k
-
-```cpp
-    int Sum_Solution(int n) {
-
-    int sumNum = n;
-    n > 0 && (sumNum += Sum_Solution(n - 1));
-    return sumNum;    
-
-    }Copy to clipboardErrorCopied
+class Solution {
+public:
+    int sumNums(int n) {
+        n && (n += sumNums(n-1));
+        return n;
+    }
+};
 ```
 
 ## No48、求两个数相加
-
-[牛客网原题链接](https://www.nowcoder.com/practice/59ac416b4b944300b617d4f7f111b215?tpId=13&&tqId=11201&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述** 写一个函数，求两个整数之和，要求在函数体内不得使用+、-、*、/四则运算符号。
 
@@ -2776,13 +2749,13 @@ int Sum_Solution(int n) {
 **输入**
 
 ```
-1,2Copy to clipboardErrorCopied
+1,2
 ```
 
 **返回值**
 
 ```
-3Copy to clipboardErrorCopied
+3
 ```
 
 **1、这种解法真的太厉害了**
