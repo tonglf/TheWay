@@ -1796,280 +1796,80 @@ public:
 
 **题目描述**
 
-在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组,求出这个数组中的逆序对的总数P。并将P对1000000007取模的结果输出。 即输出P%1000000007
-
-**输入描述**
-
-题目保证输入的数组中没有的相同的数字数据范围： 对于%50的数据,size<=10^4 对于%75的数据,size<=10^5 对于%100的数据,size<=2*10^5
-
-**示例1**
-
-**输入**
-
-```
-1,2,3,4,5,6,7,0Copy to clipboardErrorCopied
-```
-
-**输出**
-
-```
-7Copy to clipboardErrorCopied
-```
-
-**1、只通过50%的笨方法**
-
-```cpp
-    int InversePairs(vector<int> data) {
-    if (data.size() <= 1) return 0;
-    int len = data.size();
-    vector<int> dp(len, 0);
-    for (int i = len - 2; i >= 0; --i) {
-
-        for (int j = i + 1; j < len; ++j) {
-            if (data[i] > data[j]) { 
-                //dp[i] = max(dp[i], dp[j] + 1); 
-                dp[i]++;
-            }
-
-        }
-    }
-
-    return  accumulate(dp.begin(), dp.end(), 0) % 1000000007;
-
-    }Copy to clipboardErrorCopied
-```
-
-**2、牛客上的一种做法，很厉害**
-
-https://www.nowcoder.com/profile/872855282/codeBookDetail?submissionId=78340272
-
-```cpp
-int InversePairs(vector<int> data) {
-    if (data.size() == 0)
-        return 0;
-    vector<int> copy(data);    // 辅助数组，每次递归后有序
-    return InversePairsCore(data, copy, 0, data.size() - 1);
-}
-
-int InversePairsCore(vector<int>& data, vector<int>& copy, int begin, int end) {
-    if (begin == end)
-        return 0;
-    int mid = begin + (end - begin) /2;
-    int left = InversePairsCore(copy, data, begin, mid);//这里的一步很绝啊，减少了交换的这一步
-    int right = InversePairsCore(copy, data, mid + 1, end);
-
-    int end1 = mid;     // 比较从尾端开始
-    int end2 = end;    // 比较从尾端开始
-    int index_copy = end;       // 比较结果存入辅助数组尾端
-    long res = 0;
-
-    // 归并排序：相当于两个有序数组合成一个有序表（从尾端开始是为了计数）
-    while (begin<= end1 && mid + 1<= end2) {
-        if (data[end1] > data[end2]) {
-            copy[index_copy--] = data[end1--];
-            res += end2 - mid;
-            res %= 1000000007;
-        }
-        else
-            copy[index_copy--] = data[end2--];
-    }
-
-    while (begin<= end1)
-        copy[index_copy--] = data[end1--];
-    while (mid + 1<= end2)
-        copy[index_copy--] = data[end2--];
-
-    return (left + right + res) % 1000000007;
-}
-
-Copy to clipboardErrorCopied
-```
-
-InversePairsCore(copy, data, begin, mid)中 copy和data互换位置好评。。。这样就减少了赋值的那一步了。。。。。
-
-**二刷：**
-
-**1、很棒的一道题目，建议多刷**
-
-```cpp
-int InversePairsCore(vector<int>& data, vector<int>& copy, int begin, int end) {
-    if (begin == end)
-        return 0;
-    int mid = begin + (end - begin) / 2;
-    int low1 = begin, high1 = mid, low2 = mid + 1, high2 = end;
-    int left = InversePairsCore(copy, data, low1, high1);//这里的一步很绝啊，减少了交换的这一步
-    int right = InversePairsCore(copy, data, low2, high2);
-
-    long res = 0;
-    int copyIndex = low1;
-    // 归并排序：相当于两个有序数组合成一个有序表
-    while (low1 <= high1 && low2 <= high2) {
-        if (data[low1] > data[low2]) {
-            copy[copyIndex++] = data[low1++];
-            res += high2 - low2 + 1;// data[low1] > data[low2]，那么这一次，从a[i]开始到a[mid]必定都是大于这个a[j]的，因为此时分治的两边已经是各自有序了
-            res %= 1000000007;
-        }
-        else
-            copy[copyIndex++] = data[low2++];
-    }
-
-    while (low1 <= high1)
-        copy[copyIndex++] = data[low1++];
-    while (low2 <= high2)
-        copy[copyIndex++] = data[low2++];
-
-    return (left + right + res) % 1000000007;
-}
-
-
-int InversePairs(vector<int> data) {
-    if (data.size() == 0)
-        return 0;
-    vector<int> copy(data);    // 辅助数组，每次递归后有序
-    return InversePairsCore(data, copy, 0, data.size() - 1);
-}Copy to clipboardErrorCopied
-```
-
-**2、归并排序，归并成从小到大的序列，这种方法更好理解一些**
-
-运行时间：78ms 占用内存：5788k
-
-```cpp
-int InversePairsCore(vector<int>& data, vector<int>& copy, int begin, int end) {
-    if (begin == end)
-        return 0;
-    int mid = begin + (end - begin) / 2;
-    int low1 = begin, high1 = mid, low2 = mid + 1, high2 = end;
-    int left = InversePairsCore(copy, data, low1, high1);//这里的一步很绝啊，减少了数据交换的这一步
-    int right = InversePairsCore(copy, data, low2, high2);
-
-    long res = 0;
-    int copyIndex = low1;
-    // 归并排序：相当于两个有序数组合成一个有序表
-    //下面就开始两两进行比较，若前面的数大于后面的数，就构成逆序对
-    while (low1 <= high1 && low2 <= high2) {
-        if (data[low1] < data[low2]) {
-
-            copy[copyIndex++] = data[low1++];
-        }
-        else//data[low1] >= data[low2]
-        {
-            copy[copyIndex++] = data[low2++];
-            res += high1 - low1 + 1;
-            res %= 1000000007;
-        }
-
-    }
-
-    while (low1 <= high1)
-        copy[copyIndex++] = data[low1++];
-    while (low2 <= high2)
-        copy[copyIndex++] = data[low2++];
-
-
-    return (left + right + res) % 1000000007;
-}
-
-
-int InversePairs(vector<int> data) {
-    if (data.size() == 0)
-        return 0;
-    vector<int> copy(data);    // 辅助数组，每次递归后有序
-    int res = InversePairsCore(data, copy, 0, data.size() - 1);
-
-    //for (int a : data) {
-    //    cout << a << " ";
-    //}
-    //cout << endl;
-
-    //for (int a : copy) {
-    //    cout << a << " ";
-    //}
-    //cout << endl;
-
-    return res;
-
-}Copy to clipboardErrorCopied
-```
-
-**力扣上的剑指offer：**
-
-[剑指 Offer 51. 数组中的逆序对](https://leetcode-cn.com/problems/shu-zu-zhong-de-ni-xu-dui-lcof/)
-
 在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组，求出这个数组中的逆序对的总数。
 
 **示例 1:**
 
-```
+```cpp
 输入: [7,5,6,4]
-输出: 5Copy to clipboardErrorCopied
+输出: 5
 ```
 
 **限制：**
 
-```
-0 <= 数组长度 <= 50000Copy to clipboardErrorCopied
+```cpp
+0 <= 数组长度 <= 50000
 ```
 
-执行用时：244 ms, 在所有 C++ 提交中击败了97.32%的用户
-
-内存消耗：44.4 MB, 在所有 C++ 提交中击败了100.00%的用户
+**题解：归并**
 
 ```cpp
- int reversePairsCore(vector<int>&nums, vector<int>&copy, int begin, int end){
-        if(begin >= end) return 0;//终止条件
-        int mid = begin + (end - begin)/2;
-        int low1 = begin, high1 = mid, low2 = mid + 1,high2 = end;
-        int leftRes = reversePairsCore(copy, nums, low1, high1);
-        int rightRes = reversePairsCore(copy, nums, low2, high2);
-
-        int copyIndex = low1,res = 0;
-        while(low1 <= high1 && low2 <= high2){
-            if(nums[low1] <= nums[low2])//这里需要保持绝对的小
-            {
-                copy[copyIndex++] = nums[low1++];
-            }else{
-                res += high1 - low1 + 1;//说明 [low1,high1]此时都是大于 nums[low2]的
-                //这里千万注意要 +1 ，因为high1 - low1 就少一个 比如 3-0 = 4，但其实是4个数
-                copy[copyIndex++] = nums[low2++];
-            }
-
+class Solution {
+public:
+    int mergeSort(vector<int>& nums, vector<int>& tmp, int l, int r) {
+        if (l >= r) 
+        {
+            return 0;
         }
-        while(low1 <= high1)
-            copy[copyIndex++] = nums[low1++];
 
-        while(low2 <= high2)
-            copy[copyIndex++] = nums[low2++];
-
-        return res + leftRes + rightRes;
-
+        int mid = (l + r) / 2;
+        int inv_count = mergeSort(nums, tmp, l, mid) + mergeSort(nums, tmp, mid + 1, r);
+        
+        int i = l, j = mid + 1, pos = l;
+        while (i <= mid && j <= r) 
+        {
+            if (nums[i] <= nums[j]) 
+            {
+                tmp[pos] = nums[i];
+                ++i;
+                inv_count += (j - (mid + 1));
+            }
+            else 
+            {
+                tmp[pos] = nums[j];
+                ++j;
+            }
+            ++pos;
+        }
+        for (int k = i; k <= mid; ++k) 
+        {
+            tmp[pos++] = nums[k];
+            inv_count += (j - (mid + 1));
+        }
+        for (int k = j; k <= r; ++k) 
+        {
+            tmp[pos++] = nums[k];
+        }
+        copy(tmp.begin() + l, tmp.begin() + r + 1, nums.begin() + l);
+        return inv_count;
     }
 
-
-
-    int reversePairs(vector<int>& nums) {
-        if( nums.size() <= 1) return 0;
-        vector<int> copy(nums);
-        return reversePairsCore(nums,copy,0,nums.size()-1);
-
-    }Copy to clipboardErrorCopied
+    int reversePairs(vector<int>& nums) 
+    {
+        int n = nums.size();
+        vector<int> tmp(n);
+        return mergeSort(nums, tmp, 0, n - 1);
+    }
+};
 ```
 
-归并类题目：
-
-力扣 315,327,493
-
 ## No36、返回两个链表中的第一个公共节点
-
-[牛客网原题链接](https://www.nowcoder.com/practice/6ab1d9a29e88450685099d45c9e31e46?tpId=13&&tqId=11189&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
 输入两个链表，找出它们的第一个公共结点。（注意因为传入数据是链表，所以错误测试数据的提示是用其他方式显示的，保证传入数据是正确的）
 
-**题解：**
-
-**1、长度大的链表先走两个链表长度的差值，之后一起走**
+**题解一：长度较长的链表先走，之后同步走**
 
 ```cpp
 class Solution {
@@ -2122,21 +1922,21 @@ public:
 };
 ```
 
-**2、大神写法 太厉害了，真的佩服**
+**题解二：**
 
 a.长度相同的：1. 有公共结点的，第一次就遍历到；2. 没有公共结点的，走到尾部NULL相遇，返回NULL； b.长度不同的：1. 有公共结点的，第一遍差值就出来了，第二遍就会一起到公共结点；2. 没有公共结点的，第二次遍历一起到结尾NULL。
 
 ```cpp
 //定义两个指针, 第一轮让两个到达末尾的节点指向另一个链表的头部, 最后如果相遇则为交点(在第一轮移动中恰好抹除了长度差)
 //        两个指针等于移动了相同的距离, 有交点就返回, 无交点就是各走了两条指针的长度
-ListNode* FindFirstCommonNode(ListNode* pHead1, ListNode* pHead2) {
+ListNode* FindFirstCommonNode(ListNode* pHead1, ListNode* pHead2) 
+{
     if (pHead1 == NULL || pHead2 == NULL) 
         return NULL;
-    ListNode* p1 = new ListNode(-1);
-    ListNode* p2 = new ListNode(-1);
-    p1 = pHead1;
-    p2 = pHead2;
-    while (p1 != p2) {
+    ListNode* p1 = pHead1;
+    ListNode* p2 = pHead2;
+    while (p1 != p2) 
+    {
         p1 = (p1 == NULL ? pHead2 : p1->next);
         p2 = (p2 == NULL ? pHead1 : p2->next);
     }
@@ -2145,8 +1945,6 @@ ListNode* FindFirstCommonNode(ListNode* pHead1, ListNode* pHead2) {
 ```
 
 ## No37、 统计一个数字在排序数组中出现的次数
-
-[牛客网原题链接](https://www.nowcoder.com/practice/70610bf967994b22bb1c26f9ae901fa2?tpId=13&&tqId=11190&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -2157,64 +1955,89 @@ ListNode* FindFirstCommonNode(ListNode* pHead1, ListNode* pHead2) {
 **输入**
 
 ```
-[1,2,3,3,3,3,4,5],3Copy to clipboardErrorCopied
+[1,2,3,3,3,3,4,5],3
 ```
 
 **返回值**
 
 ```
-4Copy to clipboardErrorCopied
+4
 ```
 
 **1、STL中取巧的一种写法，直接调equal_range() 方法**
 
 ```cpp
-int GetNumberOfK(vector<int> data ,int k) {
-    auto pos = equal_range(data.begin(),data.end(),k);
-    return pos.second - pos.first;
-    }Copy to clipboardErrorCopied
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        auto pos = equal_range(nums.begin(), nums.end(), target);
+        return pos.second - pos.first;
+    }
+};
 ```
 
-**2、二分法，找到第一次出现的位置和最后一次出现的位置，还是记这种二分法模板吧**
-
-low<=high low = mid+1,high = mid-1;
-
-运行时间：2ms 占用内存：504k
+**2、二分法，找到第一次出现的位置和最后一次出现的位置**
 
 ```cpp
-int GetNumberOfK(vector<int> data, int k) {
-
-    int low = 0, high = data.size() - 1;
-    if (high == -1) return 0;//data为空
-
-
-    while (low  <= high) {
-        int mid = low + (high - low)/2;
-        if (data[mid] > k) high = mid -1 ;
-        else if (data[mid] < k) low = mid + 1;
-        else {//已经找到
-                int count = 0;
-            count++;
-            int index = mid-1;
-            while (index >= 0 && data[index] == k) {
-                count++;
-                index--;
+class Solution {
+public:
+    int getFirstK(vector<int>& nums, int target)
+    {
+        int l = 0, r = nums.size();
+        while (l < r)
+        {
+            int mid = l + (r - l) / 2;
+            if (nums[mid] == target)
+            {
+                if (mid == 0 || nums[mid - 1] != target)		// 找到第一个出现元素的位置
+                    return mid;
+                else
+                    r = mid;
             }
-            index = mid + 1;
-            while (index <=data.size()-1&& data[index] == k) {
-                count++;
-                index++;
+            else if (nums[mid] > target)
+            {
+                r = mid;
             }
-            return count;
+            else
+                l = mid + 1;
         }
+        return -1;
     }
-    return 0;//没有找到，直接返回 0 吧
-}Copy to clipboardErrorCopied
+
+    int getLastK(vector<int>& nums, int target)
+    {
+        int l = 0, r = nums.size();
+        while (l < r)
+        {
+            int mid = l + (r - l) / 2;
+            if (nums[mid] == target)
+            {
+                if (mid == nums.size() - 1 || nums[mid + 1] != target)	// 找到最后一个出现元素的位置
+                    return mid;
+                else
+                    l = mid + 1;
+            }
+            else if (nums[mid] > target)
+            {
+                r = mid;
+            }
+            else
+                l = mid + 1;
+        }
+        return -1;
+    }
+
+    int search(vector<int>& nums, int target) {
+        int first = getFirstK(nums, target);
+        int last = getLastK(nums, target);
+        if (first == -1)
+            return 0;
+        return last - first + 1;
+    }
+};
 ```
 
 ## No38、二叉树的深度
-
-[牛客网原题链接](https://www.nowcoder.com/practice/435fb86331474282a3499955f0a41e8b?tpId=13&&tqId=11191&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -2224,69 +2047,62 @@ int GetNumberOfK(vector<int> data, int k) {
 
 **输入**
 
-```
-{1,2,3,4,5,#,6,#,#,7}Copy to clipboardErrorCopied
+```cpp
+{1,2,3,4,5,#,6,#,#,7}
 ```
 
 **返回值**
 
-```
-4Copy to clipboardErrorCopied
+```cpp
+4
 ```
 
-**1、BFS，迭代版本**
+**题解一：层次遍历，看看有多少层**
 
 ```cpp
-int TreeDepth(TreeNode* pRoot)
-{
-    if (pRoot == nullptr) return 0;
-    queue<pair<TreeNode*, int>> q;
-    q.push(make_pair(pRoot, 1));
-    int maxDept = 1;
-    while (!q.empty()) {
-        TreeNode* curNode = q.front().first;
-        int curDepth = q.front().second;
-        q.pop();
-        if (curNode) {
-            maxDept = max(maxDept, curDepth);
-            q.push({ curNode->left,curDepth + 1 });
-            q.push({ curNode->right,curDepth + 1 });
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if (root == NULL)
+            return 0;
+        queue<TreeNode*> q;
+        q.push(root);
+        int k = 0;
+        while (!q.empty())
+        {
+            int size = q.size();
+            k++;
+            for (int i = 0; i < size; ++i)
+            {
+                TreeNode* node = q.front();
+                q.pop();
+                if (node->left)
+                    q.push(node->left);
+                if (node->right)
+                    q.push(node->right);
+            }
         }
+        return k;
     }
-    return maxDept;
-}Copy to clipboardErrorCopied
+};
 ```
 
-**2、递归法**
+**题解二：递归法**
 
 ```cpp
-int TreeDepth(TreeNode* pRoot)
-{
-    if (pRoot == nullptr) return 0;
-    int leftDept = TreeDepth(pRoot->left) + 1, rightDept = TreeDepth(pRoot->right) + 1;
-    return max(leftDept, rightDept;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、很简单的递归方法**
-
-运行时间：2ms 占用内存：504k
-
-```cpp
-int TreeDepth(TreeNode* pRoot)
-{    
-    if(pRoot == nullptr) return 0;
-    int leftDepth = TreeDepth(pRoot->left);
-    int rightDepth = TreeDepth(pRoot->right);
-    return 1 + max(leftDepth,rightDepth);
-}Copy to clipboardErrorCopied
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if (root == NULL)
+            return 0;
+        int left = maxDepth(root->left);
+        int right = maxDepth(root->right);
+        return max(left, right) + 1;
+    }
+};
 ```
 
 ## No39、平衡二叉树
-
-[牛客网原题链接](https://www.nowcoder.com/practice/8b3b95850edb4115918ecebdf1b4d222?tpId=13&&tqId=11192&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -2296,232 +2112,80 @@ int TreeDepth(TreeNode* pRoot)
 
 **输入**
 
-```
-{1,2,3,4,5,6,7}Copy to clipboardErrorCopied
+```cpp
+{1,2,3,4,5,6,7}
 ```
 
 **返回值**
 
-```
-trueCopy to clipboardErrorCopied
+```cpp
+true
 ```
 
-**1、暴力法，笨方法**
-
-最直接的做法，遍历每个结点，借助一个获取树深度的递归函数，根据该结点的左右子树高度差判断是否平衡，然后递归地对左右子树进行判断。
+**题解：递归**
 
 ```cpp
-int maxDepth(TreeNode* node) {
+class Solution {
+public:
+    bool isBalanced(TreeNode* root) {
+        return getDepth(root) != -1;
+    }
 
-    if (node == nullptr)  return 0;
-    return 1 + max(maxDepth(node->left), maxDepth(node->right));
-}
-
-bool IsBalanced_Solution(TreeNode* pRoot) {
-    if (pRoot == nullptr) return true;//这里是返回true 而不再是false
-    return abs(maxDepth(pRoot->left) - maxDepth(pRoot->right)) <= 1 &&
-        IsBalanced_Solution(pRoot->left) && IsBalanced_Solution(pRoot->right);
-}Copy to clipboardErrorCopied
-```
-
-return 后面不需要加两个&&来递归他左子树和右子树. 这样想, 有一个函数得到了他的深度, 那么只要根的左子树和右子树深度不超过1就可以了. 后面判断的没有什么必要
-
-**2、改进版，很好的方法，只遍历一次，画个二叉树就知道了**
-
-上面这种做法有很明显的问题，在判断上层结点的时候，会多次重复遍历下层结点，增加了不必要的开销。如果改为从下往上遍历，如果子树是平衡二叉树，则返回子树的高度；如果发现子树不是平衡二叉树，则直接停止遍历，这样至多只对每个结点访问一次。
-
-```cpp
-int getDepth(TreeNode* node) {
-
-    if (node == nullptr)  return 0;
-    int leftDept = getDepth(node->left);
-    if (leftDept == -1) return -1;
-    int rightDept = getDepth(node->right);
-    if (rightDept == -1) return -1;
-    if (abs(leftDept - rightDept) > 1) 
-        return -1;
-    else
-        return 1 + max(leftDept,rightDept);
-}
-
-bool IsBalanced_Solution(TreeNode* pRoot) {
-    if (pRoot == nullptr) return true;//这里是返回true 而不再是false
-    return getDepth(pRoot)!=-1;
-}Copy to clipboardErrorCopied
-```
-
-这种做法有很明显的问题，在判断上层结点的时候，会多次重复遍历下层结点，增加了不必要的开销。如果改为从下往上遍历，如果子树是平衡二叉树，则返回子树的高度；如果发现子树不是平衡二叉树，则直接停止遍历，这样至多只对每个结点访问一次。
-
-**二刷：**
-
-所谓平衡二叉树就是他的左孩子和右孩子的深度之差不能超过1
-
-**1、迭代方法 仔细想一下**
-
-```cpp
-int getDepth(TreeNode * node){
-
-    if(node == nullptr) return 0;
-    int left = getDepth(node->left),right = getDepth(node->right);
-
-    return 1 + max(left,right);
-}
-
-bool IsBalanced_Solution(TreeNode* pRoot) {
-
-    if(pRoot == nullptr) return true;//这里返回的是true，为空的话就应该是
-
-    return abs(getDepth(pRoot->left) - getDepth(pRoot->right))<=1;
-}Copy to clipboardErrorCopied
-```
-
-**2、迭代法改进版本，从下往上便利，这种方法好一点**
-
-```cpp
-int getDepth(TreeNode * node){
-
-    if(node == nullptr) return 0;
-    int left = getDepth(node->left);
-    if(left == -1)  return -1;
-
-    int right = getDepth(node->right);
-    if(right == -1) return -1;
-
-    if(abs(left - right) > 1) return -1;
-    else
-        return 1 + max(left,right);
-}
-
-bool IsBalanced_Solution(TreeNode* pRoot) {
-
-    if(pRoot == nullptr) return true;
-
-    return getDepth(pRoot) != -1;
-}Copy to clipboardErrorCopied
+    int getDepth(TreeNode* root)
+    {
+        if (root == NULL)
+            return 0;
+        int left = getDepth(root->left);
+        if (left == -1)
+            return -1;
+        int right = getDepth(root->right);
+        if (right == -1)
+            return -1;
+        return abs(left - right) > 1 ? -1 : 1 + max(left, right);
+    }
+};
 ```
 
 ## No40、数组中只出现一次的数字
-
-[牛客网原题链接](https://www.nowcoder.com/practice/e02fdb54d7524710a7d664d082bb7811?tpId=13&&tqId=11193&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
 一个整型数组里除了两个数字之外，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字。
 
-**1、常规做法**
+**题解：分组异或**
+
+先对所有数字进行一次异或，得到两个出现一次的数字的异或值。
+
+在异或结果中找到任意为 11 的位。
+
+根据这一位对所有的数字进行分组。
+
+在每个组内进行异或操作，得到两个数字。
 
 ```cpp
-void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
-    unordered_map<int, int> unmp;
-    for (int i = 0; i < data.size(); ++i) {
-        unmp[data[i]] += 1;
-    }
-
-
-    auto it = unmp.begin();
-    while (it != unmp.end()) {
-        if (it->second == 1) {
-            *num1 = it->first;
-            ++it;
-            break;
-        }
-        ++it;
-    }
-
-    while (it != unmp.end()) {
-        if (it->second == 1) {
-            *num2 = it->first;
-            break;
-        }
-        ++it;
-    }
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、hash表的笨方法**
-
-运行时间：3ms 占用内存：376k
-
-```cpp
-void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
-    unordered_map<int,int> unmp;
-    for(auto a:data){
-        unmp[a]++;
-    }
-
-    auto beg = unmp.begin();
-    while(beg != unmp.end())
-    {
-        if(beg->second == 1)
+class Solution {
+public:
+    vector<int> singleNumbers(vector<int>& nums) {
+        int ret = 0;
+        for (int n : nums)
+            ret ^= n;
+        int div = 1;
+        while ((div & ret) == 0)
+            div <<= 1;
+        int a = 0, b = 0;
+        for (int n : nums)
         {
-            *num1 = beg->first;
-            beg++;
-            break;
+            if (div & n)
+                a ^= n;
+            else
+                b ^= n;
         }
-        beg++;
-
+        return vector<int>{a, b};
     }
-
-    while(beg != unmp.end())
-    {
-        if(beg->second == 1)
-        {
-            *num2 = beg->first;
-            break;
-        }
-        beg++;
-
-    }
-}Copy to clipboardErrorCopied
-```
-
-**2、异或做法，很棒**
-
-当**只有一个数出现一次**时，我们把数组中所有的数，依次异或运算，最后剩下的就是落单的数，因为成对儿出现的都抵消了。
-
-依照这个思路，我们来看两个数（我们假设是AB）出现一次的数组。我们首先还是先异或，剩下的数字肯定是A、B异或的结果，**这个结果的二进制中的1，表现的是A和B的不同的位**。我们就取第一个1所在的位数，假设是第3位，接着把原数组分成**两组**，分组标准是第3位是否为1。如此，**相同的数肯定在一个组**，因为相同数字所有位都相同，而不同的数，**肯定不在一组**。然后把这两个组按照最开始的思路，依次异或，剩余的两个结果就是这两个只出现一次的数字。
-
-运行时间：3ms 占用内存：376k
-
-```cpp
-void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
-
-
-    if (data.size() < 2) return;
-
-    int totalNum = 0;
-    for (int i = 0; i < data.size(); i++) {
-        totalNum ^= data[i];//所有数异或，结果为不同的两个数字的异或
-    }
-
-    int sign = 0;//标志位，记录totalNum中的第一个1出现的位置
-    for (; sign < data.size(); sign++) {
-        if ((totalNum & (1 << sign)) != 0) { //左移 sign 位，将所有数字进行左移sign位，而低位补上0
-            break;
-        }
-    }
-    cout << sign << endl;
-    num1[0] = 0;
-    num2[0] = 0;
-    for (int i = 0; i < data.size(); i++) {
-        if ((data[i] & (1 << sign)) == 0) {//标志位为0的为一组，异或后必得到一个数字（这里注意==的优先级高于&，需在前面加（））
-            num1[0] ^= data[i];
-            cout << "0 "<<data[i] << " " << (1<<sign) << endl;
-        }
-        else {
-            num2[0] ^= data[i];//标志位为1的为一组
-            cout << "1 " << data[i] << " " << (1 << sign) << endl;
-        }
-    }
-    cout << num1[0] << num2[0] << endl;       
-}Copy to clipboardErrorCopied
+};
 ```
 
 ## No41、和为S的连续整数序列
-
-[牛客网原题链接](https://www.nowcoder.com/practice/c451a3fd84b64cb19485dad758a55ebe?tpId=13&&tqId=11194&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -2530,121 +2194,53 @@ void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
 **输出描述:**
 
 ```
-输出所有和为S的连续正数序列。序列内按照从小至大的顺序，序列间按照开始数字从小到大的顺序Copy to clipboardErrorCopied
+输出所有和为S的连续正数序列。序列内按照从小至大的顺序，序列间按照开始数字从小到大的顺序
 ```
 
 输入
 
 ```
-9Copy to clipboardErrorCopied
+9
 ```
 
 **返回值**
 
 ```
-[[2,3,4],[4,5]]Copy to clipboardErrorCopied
+[[2,3,4],[4,5]]
 ```
 
-**1、牛客解法，很厉害。类似于TCP滑动窗口**
+**题解：客解法，很厉害。类似于TCP滑动窗口**
 
 ```cpp
-vector<vector<int> > FindContinuousSequence(int sum) {
-    vector<vector<int>> result;
-    int low=1,high=2;//两个起点，相当于动态窗口的两边，根据其窗口内的值的和来确定窗口的位置和大小
-    while(low<high){
-        int sumTemp = (low+high) *(high-low +1)/2;
-        //由于是连续的，差为1的一个序列，那么求和公式是(a0+an)*n/2
-        if(sumTemp == sum){  //相等，那么就将窗口范围的所有数添加进结果集
-            vector<int> resultTemp;
-            for(int i=low;i<=high;++i)
-            {resultTemp.push_back(i);}
-            result.push_back(resultTemp);
-            low++;
-        }else if(sumTemp<sum){ //如果当前窗口内的值之和小于sum，那么右边窗口右移一下
-            high++;
+class Solution {
+public:
+    vector<vector<int>> findContinuousSequence(int target) {
+        vector<vector<int>> result;
+        int l = 1, r = 2;
+        while (l < r)
+        {
+            int sum = (l + r) * (r - l + 1) / 2;
+            if (sum == target)
+            {
+                vector<int> path;
+                for (int i = l; i <= r; ++i)
+                {
+                    path.push_back(i);
+                }
+                result.push_back(path);
+                l++;
+            }
+            else if (sum > target)
+                l++;
+            else
+                r++;
         }
-        else{  //如果当前窗口内的值之和大于sum，那么左边窗口右移一下
-            low++;
-        }
+        return result;
     }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-**2、暴力解法**
-
-```cpp
-vector<vector<int> > FindContinuousSequence(int sum) {
-    vector<vector<int> > result;
-    for (int n = sqrt(2 * sum); n >= 2; --n) {
-        if (((n & 1) == 1 && sum % n == 0) || (sum % n * 2 == n)) {
-            vector<int> res;
-            //j用于计数，k用于遍历求值
-            for (int j = 0, k = sum / n - (n - 1) / 2; j < n; j++, k++)//注意看k的求法
-                res.push_back(k);
-            result.push_back(res);
-        }
-    }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、滑动窗口，直接用数学公式来进行计算**
-
-运行时间：3ms 占用内存：496k
-
-```cpp
-vector<vector<int> > FindContinuousSequence(int sum) {
-    vector<vector<int>> result;
-    int low = 1,high = 2;
-    while(low < high){
-        int sumTemp = (low + high) * (high - low + 1)/2;
-        if(sumTemp == sum){
-            vector<int> temp;
-            for(int i = low;i <= high; ++i)
-                temp.push_back(i);
-            result.push_back(std::move(temp));
-            low++;//即使当前满足，那么依然要前进的，这有点滑动窗口的意思吧
-        }else if(sumTemp < sum) high++;
-        else
-            low++;
-    }
-    return std::move(result);//借助C++11的move函数，总体时间会更短    
-}Copy to clipboardErrorCopied
-```
-
-[力扣网原题链接](https://leetcode-cn.com/problems/he-wei-sde-lian-xu-zheng-shu-xu-lie-lcof/)
-
-执行用时：0 ms, 在所有 C++ 提交中击败了100.00%的用户
-
-内存消耗：6.9 MB, 在所有 C++ 提交中击败了39.52%的用户
-
-```cpp
-vector<vector<int>> findContinuousSequence(int target) {
-
-    vector<vector<int>> result;
-    int low = 1,high = 2;
-    while(low < high){
-        int sumTemp = (low + high) * (high - low + 1)/2;
-        if(sumTemp == target){
-            vector<int> temp;
-            for(int i = low;i <= high; ++i)
-                temp.push_back(i);
-            result.push_back(std::move(temp));
-            low++;
-        }else if(sumTemp < target) high++;
-        else
-            low++;
-    }
-    return std::move(result);//借助C++11的move函数，总体时间会更短    
-}Copy to clipboardErrorCopied
+};
 ```
 
 ## No42、和为S的两个数字
-
-[牛客网原题链接](https://www.nowcoder.com/practice/390da4f7a00f44bea7c2f3d19491311b?tpId=13&&tqId=11195&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -2652,98 +2248,50 @@ vector<vector<int>> findContinuousSequence(int target) {
 
 **输出描述:**
 
-```
-对应每个测试案例，输出两个数，小的先输出Copy to clipboardErrorCopied
+```cpp
+对应每个测试案例，输出两个数，小的先输出
 ```
 
 **示例1**
 
 **输入**
 
-```
-[1,2,4,7,11,15],15Copy to clipboardErrorCopied
+```cpp
+[1,2,4,7,11,15],15
 ```
 
 **返回值**
 
-```
-[4,11]Copy to clipboardErrorCopied
+```cpp
+[4,11]
 ```
 
 **1、很简单的一个问题**
 
 ```cpp
-vector<int> FindNumbersWithSum(vector<int> array,int sum) {        
-    vector<int>  result;
-    if (array.size() == 0)  return result;
-    int low = 0, high = array.size() - 1;
-
-    while (low <= high) {
-        if (array[low] + array[high] == sum) {
-            result.push_back(array[low]);
-            result.push_back(array[high]);
-            return result;
-        }
-        else if (array[low] + array[high] < sum)  low++;
-        else {
-            high--;
-        }
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        vector<int> result{-1, -1};
+        int l = 0, r = nums.size() - 1;
+        while (l < r)
+        {
+            if (nums[l] + nums[r] == target)
+            {
+                result[0] = nums[l];
+                result[1] = nums[r];
+                break;
+            }
+            else if (nums[l] + nums[r] > target)
+            {
+                r--;
+            }
+            else
+                l++;
+        } 
+        return result;
     }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、滑动窗口来做**
-
-运行时间：3ms 占用内存：512k
-
-```cpp
- vector<int> FindNumbersWithSum(vector<int> array,int sum) {
-       int low= 0, high = array.size()-1;
-       int minResult = INT_MAX;
-       vector<int> result;
-       while(low <= high){
-           int sumTemp = array[low] + array[high];
-           if(sumTemp == sum){
-               if( array[low] * array[high] < minResult){
-                  result.clear();
-                  result.push_back(array[low]);
-                  result.push_back(array[high]);
-                  minResult = array[low] * array[high];//这里其实可以直接返回的，因为同比情况下，两个数字相差越远，他们的乘积越小的，约靠近相差的乘积就越大
-               }
-
-               low++;
-           }else if(sumTemp > sum) high--;
-           else
-               low++;
-       }
-       return result;
-    }Copy to clipboardErrorCopied
-```
-
-**优化一下**
-
-运行时间：2ms 占用内存：476k
-
-```cpp
-vector<int> FindNumbersWithSum(vector<int> array,int sum) {
-       int low= 0, high = array.size()-1;
-       vector<int> result;
-       while(low <= high){
-           int sumTemp = array[low] + array[high];
-           if(sumTemp == sum){
-               result.push_back(array[low]);
-               result.push_back(array[high]);
-               return result;
-
-           }else if(sumTemp > sum) high--;
-           else
-               low++;
-       }
-       return result;
-    }Copy to clipboardErrorCopied
+};
 ```
 
 ## No43、左旋转字符串
@@ -4605,108 +4153,55 @@ public:
 
 ## No62、二叉搜索树的第K个节点
 
-[牛客网原题链接](https://www.nowcoder.com/practice/ef068f602dde4d28aab2b210e859150a?tpId=13&&tqId=11215&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
-给定一棵二叉搜索树，请找出其中的第k小的结点。例如， （5，3，7，2，4，6，8） 中，按结点数值大小顺序第三小结点的值为4。
+给定一棵二叉搜索树，请找出其中第k大的节点。
 
 **示例1**
 
 **输入**
 
 ```c
-{5,3,7,2,4,6,8},3Copy to clipboardErrorCopied
+root = [3,1,4,null,2], k = 1
 ```
 
 **返回值**
 
 ```c
-{4}Copy to clipboardErrorCopied
+4
 ```
 
-说明 按结点数值大小顺序第三小结点的值为4
+说明 按结点数值大小顺序第三小结点的值为 4
 
-**1、笨方法，全部保存下来**
-
-会超时，这个方法不行
-
-**2、中序遍历其实就是从小到大的排列顺序**
+**题解：二叉搜索树的中序遍历**
 
 ```cpp
-class situation {
+class Solution {
 public:
-    int count=0;
-
-    TreeNode* KthNode(TreeNode* pRoot, int k)
-    {
-        if (pRoot == nullptr) return nullptr;
-        TreeNode* left_node = KthNode(pRoot->left, k);
-        if (left_node) return left_node;
-        count++;
-        if (k == count) {
-            return pRoot;
-        }
-        TreeNode* right_node = KthNode(pRoot->right, k);
-        if (right_node) return right_node;
-        return nullptr;
-    }
-}Copy to clipboardErrorCopied
-```
-
-**3、中序遍历模板解法**
-
-```cpp
-TreeNode* KthNode(TreeNode* pRoot, int k)
-    {
-        if (pRoot == nullptr) return nullptr;
+    int kthLargest(TreeNode* root, int k) {
+        if (root == NULL)
+            return -1;
+        vector<int> v;
         stack<TreeNode*> s;
-        s.push(pRoot);
-        while (!s.empty() || pRoot != nullptr) {
-            if (pRoot != nullptr) {
-                s.push(pRoot);
-                pRoot = pRoot->left;
+        while (root || !s.empty())
+        {
+            if (root)
+            {
+                s.push(root);
+                root = root->left;
             }
-            else {
-                pRoot = s.top();
+            else
+            {
+                root = s.top();
                 s.pop();
-                k--;
-                if (k == 0) return pRoot;
-                pRoot = pRoot->right;
+                v.push_back(root->val);
+                root = root->right;
             }
         }
-        return nullptr;
-    }Copy to clipboardErrorCopied
-```
-
-二刷：
-
-**1、其实就是中序遍历**
-
-运行时间：3ms 占用内存：504k
-
-```cpp
-TreeNode* KthNode(TreeNode* pRoot, int k)
-{
-    if(pRoot == nullptr) return nullptr;
-    stack<TreeNode*> st;
-    while(!st.empty() || pRoot!=nullptr){
-
-        while(pRoot != nullptr){
-            st.push(pRoot);
-            pRoot = pRoot->left;
-        }
-        pRoot = st.top();
-        st.pop();
-        if(--k == 0) return pRoot;
-        pRoot = pRoot->right;
+        return v[v.size() - k];
     }
-
-    return nullptr;
-}Copy to clipboardErrorCopied
+};
 ```
-
-
 
 ## No63、数据流中的中位数
 
