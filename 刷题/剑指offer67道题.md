@@ -2401,13 +2401,13 @@ LL决定去买体育彩票啦。 现在,要求你使用这幅牌模拟上面的�
 **输入**
 
 ```
-[6,0,2,0,4]Copy to clipboardErrorCopied
+[6,0,2,0,4]
 ```
 
 **返回值**
 
 ```
-trueCopy to clipboardErrorCopied
+true
 ```
 
 **示例2**
@@ -2415,13 +2415,13 @@ trueCopy to clipboardErrorCopied
 **输入**
 
 ```
-[0,3,2,6,4]Copy to clipboardErrorCopied
+[0,3,2,6,4]
 ```
 
 **返回值**
 
 ```
-trueCopy to clipboardErrorCopied
+true
 ```
 
 **示例3**
@@ -2429,13 +2429,13 @@ trueCopy to clipboardErrorCopied
 **输入**
 
 ```
-[1,0,0,1,0]Copy to clipboardErrorCopied
+[1,0,0,1,0]
 ```
 
 **返回值**
 
 ```
-falseCopy to clipboardErrorCopied
+false
 ```
 
 **示例4**
@@ -2443,13 +2443,13 @@ falseCopy to clipboardErrorCopied
 **输入**
 
 ```
-[13,12,11,0,1]Copy to clipboardErrorCopied
+[13,12,11,0,1]
 ```
 
 **返回值**
 
 ```
-falseCopy to clipboardErrorCopied
+false
 ```
 
 **1、比较容易想到的一种方法**
@@ -2465,116 +2465,28 @@ falseCopy to clipboardErrorCopied
 5、如果出现对子，则不是顺子
 
 ```cpp
-    bool IsContinuous( vector<int> numbers ) {
-        int len = numbers.size();
-        if(len<5) return false;
-        sort(numbers.begin(),numbers.end());
-        int numOfZreo = 0,numOfInner=0;
-        for(int i=0;i<len-1;++i){
-            if(numbers[i]==0)  ++numOfZreo;
-            else if(numbers[i]==numbers[i+1]){
+class Solution {
+public:
+    bool isStraight(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        int numOfZreo = 0, numOfInner = 0;
+        for (int i = 0; i < nums.size() - 1; ++i)
+        {
+            if (nums[i] == 0)
+                numOfZreo++;
+            else if (nums[i] == nums[i + 1])
                 return false;
-            }
-            else{
-                numOfInner += numbers[i+1] - numbers[i] -1;//这里千万注意要减去1
-            }
-            //cout<<numOfZreo<<" "<<numOfInner<<endl;
+            else
+                numOfInner += nums[i + 1] - nums[i] - 1;
         }
-        if(numOfZreo>=numOfInner) return true;
-        return false;
-    }Copy to clipboardErrorCopied
-```
-
-**2、第二种方法**
-
-max 记录 最大值 min 记录 最小值 min ,max 都不记0 满足条件 1 max - min <5 2 除0外没有重复的数字(牌) 3 数组长度 为5
-
-```cpp
- bool IsContinuous( vector<int> numbers ) {
-    int maxNum = -1, minNum = 14;
-    if (numbers.size() < 5)//小于5则为false
-        return false;
-    vector<int> result(14, 0);
-    result[0] = -5;
-    for (int i = 0; i < numbers.size(); ++i)
-    {  
-        result[numbers[i]]++;
-        if (numbers[i] == 0)//出现0则跳过
-            continue;
-        if (result[numbers[i]] > 1) return false;
-        if (numbers[i] > maxNum)
-            maxNum = numbers[i];//取最大数
-        if (numbers[i] < minNum)
-            minNum = numbers[i];//取最小数
-    }
-    if (maxNum - minNum < 5)
-        return true;//判断是否小于5
-    eturn false;
-    }Copy to clipboardErrorCopied
-```
-
-下面的代码有问题，无法判断是否有重复的数字，比如1,2,4,5,4就无法判断
-
-```cpp
-    bool IsContinuous( vector<int> numbers ) {
-    int maxNum = -1, minNum = 14;
-    if (numbers.size() < 5)//小于5则为false
-        return false;
-    for (int i = 0; i < numbers.size(); i++)
-    {   //判断是是否小于0和大于13以及有没有重复数字
-        if (numbers[i] < 0 || numbers[i]>13 || numbers[i] == maxNum || numbers[i] == minNum)
+        if (numOfInner > numOfZreo)
             return false;
-        if (numbers[i] == 0)//出现0则跳过
-            continue;
-        if (numbers[i] > maxNum)
-            maxNum = numbers[i];//取最大数
-        if (numbers[i] < minNum)
-            minNum = numbers[i];//取最小数
+        return true;
     }
-    if (maxNum - minNum < 5)
-        return true;//判断是否小于5
-    return false;
-    }Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**先排序，再进行操作即可，挺好**
-
-运行时间：3ms 占用内存：504k
-
-```cpp
-    bool IsContinuous( vector<int> numbers ) {
-if (numbers.size() <= 4) return false;
-    sort(numbers.begin(), numbers.end());
-    int countZero = 0;
-    int index = 0;
-    while (index < numbers.size() && numbers[index] == 0) {
-        countZero++;
-        index++;
-    }
-    //cout << index << endl;
-    //cout << countZero << endl;
-    for (int i = index; i < numbers.size() - 1; ++i) {
-        if (numbers[i] == numbers[i+1]) return false;
-        else if ( (numbers[i]+1) == numbers[i+1]) {
-            continue;
-        }
-        else {
-            countZero -= (numbers[i+1] - numbers[i] - 1);
-        }
-        //cout << countZero << endl;
-        if (countZero < 0) return false;
-    }
-
-
-    return countZero >= 0;
-    }Copy to clipboardErrorCopied
+};
 ```
 
 ## No46、孩子们的游戏（圆圈中最后剩下的数）
-
-[牛客网原题链接](https://www.nowcoder.com/practice/f78a359491e64a50bce2d89cff857eb6?tpId=13&&tqId=11199&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -2587,125 +2499,45 @@ if (numbers.size() <= 4) return false;
 **输入**
 
 ```
-5,3Copy to clipboardErrorCopied
+5,3
 ```
 
 **返回值**
 
 ```
-3Copy to clipboardErrorCopied
+3
 ```
 
-**1、时间复杂度太大**
+**题解一：约瑟夫环的问题**
 
 ```cpp
 class Solution {
 public:
-struct ListNode {
-    int val;
-    struct ListNode* next;
-    ListNode(int v) :val(v), next(NULL) {
-
+    int lastRemaining(int n, int m) {
+        if (n < 1 || m < 1)
+            return -1;
+        int last = 0;
+        for (int i = 2; i <= n; ++i)
+            last = (last + m) % i;
+        return last;
     }
 };
-
-    int LastRemaining_Solution(int n, int m)
-    {
-    ListNode* root=(ListNode*)malloc(sizeof(ListNode));
-    root->val = 0;
-    ListNode* node = (ListNode*)(malloc)(sizeof(ListNode));
-    node=root;
-    for (int i = 1; i < n; ++i) {
-        ListNode* temp = (ListNode*)(malloc)(sizeof(ListNode));
-        temp->val = i;
-        node->next = temp;
-        node = node->next;
-    }
-    node->next = root;
-
-    int count = 0,result=-1;
-    while (root != nullptr && n!=1) {
-        if (++count == m - 1) {
-            result = root->val;
-            root = root->next;
-            node->next = root;
-            count = 0;
-            n--;
-            continue;
-        }
-
-        root = root->next;
-        node = node->next;
-
-    }
-    result = root->val;
-    return result;
-    }
-};Copy to clipboardErrorCopied
 ```
 
-**2、约瑟夫环的问题，背模板吧 啥也别说了，背模板吧**
-
-执行用时：4 ms, 在所有 C++ 提交中击败了99.81%的用户
-
-内存消耗：5.8 MB, 在所有 C++ 提交中击败了100.00%的用户
+**题解二：递归**
 
 ```cpp
-int lastRemaining(int n, int m) {
-
-    if(n <= 0 || m < 0)
-        return -1;
-    int ans = 0;
-    // 最后一轮剩下2个人，所以从2开始反推
-    for (int i = 2; i <= n; ++i) {
-        ans = (ans + m) % i;
+class Solution {
+public:
+    int lastRemaining(int n, int m) {
+        if (n == 0)
+            return -1;
+        if (n == 1)
+            return 0;
+        else
+            return (lastRemaining(n - 1, m) + m) % n;
     }
-    return ans;
-}Copy to clipboardErrorCopied
-```
-
-**3、递归做法，不觉明厉**
-
-```cpp
-int LastRemaining_Solution(int n, int m)
-{
-    if(n==0)
-        return -1;
-    if(n==1)
-        return 0;
-    else
-        return (LastRemaining_Solution(n-1,m)+m)%n;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、使用数组代替环，考虑清楚从头开始的情况**
-
-运行时间：58ms 占用内存：496k
-
-```cpp
-int LastRemaining_Solution(int n, int m)
-{
-
-    if(n<1 || m<1)  return -1;
-    vector<int> numbers(n,0);
-    int index = -1,step = 0, count = n;
-    while(count > 0){  //跳出循环时将最后一个元素也设置为了-1
-
-        index++; //指向上一个被删除对象的下一个元素。
-        if(index >= n )index = 0; //模拟环。
-        if(numbers[index] == -1) continue; //跳过被删除的对象。
-        step++; //记录已走过的。向前走一步
-        if(step == m){ //找到待删除的对象。
-
-            numbers[index] = -1;
-            step = 0;
-            count--;
-        }
-    }
-    return index; //返回跳出循环时的index,即最后一个被设置为-1的元素
-}Copy to clipboardErrorCopied
+};
 ```
 
 ## No47、求1+2+3+...+N
@@ -2822,8 +2654,6 @@ int Add(int num1, int num2)
 
 ## No49、字符串转化为整数
 
-[牛客网原题链接](https://www.nowcoder.com/practice/1277c681251b4372bdef344468e4f26e?tpId=13&&tqId=11202&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 将一个字符串转换成一个整数，要求不能使用字符串转换整数的库函数。 数值为0或者字符串不是一个合法的数值则返回0
@@ -2831,13 +2661,13 @@ int Add(int num1, int num2)
 **输入描述:**
 
 ```
-输入一个字符串,包括数字字母符号,可以为空Copy to clipboardErrorCopied
+输入一个字符串,包括数字字母符号,可以为空
 ```
 
 **输出描述:**
 
 ```
-如果是合法的数值表达则返回该数字，否则返回0Copy to clipboardErrorCopied
+如果是合法的数值表达则返回该数字，否则返回0
 ```
 
 **示例1**
@@ -2856,159 +2686,104 @@ int Add(int num1, int num2)
 0
 ```
 
-**1、自己思考的一种笨方法,这题用C++ AC 不了**
-
-负数 -1234，正数 +2563的情形 第一个为正负号 要考虑到
-
-第一位为0的也是不是合法的
-
-出现0~9之外的字符也是不合法的
+**题解一：字符流**
 
 ```cpp
-int StrToInt(string str) {
-    long long num = 0;
-    if (str.size() == 0) return 0;
-    int len = str.size();
-    bool isNegative = false,isPositive = false;
-    if (str[0] == '-') isNegative=true;
-    else if (str[0] == '+') isPositive = true;
-    else
-        if (str[0]<='0' || str[0]>'9')  return 0;
-
-    int i = 0;
-    if (isPositive || isNegative) i = 1;
-    for (    ; i <len ; ++i) {
-        if (str[i]<'0' || str[i]>'9') return 0;
-        else {
-            num = num * 10 + str[i] - '0';
+class Solution {
+public:
+    int strToInt(string str) {
+        //对于全是空格的案例，istringstream不能成功转为int,istringstream会输出空格的长度
+        //所以先特俗处理
+        int i = 0;
+        int len = str.size();
+        for(i = 0; i < len; i++)
+        {
+            if((int)str[i] != 32	// 空格的ASSCI值为32
+                break;
         }
-
+        if(i == len) 
+            return 0;
+        
+        istringstream iss(str);// 对于转正数或者负数都可以
+        int val;
+        iss >> val;
+        //当为字符时，转化为int失败，会自动输出0
+        //当int超出范围，会自动返回数字，因此返回 INT_MIN (−231) 。
+        return val;
     }
-    if (isNegative) num = -1 * num;
-    if (num <= INT_MAX && num >= INT_MIN) return num;
-    return 0;
-}Copy to clipboardErrorCopied
+};
 ```
 
-只通过85.71%的案例。
-
-**2、第二种精简一点的方法**
+**题解二：模拟**
 
 ```cpp
-int StrToInt(string str) {
-    int len = str.size();
-    if (len == 0) return 0;//为空，直接返回即可
-    int i = 0, flag = 1,isSingal = 0;// 索引 正负号标志位  正负号出现次数
-    long res = 0; //默认flag = 1，正数
-    while (i<len && str[i] == ' ') i++; //若str全为空格，str[i] = '\0'(最后一个i)
-    if (i >= len) return 0;//全部都是空格，直接返回吧
-    if (i < len && str[i] == '-') { flag = -1; ++i; isSingal++; }
-    if (i < len && str[i] == '+') { ++i; ++isSingal; }
-    if (isSingal > 1) return 0;
-    for (  ; i < len ; ++i) {
-        if(str[i]<'0' || str[i] > '9') return 0;
-        res = res * 10 + (str[i] - '0');
-        if (res >= INT_MAX && flag == 1) return  INT_MAX;
-        if (res > INT_MAX && flag == -1) return  INT_MIN;
-    }
-    return flag * res;
-
-}Copy to clipboardErrorCopied
-```
-
-**3、有很多要注意的地方**
-
-```cpp
-int StrToInt(string str) {
-
-    int len = str.size();
-    if (len == 0) return 0;
-    int  flag=1,singal=0, i = 0;
-    long long num = 0;
-    while (i < len && str[i] == ' ') i++;//可能一直为空或者前面若干都是 空格，处理空格
-    if (i >= len) return 0;//一直为空则返回0
-    if (str[i] == '-') { flag = -1; singal++; ++i; }//符号判断，同时千万记得 ++i
-    if (str[i] == '+') { singal++; ++i; }//正号判断 ,++ i
-    if (singal > 1) return 0;//如果出现两个符号，则是不合法的数字表达了 -+45这样的数字
-
-
-    for (; i < len; ++i) {
-        if (str[i]<'0' || str[i]>'9') return 0;// 是否有不合法数字出现 比如12a454
-        else {
-            num = num * 10 + str[i] - '0';
-            if (num >= INT_MAX && flag==1) return INT_MAX;//注意这里的表达 输入如果是 INT_MAX也就是 2147483647 ，就还好
-            if (num > INT_MAX && flag==-1) return INT_MIN;//但是如果输入是 INY_MIN 也就是 -2147483647-1 = -2147483648的话，
-                                                            // num因为是正数表达，所以必须num>INT_MAX才能正确判断了
+class Solution {
+public:
+    int strToInt(string str) {
+        vector<int> temp;
+        int i;
+        int isPositive = 3;
+        //找到i第一个为正号，负号或数字的位置
+        for (i = 0; i < str.size(); i++) 
+        {
+            if (str[i] == ' ') 
+                continue;
+            else if ('0' <= str[i] && str[i] <= '9') 
+                break;
+            else if (str[i] == '-') 
+            {
+                isPositive = 0;
+                break;
+            }
+            else if (str[i] == '+') 
+            {
+                isPositive = 1;
+                break;
+            }
+            else
+                return 0;
         }
-
+        // 下标越界说明全是空格
+        if (i == str.size()) 
+            return 0;
+        int ans = 0;
+        int j;
+        //下标位置为正号或数字
+        if (isPositive != 0) 
+        {
+            j = isPositive == 1 ? i + 1 : i;
+            while (j < str.size() && '0' <= str[j] && str[j] <= '9') 
+            {
+                if ((long)ans * 10 > INT_MAX) 
+                    return INT_MAX;
+                else 
+                    ans *= 10;
+                if ((long)ans + str[j] - '0' > INT_MAX) 
+                    return INT_MAX;
+                else 
+                    ans += str[j] - '0';
+                j++;
+            }
+        }
+        //下标位置为负号
+        else 
+        {
+            j = i + 1;
+            while (j < str.size() && '0' <= str[j] && str[j] <= '9') 
+            {
+                if ((long)ans * 10 < INT_MIN) 
+                    return INT_MIN;
+                else 
+                    ans *= 10;
+                if ((long)ans -str[j] + '0' < INT_MIN) 
+                    return INT_MIN;
+                ans -= str[j] - '0';
+                j++;
+            }
+        }
+        return ans;
     }
-
-    return num*flag;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、这种做法更加稳妥**
-
-运行时间：2ms 占用内存：376k
-
-```cpp
-int StrToInt(string str) {
-    int len = str.size();
-    if(len == 0) return 0;
-    int i = 0,flag = 1,isSignal = 0;
-    long res = 0;
-    while(i<len && str[i] == ' ') i++;//首先跳过全部的空格
-    if(i >= len) return 0;//全部都是空格也不行
-    while(i<len && (str[i] == '-' || str[i] == '+'))  {//判断标志位
-        if(str[i] == '-') flag = -1;
-        i++;
-        isSignal++;
-        if(isSignal > 1) return 0;//不能出现两个标志位
-    }
-
-    for( ; i < len; ++i){
-        if(str[i]>'9' || str[i]<'0') return 0;
-        res = res*10 + str[i] - '0';
-        if(res > INT_MAX && flag == 1) return INT_MAX;
-        if(res > INT_MAX+1 && flag == -1)  return INT_MIN;// INT_MAX+1会溢出  ，将1移到左边去就可以了  
-
-    }
-
-    return flag * res;
-}Copy to clipboardErrorCopied
-```
-
-**2、考虑负数溢出情况**
-
-运行时间：2ms 占用内存：492k
-
-```cpp
-int StrToInt(string str) {
-    int len = str.size();
-    if (len == 0) return 0;
-    int i = 0, flag = 1, isSignal = 0;
-    long res = 0;
-    while (i < len && str[i] == ' ') i++;//首先跳过全部的空格
-    if (i >= len) return 0;//全部都是空格也不行
-    while (i < len && (str[i] == '-' || str[i] == '+')) {
-        if (str[i] == '-') flag = -1;
-        i++;
-        isSignal++;
-        if (isSignal > 1) return 0;//不能出现两个标志位
-    }
-
-    for (; i < len; ++i) {
-        if (str[i] > '9' || str[i] < '0') return 0;
-        res = res * 10 + str[i] - '0';  
-        if (res > INT_MAX && flag == 1) return 0;//正数溢出
-        if (res-1 > INT_MAX  && flag == -1)  return 0;//负数溢出，这个时候可以将 1 移到左边来，INT_MIN = -1 - 2的31次方 是比INT_MAX的绝对值大一的
-
-    }
-
-    return flag * res;
-}Copy to clipboardErrorCopied
+};
 ```
 
 ## No50、数组中重复的数字
@@ -3072,78 +2847,35 @@ public:
 **输入**
 
 ```
-[1,2,3,4,5]Copy to clipboardErrorCopied
+[1,2,3,4,5]
 ```
 
 **返回值**
 
 ```
-[120,60,40,30,24]Copy to clipboardErrorCopied
+[120,60,40,30,24]
 ```
 
-**1、暴力法**
+**题解：正反两次遍历**
 
 ```cpp
-vector<int> multiply(const vector<int>& A) {
-    vector<int> B;
-    for (int i = 0; i < A.size(); ++i) {
-
-        int temp = 1;
-        for (int j = 0; j < A.size(); ++j) {
-            if (j != i) temp *= A[j];
+class Solution {
+public:
+    vector<int> constructArr(vector<int>& a) {
+        vector<int> result(a.size(), 1);
+        for (int i = 1; i < a.size(); ++i)
+        {
+            result[i] = result[i - 1] * a[i - 1];
         }
-        B.push_back(temp);
+        int temp = 1;
+        for (int i = a.size() - 1; i >= 0; --i)
+        {
+            result[i] *= temp; 
+            temp *= a[i];
+        }
+        return result;
     }
-    return B;
-}Copy to clipboardErrorCopied
-```
-
-**2、一种超级精妙的解法，吹爆了**
-
-```cpp
-vector<int> multiply(const vector<int>& A) {
-    int len = A.size();
-    vector<int> B(len,0);
-    int temp = 1;
-    for (int i = 0; i <len; temp*=A[i],++i) {
-
-        B[i] = temp;
-    }
-
-    temp = 1;
-    for (int i = len-1; i >= 0; temp *= A[i], --i) {
-
-        B[i] = B[i]*temp;
-    }
-    return B;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、遇到一点问题，还没有很顺利的写出来**
-
-运行时间：2ms 占用内存：376k
-
-```cpp
-    vector<int> multiply(const vector<int>& A) {
-
-    if (A.size() <= 1) return vector<int>();
-    int len = A.size();
-    vector<int> B(len, 1);
-    int left = A[0], right = A[len-1];
-    for (int i = 1; i < len; ++i) {//而这里要从第二个开始
-        B[i] = left;
-        left = left * A[i];
-    }
-
-    for (int i = len - 2; i >= 0; --i) {//这里要从倒数第二个开始
-        B[i] = B[i] * right;
-        right = right * A[i];
-    }
-
-    return std::move(B);
-    }Copy to clipboardErrorCopied
+};
 ```
 
 ## No52、正则表达式匹配
@@ -3664,8 +3396,6 @@ TreeLinkNode* GetNext(TreeLinkNode* pNode)
 
 ## No58、对称的二叉树
 
-[牛客网原题链接](https://www.nowcoder.com/practice/ff05d44dfdb04e1d83bdbdab320efbcb?tpId=13&&tqId=11211&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 请实现一个函数，用来判断一棵二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。
@@ -3740,8 +3470,6 @@ bool isSymmetrical(TreeNode* pRoot)
 
 ## No59、按之字形顺序打印二叉树
 
-[牛客网原题链接](https://www.nowcoder.com/practice/91b69814117f4e8097390d107d2efbe0?tpId=13&&tqId=11212&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。
@@ -3750,227 +3478,23 @@ bool isSymmetrical(TreeNode* pRoot)
 
 **输入**
 
-```
-{8,6,10,5,7,9,11}Copy to clipboardErrorCopied
+```cpp
+{8,6,10,5,7,9,11}
 ```
 
 **返回值**
 
-```
-[[8],[10,6],[5,7,9,11]]Copy to clipboardErrorCopied
+```cpp
+[[8],[10,6],[5,7,9,11]]
 ```
 
-**1、注意左右子树在两个栈中的入栈顺序**
+**题解：层次遍历**
 
 ```cpp
-vector<vector<int> > Print(TreeNode* pRoot) {
-    vector<vector<int>> result;
-    if (pRoot == nullptr) return result;
-    stack<TreeNode*> left_right_st;
-    stack<TreeNode*> right_left_st;
-    left_right_st.push(pRoot);
-    while (left_right_st.size() ||  right_left_st.size()) {
-        if (!left_right_st.empty()) {
-            vector<int> temp;
-            TreeNode* node;
-            while (!left_right_st.empty()) {
-                node = left_right_st.top();
-                temp.push_back(node->val);
-                if (node->left)//这里先左再右
-                    right_left_st.push(node->left);
-                if (node->right)
-                    right_left_st.push(node->right);
-                left_right_st.pop();
-            }
-            result.push_back(temp);
-        }
 
-        if (!right_left_st.empty()) {
-            vector<int> temp;
-            TreeNode* node;
-            while (!right_left_st.empty()) {
-                node = right_left_st.top();
-                temp.push_back(node->val);
-                if (node->right)//这里需要是先右再左
-                    left_right_st.push(node->right);
-                if (node->left)
-                    left_right_st.push(node->left);
-                right_left_st.pop();
-            }
-            result.push_back(temp);
-        }
-
-    }
-    return result;
-}Copy to clipboardErrorCopied
 ```
-
-**2、稍微优化一下代码**
-
-```cpp
-vector<vector<int> > Print(TreeNode* pRoot) {
-    vector<vector<int>> result;
-    if (pRoot == nullptr) return result;
-    stack<TreeNode*> left_right_st;
-    stack<TreeNode*> right_left_st;
-    left_right_st.push(pRoot);
-    while (left_right_st.size() ||  right_left_st.size()) {
-        vector<int> temp;
-        TreeNode* node;
-        if (!left_right_st.empty()) {
-            while (!left_right_st.empty()) {
-                node = left_right_st.top();
-                temp.push_back(node->val);
-                if (node->left)
-                    right_left_st.push(node->left);
-                if (node->right)
-                    right_left_st.push(node->right);
-                left_right_st.pop();
-            }
-            result.push_back(temp);
-
-        }
-        vector<int>().swap(temp);
-        if (!right_left_st.empty()) {
-            while (!right_left_st.empty()) {
-                node = right_left_st.top();
-                temp.push_back(node->val);
-                if (node->right)
-                    left_right_st.push(node->right);
-                if (node->left)
-                    left_right_st.push(node->left);
-                right_left_st.pop();
-            }
-            result.push_back(temp);
-        }
-
-    }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-**3、只用一个队列来做，很不错的想法**
-
-```cpp
-vector<vector<int> > Print(TreeNode* pRoot) {
-    vector<vector<int>> result;
-    if (pRoot == nullptr) {
-        return result;
-    }
-    queue<TreeNode*> q;
-    q.push(pRoot);
-    bool isLeft = false;
-    while (!q.empty()) {
-        int rowLen = q.size();
-        vector<int> temp;
-        while(rowLen--) {
-            TreeNode* curNode = q.front();
-            q.pop();
-            if (curNode != nullptr) {
-                temp.push_back(curNode->val);
-                if (curNode->left)q.push(curNode->left);
-                if (curNode->right)q.push(curNode->right);
-            }
-        }
-        isLeft = !isLeft;
-        if (!isLeft) {
-            result.push_back(vector<int>(temp.rbegin(), temp.rend()));//注意这里是翻转一下的
-        }
-        else {
-            result.push_back(temp);
-        }
-    }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、算是二叉树的层次遍历的一种变形吧，果然还是第一反应想到这种做法**
-
-运行时间：4ms 占用内存：360k
-
-```cpp
-vector<vector<int> > Print(TreeNode* pRoot) {
-    if(pRoot == nullptr) return vector<vector<int>>();
-    vector<vector<int>> result;
-    stack<TreeNode*> left_right,right_left;
-    left_right.push(pRoot);
-    TreeNode*node = nullptr;
-    vector<int> temp;
-    while(!left_right.empty() || !right_left.empty()){
-        vector<int>().swap(temp);
-        while(!left_right.empty()){
-            node = left_right.top();
-            temp.push_back(node->val);
-            left_right.pop();
-            if(node->left) right_left.push(node->left);
-            if(node->right) right_left.push(node->right);
-        }
-        if(temp.size() > 0)    result.push_back(std::move(temp));
-
-        vector<int>().swap(temp);
-        while(!right_left.empty()){
-            node = right_left.top();
-            temp.push_back(node->val);
-            right_left.pop();
-            if(node->right) left_right.push(node->right);
-            if(node->left) left_right.push(node->left);
-
-        }
-        if(temp.size() > 0)   result.push_back(std::move(temp));// 可能走到头了，也就是此时temp是个空，不能把空的放在结果了
-    }
-    return std::move(result);
-}Copy to clipboardErrorCopied
-```
-
-**2、优化一下**
-
-运行时间：3ms 占用内存：504k
-
-```cpp
-vector<vector<int> > Print(TreeNode* pRoot) {
-    if(pRoot == nullptr) return vector<vector<int>>();
-    vector<vector<int>> result;
-    stack<TreeNode*> left_right,right_left;
-    left_right.push(pRoot);
-    TreeNode*node = nullptr;
-
-    while(!left_right.empty() || !right_left.empty()){
-        if(!left_right.empty()){
-            vector<int> temp;
-            while(!left_right.empty()){
-                node = left_right.top();
-                temp.push_back(node->val);
-                left_right.pop();
-                if(node->left) right_left.push(node->left);
-                if(node->right) right_left.push(node->right);
-            }
-            result.push_back(std::move(temp));
-        }
-
-        if(!right_left.empty()){
-            vector<int> temp;
-            while(!right_left.empty()){
-                node = right_left.top();
-                temp.push_back(node->val);
-                right_left.pop();
-                if(node->right) left_right.push(node->right);
-                if(node->left) left_right.push(node->left);
-
-            }
-            result.push_back(std::move(temp));
-        }
-    }
-    return std::move(result);
-}Copy to clipboardErrorCopied
-```
-
-
 
 ## No60、把二叉树打印成多行
-
-[牛客网原题链接](https://www.nowcoder.com/practice/445c44d982d04483b04a54f298796288?tpId=13&&tqId=11213&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -4277,159 +3801,55 @@ private:
 [4,4,6,6,6,5]
 ```
 
-**1、自己想的，边界条件很多**
-
-总的来说，利用 low high maxIndex三个指针维护整个数组的情况
-
-1、滑动窗口大小为0，num数组为空，滑动窗口大于 num.size 也不符合规矩，直接返回空
-
-2、先考虑第一个滑动窗口的情况，走一遍，找出最大值的index
+**题解：**
 
 ```cpp
- vector<int> maxInWindows(const vector<int>& num, unsigned int size)
-    {
-    vector<int> result;
-    if (num.size() == 0 || size == 0 || size > num.size()) return result;
-    if (size == num.size()) {
-        result.push_back(*max_element(num.begin(), num.end())); 
-         return result;
-      }
-
-    int low = 0, high = size - 1, maxIndex = 0;
-    int len = num.size();
-    for (int i = 0; i <= high; ++i) {
-        if (num[i] > num[maxIndex])  maxIndex = i;
-    }
-    //result.push_back(num[maxIndex]); //这里不能直接先push，要不然第一个滑动窗口的最大值会push两次
-    while (high <= len - 1) {
-        if (maxIndex == low - 1) {//如果maxIndex还是上个窗口的最低索引，需要更新
-            maxIndex = low;
-            for (int i = low; i <= high; ++i)
-                if (num[i] > num[maxIndex])  maxIndex = i;
-
-        }
-        else if (num[maxIndex] < num[high]) //如果最新添加进来的high索引比原窗口中的所有值都要大，也要更新
+class Solution {
+private:
+    class MyQueue {
+        public:
+        deque<int> que;
+        void pop(int value)
         {
-            maxIndex = high;
+            if (!que.empty() && value == que.front())
+            {
+                que.pop_front();
+            }
         }
-        high++;
-        low++;
-
-        result.push_back(num[maxIndex]);
-
+        void push(int value)
+        {
+            while (!que.empty() && value > que.back())
+            {
+                que.pop_back();
+            }
+            que.push_back(value);
+        }
+        int front()
+        {
+            return que.front();
+        }
+    };
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        MyQueue que;
+        vector<int> result;
+        if (nums.size() == 0 || k == 0)
+            return result;
+        for (int i = 0; i < k; ++i)
+        {
+            que.push(nums[i]);
+        }
+        result.push_back(que.front());
+        for (int i = k; i < nums.size(); ++i)
+        {
+            que.pop(nums[i - k]);
+            que.push(nums[i]);
+            result.push_back(que.front());
+        }
+        return result;
     }
-    return result;
-    }Copy to clipboardErrorCopied
+};
 ```
-
-**2、第二种做法，比较水，借助优先队列来做，小顶堆**
-
-```cpp
-vector<int> maxInWindows(const vector<int>& num, unsigned int size)
-{
-    vector<int> result;
-    if (num.size() == 0 || size == 0 || size > num.size()) return result;
-    priority_queue<int> pri_que;
-    int count = 0;
-    for (int i = 0; i < num.size()-size+1; ++i) {
-        while (count < size) {
-            pri_que.push(num[count + i]);
-            count++;
-        }
-        count = 0;
-        result.push_back(pri_que.top());
-        while (!pri_que.empty()) {
-            pri_que.pop();
-        }
-    }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-**3、借助双端队列来做，最为高效的一种方法**
-
-```cpp
-vector<int> maxInWindows(const vector<int>& num, unsigned int size)
-{
-    vector<int>res;
-    int len = num.size();
-    if (len == 0 || size == 0 || size > len)    return res;
-    deque<int>s;  //deque s中存储的是num的下标
-    for (int i = 0; i < len; ++i)
-    {
-        while (!s.empty() && num[s.back()] <num[i])//当前值比队列从后往前的大，成为下一个待选值
-            s.pop_back();
-        while (!s.empty() && i - s.front() + 1 > size)//最大值已不在窗口中
-            s.pop_front();
-        s.push_back(i);
-
-        if (i + 1 >= size)//当滑动窗口首地址i大于等于size时才开始写入窗口最大值
-            res.push_back(num[s.front()]);
-    }
-    return res;
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、优先队列，其实也就是大顶堆来做**
-
-运行时间：3ms 占用内存：376k
-
-```cpp
-vector<int> maxInWindows(const vector<int>& num, unsigned int size)
-{
-
-    if(size > num.size() || size == 0 || num.size() == 0) return vector<int>();
-    int len = num.size(),count = 0;
-    priority_queue<int> pq;
-    vector<int> result;
-    for(int i = 0;i <= len - size; ++i){
-        while(count < size){
-            pq.push(num[i+count]);
-            count++;
-        }
-        count = 0;
-        result.push_back(pq.top());
-        while(!pq.empty()){
-            pq.pop();
-        }
-
-    }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-**2、单调栈来做应该是最快的**
-
-运行时间：3ms 占用内存：480k
-
-```cpp
-vector<int> maxInWindows(const vector<int>& num, unsigned int size)
-{
-
-    if(size > num.size() || size == 0 || num.size() == 0) return vector<int>();
-    int len = num.size();
-    vector<int> result;
-    deque<int> dq;
-    for(int i = 0; i< len; ++i){
-        while(!dq.empty() && num[i] > num[dq.back()]){//始终维持队首是最大的，如果新元素比队尾大，
-            //那就直接把队尾的元素删掉
-            dq.pop_back();
-        }
-        while(!dq.empty() && i - dq.front() >= size){// 当队列投的值已经是上一个窗口中的最大值后
-            dq.pop_front();
-        }
-        dq.push_back(i);
-        if(i + 1 >= size){
-            result.push_back(num[dq.front()]);
-        }
-    }
-    return result;
-}Copy to clipboardErrorCopied
-```
-
-
 
 ## No65、矩阵中的路径
 
