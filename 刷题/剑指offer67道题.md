@@ -4268,13 +4268,13 @@ private:
 **输入**
 
 ```
-[2,3,4,2,6,2,5,1],3Copy to clipboardErrorCopied
+[2,3,4,2,6,2,5,1],3
 ```
 
 **返回值**
 
 ```
-[4,4,6,6,6,5]Copy to clipboardErrorCopied
+[4,4,6,6,6,5]
 ```
 
 **1、自己想的，边界条件很多**
