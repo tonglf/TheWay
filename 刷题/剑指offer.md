@@ -4,15 +4,21 @@
 
 ### 重点题目
 
-- [ ] No65、矩阵中的路径
-- [ ] No66、机器人的运动范围
-- [ ] No52、正则表达式匹配
-- [ ] No53、表示数值的字符串
 - [ ] No17、树的子结构
-- [ ] No31、整数中1出现的次数（ 从1 到 n 中1出现的次数 ）
 - [ ] No19、顺时针打印矩阵
 - [ ] No21、栈的压入弹出序列
-- [ ] 
+- [ ] No31、整数中 1 出现的次数（ 从 1 到 n 中 1 出现的次数 ）
+- [ ] No35、数组中的逆排序
+- [ ] No40、数组中只出现一次的数字
+- [ ] No46、孩子们的游戏（圆圈中最后剩下的数）
+- [ ] No49、字符串转化为整数
+- [ ] No52、正则表达式匹配
+- [ ] No53、表示数值的字符串
+- [ ] No57、二叉树的下一个结点
+- [ ] No61、序列化二叉树
+- [ ] No63、数据流中的中位数
+- [ ] No65、矩阵中的路径
+- [ ] No66、机器人的运动范围
 
 ### 数组
 
@@ -1198,35 +1204,36 @@ public:
 
 **输入**
 
-```
+```臭屁屁
 [1,2,3,4,5],[4,3,5,1,2]
 ```
 
 **返回值**
 
-```
+```cpp
 false
 ```
 
 **题解：存储用vector、stack均可**
 
 ```cpp
-bool IsPopOrder(vector<int> pushV,vector<int> popV) 
-{
-	if(pushV.size() == 0) 
-        return false;
-	vector<int> v;
-    for(int i = 0, j = 0; i < pushV.size();)
+class Solution {
+public:
+    bool validateStackSequences(vector<int>& pushed, vector<int>& popped) 
     {
-        v.push_back(pushV[i++]);
-        while(j < popV.size() && !v.empty() && v.back() == popV[j])
+	vector<int> v;
+    for(int i = 0, j = 0; i < pushed.size();)
+    {
+        v.push_back(pushed[i++]);
+        while (j < popped.size() && !v.empty() && v.back() == popped[j])
         {
             v.pop_back();
             j++;
     	}      
     }
 	return v.empty();
-}
+    }
+};
 ```
 
 ## No22、从上往下打印二叉树
@@ -1235,7 +1242,7 @@ bool IsPopOrder(vector<int> pushV,vector<int> popV)
 
 从上往下打印出二叉树的每个节点，同层节点从左至右打印。层次打印二叉树
 
-**1、迭代做法，借助队列，比较简单**
+**题解：层次遍历，借助队列**
 
 ```cpp
 vector<int> PrintFromTopToBottom(TreeNode* root) 
@@ -1266,7 +1273,7 @@ vector<int> PrintFromTopToBottom(TreeNode* root)
 
 输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历的结果。如果是则返回true,否则返回false。假设输入的数组的任意两个数字都互不相同。（ps：我们约定空树不是二叉搜索树）
 
-**题解：递归主要的做法就是递归**
+**题解：递归**
 
 ```cpp
 bool VerifySquenceOfBST(vector<int> sequence) 
@@ -1289,8 +1296,8 @@ bool VerifySquenceOfBSTCore(vector<int>& sequence, int start, int end)
             return false;
     }
 
-    return VerifySquenceOfBSTCore(sequence, start,low-1) 
-        && VerifySquenceOfBSTCore(sequence, low,end-1);
+    return VerifySquenceOfBSTCore(sequence, start,low - 1) 
+        && VerifySquenceOfBSTCore(sequence, low,end - 1);
 }
 ```
 
@@ -1304,13 +1311,13 @@ bool VerifySquenceOfBSTCore(vector<int>& sequence, int start, int end)
 
 **输入**
 
-```
+```cpp
 {10,5,12,4,7},22
 ```
 
 **返回值**
 
-```
+```cpp
 [[10,5,7],[10,12]]
 ```
 
@@ -1318,13 +1325,13 @@ bool VerifySquenceOfBSTCore(vector<int>& sequence, int start, int end)
 
 **输入**
 
-```
+```cpp
 {10,5,12,4,7},15
 ```
 
 **返回值**
 
-```
+```cpp
 []
 ```
 
@@ -1465,12 +1472,12 @@ public:
         stack<Node*> s;
         while (root || !s.empty())
         {
-            while (root)
+            if (root)
             {
                 s.push(root);
                 root = root->left;
             }
-            if (!s.empty())
+            else
             {
                 root = s.top();
                 s.pop();
@@ -1529,7 +1536,8 @@ class Solution {
 vector<string> result;
 string str;
 public:
-    vector<string> permutation(string s) {
+    vector<string> permutation(string s) 
+    {
         vector<bool> used(s.size(), false);
         sort(s.begin(), s.end());
         backtracking(s, used);
@@ -1710,9 +1718,9 @@ public:
 ```cpp
 class Solution {
 public:
-    int maxSubArray(vector<int>& nums) {
+    int maxSubArray(vector<int>& nums) 
+    {
         int maxVal = nums[0];
-
         vector<int> dp(nums.size());
         dp[0] = nums[0];
         for (int i = 1; i < nums.size(); ++i)
@@ -1725,7 +1733,7 @@ public:
 };
 ```
 
-## No31、整数中1出现的次数（ 从1 到 n 中1出现的次数 ）
+## No31、整数中 1 出现的次数（ 从 1 到 n 中 1 出现的次数 ）
 
 **题目描述**
 
@@ -1758,7 +1766,8 @@ case2：最高位不是1，则最高位的1的次数为pow（1000-1999） 每阶
 ```cpp
 class Solution {
 public:
-    int countDigitOne(int n) {
+    int countDigitOne(int n) 
+    {
         if (n <= 0)
             return 0;
         if (n < 10)
@@ -2669,7 +2678,7 @@ public:
 class Solution {
 public:
     int sumNums(int n) {
-        n && (n += sumNums(n-1));
+        n && (n += sumNums(n - 1));
         return n;
     }
 };
@@ -2698,14 +2707,15 @@ public:
 ```cpp
 int Add(int num1, int num2)
 {
-    while( num2!=0 ){
+    while(num2 != 0)
+    {
         int sum = num1 ^ num2;
         int carray = (num1 & num2) << 1;
         num1 = sum;
         num2 = carray;
     } 
     return num1;
-}Copy to clipboardErrorCopied
+}
 ```
 
 1. **两个数异或**：相当于每一位相加，而不考虑进位；
@@ -2733,27 +2743,6 @@ int Add(int num1, int num2)
 继续重复上述两步：1000^100 = 1100，进位值为0，跳出循环，1100为最终结果。
 
 什么时候进位制为0也就说明两个数相加到了最终点，也就计算结束了
-
-**二刷：**
-
-**1、不太理解，记住模板吧**
-
-运行时间：2ms 占用内存：376k
-
-```cpp
-int Add(int num1, int num2)
-{
-
-    while(num2 != 0){
-        int sum = num1 ^num2;
-        int carry = (num1 & num2)<<1;
-        num1 = sum;
-        num2 = carry;
-
-    }
-    return num1;
-}Copy to clipboardErrorCopied
-```
 
 ## No49、字符串转化为整数
 
@@ -2801,7 +2790,7 @@ public:
         int len = str.size();
         for(i = 0; i < len; i++)
         {
-            if((int)str[i] != 32	// 空格的ASSCI值为32
+            if ((int)str[i] != 32)	// 空格的ASSCI值为32
                 break;
         }
         if(i == len) 
@@ -2964,7 +2953,8 @@ public:
 ```cpp
 class Solution {
 public:
-    vector<int> constructArr(vector<int>& a) {
+    vector<int> constructArr(vector<int>& a) 
+    {
         vector<int> result(a.size(), 1);
         for (int i = 1; i < a.size(); ++i)
         {
@@ -2982,8 +2972,6 @@ public:
 ```
 
 ## No52、正则表达式匹配
-
-[牛客网原题链接](https://www.nowcoder.com/practice/45327ae22b7b413ea21df13ee7d6429c?tpId=13&&tqId=11205&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
 
 **题目描述**
 
@@ -3144,50 +3132,22 @@ public:
 
 ## No54、字符流中第一个不重复的字符
 
-[牛客网原题链接](https://www.nowcoder.com/practice/00de97733b8e4f97a3fb5c680ee10720?tpId=13&&tqId=11207&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)
-
 **题目描述**
 
 请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
 
 ```
-如果当前字符流没有存在出现一次的字符，返回#字符。Copy to clipboardErrorCopied
+如果当前字符流没有存在出现一次的字符，返回#字符。
 ```
 
-**1、自己想的一种方法**
-
-```cpp
-class Solution
-{
-public:
-    //Insert one char from stringstream
-    void Insert(char ch)
-    {
-        v.push_back(ch);
-    }
-    //return the first appearence once char in current stringstream
-    char FirstAppearingOnce()
-    {
-        if(v.empty())  return '#';
-        /*int len = v.size();*/
-        for (auto &ch:v) {
-            if (count(v.begin(), v.end(), ch) == 1) return ch;
-        }
-        return '#';
-    }
-
-    vector<char> v;
-};Copy to clipboardErrorCopied
-```
-
-**2、借助一个unordered_map**
+**题解：借助哈希表**
 
 这个方法要慢一些
 
 ```cpp
 class Solution
 {
-public:
+public :
     //Insert one char from stringstream
     void Insert(char ch)
     {
@@ -3197,103 +3157,28 @@ public:
     //return the first appearence once char in current stringstream
     char FirstAppearingOnce()
     {
-        for (auto &ch:v) {
-            if (unmp[ch] == 1) return ch;
+        for (auto &ch : v) 
+        {
+            if (unmp[ch] == 1) 
+                return ch;
         }
         return '#';
     }
-
+private ：
     vector<char> v;
     unordered_map<char, int> unmp;
-};Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、简单的方法，复杂度稍微高一些**
-
-运行时间：4ms 占用内存：376k
-
-```cpp
-class Solution
-{
-public:
-    //Insert one char from stringstream
-    void Insert(char ch)
-    {
-        v.push_back(ch);
-    }
-    //return the first appearence once char in current stringstream
-    char FirstAppearingOnce()
-    {
-        for (auto &ch:v) {
-            if (count(v.begin(),v.end(),ch) == 1) return ch;
-        }
-        return '#';
-    }
-
-    vector<char> v;
-
-};Copy to clipboardErrorCopied
-```
-
-**2、借助一个哈希表，稍微快一点了**
-
-运行时间：4ms 占用内存：376k
-
-```cpp
-class Solution
-{
-public:
-    //Insert one char from stringstream
-    void Insert(char ch)
-    {
-        v.push_back(ch);
-        result[ch]++;
-    }
-    //return the first appearence once char in current stringstream
-    char FirstAppearingOnce()
-    {
-        for (auto &ch:v) {
-            if (result[ch] == 1) return ch;
-        }
-        return '#';
-    }
-
-    vector<char> v;
-    unordered_map<char,int> result;
-
-};Copy to clipboardErrorCopied
+};
 ```
 
 ## No55、链表中环的入口结点
 
 **题目描述**
 
-给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
+给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出 null。
 
-**1、借助unordered_map**
+**题解：快慢指针**
 
-```cpp
-ListNode* EntryNodeOfLoop(ListNode* pHead)
-{
-    if (pHead == nullptr) 
-        return NULL;
-    unordered_map<ListNode*, int> unmp;	// 注意是ListNode*，不是ListNode
-    while (pHead != NULL) {
-
-        unmp[pHead]++;
-        if (unmp[pHead] == 2) 
-            return pHead;
-        pHead = pHead->next;
-    }
-    return NULL;
-}
-```
-
-**2、快慢指针**
-
-先说个定理：两个指针一个 fast、一个 slow 同时从一个链表的头部出发 fast一次走2步，slow 一次走一步，如果该链表有环，两个指针必然在环内相遇 此时只需要把其中的一个指针重新指向链表头部，另一个不变（还在环内）， 这次两个指针一次走一步，相遇的地方就是入口节点。 这个定理可以自己去网上看看证明。
+先说个定理：两个指针一个 fast、一个 slow 同时从一个链表的头部出发 fast 一次走 2 步，slow 一次走一步，如果该链表有环，两个指针必然在环内相遇，此时只需要把其中的一个指针重新指向链表头部，另一个不变（还在环内）， 这次两个指针一次走一步，相遇的地方就是入口节点。 
 
 ```C++
 class Solution {
@@ -3364,12 +3249,14 @@ public:
                 ListNode* tmp = cur;
                 cur = cur->next;
                 delete tmp;
+                tmp = nullptr;
                 flag = true;
             } 
             if (flag)						// 删除最后一个重复的节点
             {
                 ListNode* tmp = cur;
                 cur = cur->next;
+                tmp = nullptr;
                 delete tmp;
             }
             else
@@ -3391,44 +3278,19 @@ public:
 
 给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
 
-**1、没有思路，自己瞎写的，错误**
+**题解：**
 
-```cpp
-TreeLinkNode* GetNext(TreeLinkNode* pNode)
-{
-    if (pNode == nullptr) return nullptr;
-    if (pNode->next == nullptr) {
-        if (pNode->right == nullptr) return nullptr;
-        else
-            return pNode->right;
-    } 
-    if (pNode->left == nullptr && pNode->right == nullptr) return pNode->next;
-    if (pNode->left == nullptr) return pNode->right;
-    if (pNode->right == nullptr) return pNode->next;
-}Copy to clipboardErrorCopied
-```
+1. 二叉树为空，则返回空；
 
-画了图来分析，没有父亲节点再分情况讨论
+2. 节点右孩子存在，则设置一个指针从该节点的右孩子出发，一直沿着指向左子结点的指针找到的叶子节点即为下一个节点；
 
-如果无左右孩子，则返回父亲节点
-
-无左孩子返回右孩子，无右孩子则返回父亲节点
-
-**2、牛客网上做法**
-
-分析可知：
-
-1.二叉树为空，则返回空；
-
-2.节点右孩子存在，则设置一个指针从该节点的右孩子出发，一直沿着指向左子结点的指针找到的叶子节点即为下一个节点；
-
-3.右孩子不存在，如果节点不是根节点，如果该节点是其父节点的左孩子，则返回父节点；否则继续向上遍历其父节点的父节点，重复之前的判断，返回结果。
+3. 右孩子不存在，如果节点不是根节点，如果该节点是其父节点的左孩子，则返回父节点；否则继续向上遍历其父节点的父节点，重复之前的判断，返回结果。
 
 ```cpp
 TreeLinkNode* GetNext(TreeLinkNode* pNode)
 {
     if (pNode == nullptr)
-            return nullptr;
+        return nullptr;
     if (pNode->right != nullptr)
     {
         pNode = pNode->right;
@@ -3444,58 +3306,8 @@ TreeLinkNode* GetNext(TreeLinkNode* pNode)
         pNode = pNode->next;
     }
     return nullptr;
-}Copy to clipboardErrorCopied
+}
 ```
-
-**3、第二种写法的变种**
-
-```cpp
-TreeLinkNode* GetNext(TreeLinkNode* pNode)
-    {
-    if (pNode == nullptr)
-        return nullptr;
-    TreeLinkNode* node = nullptr;
-    if (pNode->right != nullptr) {//如果当前节点有右子树,则右子树最左边的那个节点就是
-        node = pNode->right;
-        while (node->left != nullptr)
-            node = node->left;
-        return node;
-    }
-    node = pNode;
-    while (node->next != nullptr && node == node->next->right) {//找到当前节点是其父亲节点的左孩子的那个节点，然后返回其父亲节点，如果当前节点没有右子树
-        node = node->next;
-    }
-    return node->next;
-    }Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、继续刷起来，也是很好的题目**
-
-运行时间：2ms 占用内存：480k
-
-```cpp
-TreeLinkNode* GetNext(TreeLinkNode* pNode)
-{
-    if(pNode == nullptr) return nullptr;
-    TreeLinkNode *node = nullptr;
-    if(pNode->right != nullptr){
-        node = pNode->right;
-        while(node->left != nullptr){
-            node = node->left;
-        }
-        return node;
-    }
-
-    node = pNode;
-    while(node->next != nullptr && node == node->next->right)
-        node = node->next;
-    return node->next;
-}Copy to clipboardErrorCopied
-```
-
-
 
 ## No58、对称的二叉树
 
@@ -3531,44 +3343,25 @@ true
 false
 ```
 
-**1、递归法比较好做，也很方便**
+**题解：递归**
 
 ```cpp
 bool isEqual(TreeNode*node1,TreeNode*node2){
-    if(node1==nullptr && node2 ==nullptr)  return true;
-    if(node1 ==nullptr || node2==nullptr) return false;//减少逻辑判断
-    if(node1->val == node2->val) {
-        return isEqual(node1->left,node2->right) && isEqual(node1->right,node2->left);//注意这里是右左，左右来进行判断
-
-    }else
+    if (node1==nullptr && node2 ==nullptr)  
+        return true;
+    if (node1 ==nullptr || node2==nullptr) 
+        return false;//减少逻辑判断
+    if (node1->val == node2->val) 
+        return isEqual(node1->left, node2->right) && isEqual(node1->right, node2->left);	// 注意这里是右左，左右来进行判断
+    else
         return false;
 }
-bool isSymmetrical(TreeNode* pRoot) {
-    if(pRoot==nullptr) return true;//这里是返回true的
-    return isEqual(pRoot->left,pRoot->right);
-}Copy to clipboardErrorCopied
-```
-
-**二刷：**
-
-**1、对称 是指 8 6 6 5 7 7 5这样的对称，我的左子树要跟你的右子树一样才叫对称**
-
-运行时间：2ms 占用内存：380k
-
-```cpp
-bool isEqual(TreeNode*node1, TreeNode*node2){
-    if(node1 == nullptr && node2 == nullptr) return true;
-    if(node1 == nullptr || node2 == nullptr) return false;
-    if(node1->val != node2->val) return false;
-
-    return isEqual(node1->left, node2->right) && isEqual(node1->right, node2->left);
-}
-
-bool isSymmetrical(TreeNode* pRoot)
+bool isSymmetrical(TreeNode* pRoot) 
 {
-    if(pRoot == nullptr) return true;
+    if(pRoot==nullptr) 
+        return true;		// 这里是返回true的
     return isEqual(pRoot->left, pRoot->right);
-}Copy to clipboardErrorCopied
+}
 ```
 
 ## No59、按之字形顺序打印二叉树
@@ -3594,7 +3387,35 @@ bool isSymmetrical(TreeNode* pRoot)
 **题解：层次遍历**
 
 ```cpp
-
+vector<vector<int>> Print(TreeNode* pRoot) 
+{
+    vector<vector<int>> result;
+    if (pRoot == nullptr) 
+        return result;
+    queue<TreeNode*> q;
+    q.push(pRoot);
+    int i = 0;
+    while (!q.empty()) 
+    {
+        int len = q.size();		// 利用 len 保存每层的个数
+        vector<int> temp;
+        while (len--) 
+        {
+            TreeNode* node = q.front();
+            q.pop();
+            temp.push_back(node->val);
+            if (node->left)      
+                q.push(node->left);
+            if (node->right)  
+                q.push(node->right);;
+        }
+        i++;
+        if (i % 2 == 0)
+            reverse(temp.begin(), temp.end());
+        result.push_back(temp);
+    }
+    return result;
+}
 ```
 
 ## No60、把二叉树打印成多行
@@ -3607,71 +3428,45 @@ bool isSymmetrical(TreeNode* pRoot)
 
 **输入**
 
-```
-{8,6,10,5,7,9,11}Copy to clipboardErrorCopied
+```cpp
+{8,6,10,5,7,9,11}
 ```
 
 **返回值**
 
-```
-[[8],[6,10],[5,7,9,11]]Copy to clipboardErrorCopied
+```cpp
+[[8],[6,10],[5,7,9,11]]
 ```
 
-**1、队列做法，保存每层的节点个数**
+**题解：层次遍历——队列**
 
 ```cpp
-vector<vector<int> > Print(TreeNode* pRoot) {
+vector<vector<int>> Print(TreeNode* pRoot) 
+{
     vector<vector<int>> result;
-    if (pRoot == nullptr) return result;
+    if (pRoot == nullptr) 
+        return result;
     queue<TreeNode*> q;
     q.push(pRoot);
-    while (!q.empty()) {
-        int len = q.size();//利用len保存每层的个数
+    while (!q.empty()) 
+    {
+        int len = q.size();		// 利用 len 保存每层的个数
         vector<int> temp;
-        while (len--) {
+        while (len--) 
+        {
             TreeNode* node = q.front();
             q.pop();
             temp.push_back(node->val);
-            if (node->left)      q.push(node->left);//为空才push进去,而不是if(node) 然后直接push左右两个节点
-            if (node->right)  q.push(node->right);;
+            if (node->left)      
+                q.push(node->left);
+            if (node->right)  
+                q.push(node->right);;
         }
         result.push_back(temp);
     }
     return result;
-}Copy to clipboardErrorCopied
+}
 ```
-
-**二刷：**
-
-**1、跟59有点像**
-
-运行时间：2ms 占用内存：508k
-
-```cpp
-vector<vector<int> > Print(TreeNode* pRoot) {
-    if(pRoot == nullptr) return vector<vector<int>>();
-
-    queue<TreeNode*> q;
-    q.push(pRoot);
-    vector<vector<int>> result;
-    while(!q.empty()){
-        int size = q.size();
-        vector<int> temp;
-        while(size--){
-            pRoot = q.front();
-            q.pop();
-            temp.push_back(pRoot->val);
-            if(pRoot->left)  q.push(pRoot->left);
-            if(pRoot->right)  q.push(pRoot->right);
-
-        }
-        if(temp.size() > 0) result.push_back(temp);
-    }
-    return std::move(result);
-}Copy to clipboardErrorCopied
-```
-
-
 
 ## No61、序列化二叉树
 
@@ -3778,7 +3573,8 @@ root = [3,1,4,null,2], k = 1
 ```cpp
 class Solution {
 public:
-    int kthLargest(TreeNode* root, int k) {
+    int kthLargest(TreeNode* root, int k) 
+    {
         if (root == NULL)
             return -1;
         vector<int> v;
@@ -3820,7 +3616,7 @@ public:
 
 **示例 1：**
 
-```
+```cpp
 输入：
 ["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"]
 [[],[1],[2],[],[3],[]]
@@ -3829,7 +3625,7 @@ public:
 
 **示例 2：**
 
-```
+```cpp
 输入：
 ["MedianFinder","addNum","findMedian","addNum","findMedian"]
 [[],[2],[],[3],[]]
@@ -3894,13 +3690,13 @@ private:
 
 **输入**
 
-```
+```cpp
 [2,3,4,2,6,2,5,1],3
 ```
 
 **返回值**
 
-```
+```cpp
 [4,4,6,6,6,5]
 ```
 
