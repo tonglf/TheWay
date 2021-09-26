@@ -71,7 +71,6 @@
 - [写时复制的 string 类 （copy-on-write）](./C++编程技巧与规范/2.2写时复制的string类.md)
 - [shared_ptr](./手撕代码/shared_ptr代码实现.md)
 - [vector 简单实现](./手撕代码/vector简单实现.md)
-- [手撕 LRU 算法](./手撕代码/手撕LRU算法.md)
 - [LRU Cache](./手撕代码/LRUCache.md)
 
 ## Linux 杂谈
