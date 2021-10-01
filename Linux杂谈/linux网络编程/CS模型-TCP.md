@@ -9,22 +9,24 @@
 **TCP通信流程分析:**
 
   **server:**
-​    1. socket()  创建socket
+​    1. socket()  创建 socket
 ​    2. bind() 绑定服务器地址结构
 ​    3. listen()  设置监听上限 
 ​    4. accept()  阻塞监听客户端连接
-​    5. read(fd)  读socket获取客户端数据
+​    5. read(fd)  读 socket 获取客户端数据
 ​    6. 小--大写  toupper()
 ​    7. write(fd)
 ​    8. close(); 
 
   **client:**
-​    1. socket()  创建socket
+​    1. socket()  创建 socket
 ​    2. connect(); 与服务器建立连接
 ​    3. write() 写数据到 socket
 ​    4. read() 读转换后的数据。
 ​    5. 显示读取结果
 ​    6. close()
+
+**服务器端：**
 
 `server.cpp`
 
@@ -115,6 +117,8 @@ int main(int argc, char *argv[])
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/2021062720212950.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTg2NzM4Mg==,size_16,color_FFFFFF,t_70)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210627202135207.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTg2NzM4Mg==,size_16,color_FFFFFF,t_70)
+
+**客户端：**
 
 `client.cpp`
 
