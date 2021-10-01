@@ -8,7 +8,7 @@ class SmartPtr {
 public:
 	SmartPtr(T *p);								// SmartPtr<int> p(new int(2));
 	SmartPtr(const SmartPtr<T>& orig);			// SmartPtr<int> q(p);
-	SmartPtr& operator=(const SmartPtr<T>& rhs);// q = p;
+	SmartPtr<T>& operator=(const SmartPtr<T>& rhs);// q = p;
 	~SmartPtr();
 
 	T& operator*();							// 为了能把智能指针当成普通指针操作定义解引用操作
@@ -56,7 +56,7 @@ SmartPtr<T>::SmartPtr(const SmartPtr<T>& orig)
 template <typename T>
 SmartPtr<T>& SmartPtr<T>::operator=(const SmartPtr<T>& rhs)
 {							// 不检查自我赋值也可以，因为首先 ++*(rhs.use_count); 确保 (--(*use_count)) != 0
-	++*(rhs.use_count);
+	++(*rhs.use_count);
 	if ((--(*use_count)) == 0)
 	{
 		delete ptr;

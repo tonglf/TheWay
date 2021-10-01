@@ -86,6 +86,7 @@ inline
 String::~String()
 {
 	delete[] m_data;
+    m_data = nullptr;
 }
 
 // 输出操作符重载需设置成非成员函数

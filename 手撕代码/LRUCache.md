@@ -48,10 +48,12 @@ public:
 			{
 				m_cacheMap.erase(m_cacheList.back().key);
 				m_cacheList.pop_back();
+                --m_capacity;
 			}
 			// 插入新节点到链表头部，并且在 map 中增加该节点
 			m_cacheList.push_front(CacheNode(key, value));
 			m_cacheMap[key] = m_cacheList.begin();
+            ++m_capacity;
 		}
 		else
 		{
