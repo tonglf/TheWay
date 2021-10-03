@@ -39,7 +39,7 @@ ps 命令提供进程的一次性的查看，它所提供的查看结果并不�
 2) R 运行： runnable (on run queue ） 。
 3) s 中断： sleeping 。
 4 ) T 停止： traced or stopped 。
-5 ) z 僵死： a defunct (” zombie”) process 。
+5 ) z 僵死： a defunct (” zombie ”) process 。
 命令格式是： ps ［参数］ 。命令功能是用来显示当前进程的状态。
 
 ### ps 命令常用参数
