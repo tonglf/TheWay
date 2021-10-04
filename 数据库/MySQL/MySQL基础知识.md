@@ -1,6 +1,6 @@
 # MySQL day01
 
-## 1、sql、DB、DBMS分别是什么，他们之间的关系？
+## 1、sql、DB、DBMS 分别是什么，他们之间的关系？
 
 ​    **DB:** 
 
@@ -45,23 +45,23 @@
 
 ​       字段名、数据类型、相关的约束、字段长度。
 
-## 3、学习MySQL主要还是学习通用的SQL语句，那么SQL语句包括增删改查，SQL语句怎么分类呢？
+## 3、学习 MySQL 主要还是学习通用的 SQL 语句，那么 SQL 语句包括增删改查，SQL 语句怎么分类呢？
 
-​    **DQL** **（数据查询语言）**:  **查询语句，凡是 select 语句都是DQL **。
+​    **DQL** **（数据查询语言）**:  **查询语句，凡是 select 语句都是 DQL **。
 
 ​    **DML** **（数据操作语言）：**insert delete update，对表当中的**数据进行增删改**。
 
 ​    **DDL** **（数据定义语言）：**create drop alter，对表结构的增删改。
 
-​    **TCL** **（事务控制语言）：**commit 提交事务，rollback回滚事务。(TCL中的T是Transaction)
+​    **TCL** **（事务控制语言）：**commit 提交事务，rollback 回滚事务。( TCL中的 T 是 Transaction )
 
 ​    **DCL （数据控制语言）:** grant授权、revoke撤销权限等。
 
 ## 4、导入数据（后期大家练习的时候使用这个演示的数据）
 
-​    **第一步：登录mysql数据库管理系统**
+​    **第一步：登录 mysql 数据库管理系统**
 
-​       dos命令窗口： mysql -uroot -p333
+​       dos 命令窗口： mysql -uroot -p333
 
 ​    **第二步：查看有哪些数据库**
 
@@ -89,7 +89,7 @@ show tables; 			# (不是SQL语句，属于MySQL的命令。)
 
 ​		刚刚创建的数据库中没有数据，表为空。
 
-​    **第六步：初始化数据（数据导入，****source** **文件路径）**
+​    **第六步：初始化数据（数据导入，source 文件路径）**
 
 ```mysql
 mysql> source D:\course\05-MySQL\resources\bjpowernode.sql
@@ -103,11 +103,11 @@ show tables; 		# (不是SQL语句，属于MySQL的命令。)
 
 ​		数据初始化完成之后，数据库有三张表：dept、emp、salgrade
 
-## 5、bjpowernode.sql，这个文件以sql结尾，这样的文件被称为“sql脚本”。什么是sql脚本呢？
+## 5、bjpowernode.sql，这个文件以 sql 结尾，这样的文件被称为“ sql 脚本”。什么是 sql 脚本呢？
 
-​    当一个文件的扩展名是 .sql，并且该文件中编写了大量的 sql 语句，我们称这样的文件为 sql 脚本。
+​    当一个文件的扩展名是 `.sql`，并且该文件中编写了大量的 sql 语句，我们称这样的文件为 sql 脚本。
 
-​    注意：直接使用 source 命令可以执行sql脚本。
+​    注意：直接使用 source 命令可以执行 sql 脚本。
 
 ​    sql 脚本中的数据量太大的时候，无法打开，请使用 source 命令完成初始化。
 
@@ -175,11 +175,11 @@ mysql> select * from salgrade;
 ```mysql
 mysql> select database(); 	# 查看当前使用的是哪个数据库
 
-mysql> select version(); 	# 查看mysql的版本号。
+mysql> select version(); 	# 查看 mysql 的版本号。
 
 \c   						# 命令，结束一条语句。
 
-exit 						# 命令，退出mysql。
+exit 						# 命令，退出 mysql。
 ```
 
 **创建数据库：**
@@ -207,7 +207,7 @@ show create table emp;
 ​    **语法格式：**
 
 ```mysql
-select 字段名1,字段名2,字段名3,.... from 表名;
+select 字段名1, 字段名2, 字段名3, .... from 表名;
 ```
 
 ​    **提示：**
@@ -219,13 +219,13 @@ select 字段名1,字段名2,字段名3,.... from 表名;
 ​    **查询员工的年薪？**（字段可以参与数学运算。）
 
 ```mysql
-select ename,sal * 12 from emp;
+select ename, sal * 12 from emp;
 ```
 
 ​    **给查询结果的列重命名？**
 
 ```mysql
-select ename,sal * 12 as yearsal from emp;
+select ename, sal * 12 as yearsal from emp;
 ```
 
 ​    **别名中有中文？**
@@ -254,12 +254,12 @@ select * from emp; 		# 实际开发中不建议使用 *，效率较低。
 ​    **语法格式：**
 
 ```mysql
-select 字段,字段... from 表名 where 条件;
+select 字段, 字段 ... from 表名 where 条件;
 ```
 
 ​    **执行顺序：先 from ，然后 where ，最后 select**
 
-where支持如下运算符
+where 支持如下运算符
 
 | 运算符            | 说明                                                         |
 | ----------------- | ------------------------------------------------------------ |
@@ -275,7 +275,7 @@ where支持如下运算符
 | **or**            | 或者                                                         |
 | in                | 包含，相当于多个 or（ not in 不在这个范围中）                |
 | not               | not 可以取非，主要用在 is 或 in 中                           |
-| like              | like 称为模糊查询，支持 %或下划线匹配：**% 匹配任意个字符，下划线_，一个下划线只匹配一个字符** |
+| like              | like 称为模糊查询，支持 % 或下划线匹配：**% 匹配任意个字符，下划线_，一个下划线只匹配一个字符** |
 
 ​    **查询工资等于 5000 的员工姓名？**
 
@@ -329,7 +329,7 @@ select ename from emp where ename between 'A' and 'D';  # 左闭右开
 
 ​       **找出哪些人津贴为 NULL ？**
 
-​           在数据库当中NULL不是一个值，代表什么也没有，为空。
+​           在数据库当中 NULL 不是一个值，代表什么也没有，为空。
 
 ​           **空不是一个值，不能用等号衡量，必须使用 is null 或者 is not null**
 
@@ -372,12 +372,12 @@ select ename,sal,deptno from emp where sal > 1000 and (deptno = 20 or deptno = 3
 ```mysql
 select ename,job from emp where job = 'SALESMAN' or job = 'MANAGER';
 
-select ename,job from emp where job in('SALESMAN', 'MANAGER');
+select ename,job from emp where job in ('SALESMAN', 'MANAGER');
 
-select ename,job from emp where sal in(800, 5000); 		# in后面的值不是区间，是具体的值。
+select ename,job from emp where sal in (800, 5000); 		# in后面的值不是区间，是具体的值。
 ```
 
-​       **not in:** **不在这几个值当中。**
+​       **not in :** **不在这几个值当中。**
 
 ```mysql
 select ename,job from emp where sal not in(800, 5000);       
@@ -387,7 +387,7 @@ select ename,job from emp where sal not in(800, 5000);
 
 ​           **找出名字当中含有 O 的？**
 
-​              （在模糊查询当中，必须掌握两个特殊的符号，一个是%，一个是\_） ==%代表任意多个字符，_代表任意1个字符==
+​              （在模糊查询当中，必须掌握两个特殊的符号，一个是 %，一个是 \_ ） ==% 代表任意多个字符，_ 代表任意 1 个字符==
 
 ```mysql
 select ename from emp where ename like '%O%';
@@ -414,7 +414,7 @@ select ename from emp where ename like '%T';
 
 **注意**：
 
-MySQL 在 windows 下是不区分大小写的，将 script 文件导入 MySQL 后表名也会自动转化为小写，结果再想要将数据库导出放到 linux 服务器中使用时就出错了。因为**在 linux 下表名区分大小写**而找不到表，查了很多都是说在 linux 下更改 MySQL 的设置使其也不区分大小写，但是有没有办法反过来让 windows 下大小写敏感呢。其实方法是一样的，相应的更改 windows 中 MySQL 的设置就行了。
+MySQL 在 windows 下是不区分大小写的，将 script 文件导入 MySQL 后表名也会自动转化为小写，结果再想要将数据库导出放到 linux 服务器中使用时就出错了。因为==**在 linux 下表名区分大小写**==而找不到表，查了很多都是说在 linux 下更改 MySQL 的设置使其也不区分大小写，但是有没有办法反过来让 windows 下大小写敏感呢。其实方法是一样的，相应的更改 windows 中 MySQL 的设置就行了。
 
 具体操作：
 
@@ -436,7 +436,7 @@ MySQL在 Linux 下数据库名、表名、列名、别名大小写规则是这�
 
 ## 13、排序（升序、降序）
 
-排序采用 **==order by==** 子句，order by 后面跟上排序字段，排序字段可以放多个，多个采用逗号间隔，**order by 默认采用升序**，如果存在where 子句那么 order by 必须放到 where 语句的后面。
+排序采用 **==order by==** 子句，order by 后面跟上排序字段，排序字段可以放多个，多个采用逗号间隔，**order by 默认采用升序**，如果存在 where 子句那么 order by 必须放到 where 语句的后面。
 
 **按照工资升序，找出员工名和薪资？**
 
@@ -518,7 +518,7 @@ select count(*) from emp;
 select count(ename) from emp;
 ```
 
-​    分组函数一共5个。分组函数还有另一个名字：**多行处理函数**。多行处理函数的特点：==输入多行，最终输出的结果是 1 行==。
+​    分组函数一共 5 个。分组函数还有另一个名字：**多行处理函数**。多行处理函数的特点：==输入多行，最终输出的结果是 1 行==。
 
 ​    **分组函数自动忽略 NULL 。**
 
@@ -594,7 +594,7 @@ select ename,sal from emp where sal > (select avg(sal) from emp);
 ​    **计算每个员工的年薪？**
 
 ```mysql
-select ename,(sal+comm)*12 as yearsal from emp;     
+select ename,(sal + comm) * 12 as yearsal from emp;     
 ```
 
 ​       **重点：所有数据库都是这样规定的，只要有 NULL 参与的运算结果一定是 NULL 。**
@@ -607,7 +607,7 @@ select ename,(sal + ifnull(comm, 0)) * 12 as yearsal from emp;
 
 ​    **ifnull()** **空处理函数？**
 
-​       ifnull(可能为NULL的数据,被当做什么处理) ： 属于单行处理函数。
+​       ifnull (可能为 NULL 的数据,被当做什么处理) ： 属于单行处理函数。
 
 ```mysql
 select ename, ifnull(comm, 0) as comm from emp;   
@@ -617,7 +617,7 @@ select ename, ifnull(comm, 0) as comm from emp;
 
 ​    ==group by ： 按照某个字段或者某些字段进行**分组**。==
 
-​    ==having : having是对分组之后的数据进行再次**过滤**。==
+​    ==having : having 是对分组之后的数据进行再次**过滤**。==
 
 ​    **案例：找出每个工作岗位的最高薪资。**
 
@@ -646,7 +646,7 @@ select job, avg(sal) from emp group by job;
 ​    **案例：找出每个部门不同工作岗位的最高薪资。**
 
 ```mysql
-select deptno,job,max(sal) from emp group by deptno,job;
+select deptno, job, max(sal) from emp group by deptno, job;
 ```
 
 ​           ==分组顺序：先按 deptno 分组，再在 deptno 组内按 job 分组。==
@@ -662,10 +662,10 @@ select max(sal),deptno from emp group by deptno;
 ​       第二步：找出薪资大于2900
 
 ```mysql
-select max(sal),deptno from emp group by deptno having max(sal) > 2900;  #  这种方式效率低。
+select max(sal), deptno from emp group by deptno having max(sal) > 2900;  #  这种方式效率低。
 
 # 效率较高，建议能够使用where过滤的尽量使用where。
-select max(sal),deptno from emp where sal > 2900 group by deptno; 
+select max(sal), deptno from emp where sal > 2900 group by deptno; 
 ```
 
 ​    **找出每个部门的平均薪资，要求显示薪资大于 2000 的数据。**
@@ -673,7 +673,7 @@ select max(sal),deptno from emp where sal > 2900 group by deptno;
 ​        第一步：找出每个部门的平均薪资
 
 ```mysql
-select deptno,avg(sal) from emp group by deptno;
+select deptno, avg(sal) from emp group by deptno;
 ```
 
 ​        第二步：要求显示薪资大于2000的数据
@@ -700,7 +700,7 @@ select deptno,avg(sal) from emp where avg(sal) > 2000 group by deptno;
 ## 1、关于查询结果集的去重？
 
 ```mysql
-mysql> select distinct job from emp;    # distinct关键字去除重复记录。
+mysql> select distinct job from emp;    # distinct 关键字去除重复记录。
 
 mysql> select ename, distinct job from emp;	# 错误
 ```
@@ -708,7 +708,7 @@ mysql> select ename, distinct job from emp;	# 错误
 记住：**distinct 只能出现在所有字段的最前面，表示所有字段组合起来去重。**
 
 ```mysql
-mysql> select distinct deptno, job from emp;    # deptno, job组合后去重
+mysql> select distinct deptno, job from emp;    # deptno, job 组合后去重
 ```
 
 **案例：统计岗位的数量？**
@@ -754,7 +754,7 @@ select count(distinct job) from emp;
 **案例：找出每一个员工的部门名称，要求显示员工名和部门名。**
 
 ```mysql
-select ename,dname from emp,dept;	# 查询结果有56条记录
+select ename, dname from emp, dept;	# 查询结果有56条记录
 ```
 
 **笛卡尔积现象**：当两张表进行连接查询的时候，没有任何条件进行限制，最终的查询结果条数是**两张表记录条数的乘积**。
@@ -762,7 +762,7 @@ select ename,dname from emp,dept;	# 查询结果有56条记录
 **关于表的别名**：
 
 ```mysql
-select e.ename,d.dname from emp e,dept d;
+select e.ename, d.dname from emp e, dept d;
 # select后的字段不加表名限制则会从 from 后的所有表（emp、dept）中查找含有该字段的数据，加上表名限制则只会在该表内查询
 ```
 
@@ -811,7 +811,7 @@ select
 	e.ename,e.sal,s.grade
 from
 	emp e
-inner join                 # inner可以省略
+inner join                 # inner 可以省略
 	salgrade s
 on
 	e.sal 
@@ -841,11 +841,11 @@ on
 
 ​    **内连接：**
 
-​       假设A和B表进行连接，使用内连接的话，凡是 A 表和 B 表能够匹配上的记录查询出来，这就是内连接。AB 两张表没有主副之分，两张表是平等的。
+​       假设 A 和 B 表进行连接，使用内连接的话，凡是 A 表和 B 表能够匹配上的记录查询出来，这就是内连接。A B 两张表没有主副之分，两张表是平等的。
 
 ​    **外连接：**
 
-​       **==假设 A 和 B 表进行连接，使用外连接的话，AB 两张表中有一张表是主表，一张表是副表，主要查询主表中的数据，捎带着查询副表，当副表中的数据没有和主表中的数据匹配上，副表自动模拟出 NULL 与之匹配。==**
+​       **==假设 A 和 B 表进行连接，使用外连接的话，A B 两张表中有一张表是主表，一张表是副表，主要查询主表中的数据，捎带着查询副表，当副表中的数据没有和主表中的数据匹配上，副表自动模拟出 NULL 与之匹配。==**
 
 ​    **外连接的分类？**
 
@@ -883,7 +883,7 @@ select d.* from emp e right join dept d on e.deptno = d.deptno where e.empno is 
 注意，解释一下：
 
 ```mysql
-.... A join B join C on ...  # 表示：A表和B表先进行表连接，连接之后A表（连接之后的结果）继续和C表进行连接。
+.... A join B join C on ...  # 表示：A 表和 B 表先进行表连接，连接之后A表（连接之后的结果）继续和 C 表进行连接。
 
 select e.ename,d.dname,s.grade from emp e 
 	join dept d on e.deptno = d.deptno 
@@ -894,7 +894,7 @@ select e.ename,d.dname,s.grade from emp e
 **案例：找出每一个员工的部门名称、工资等级、以及上级领导。**
 
 ```mysql
-select  e.ename '员工',d.dname,s.grade,e1.ename '领导' from emp e 
+select e.ename '员工', d.dname, s.grade, e1.ename '领导' from emp e 
 	join dept d on e.deptno = d.deptno 
 	join salgrade s on e.sal 
 	between s.losal and s.hisal
@@ -997,9 +997,9 @@ select dname from dept;
 
 **注意：**
 
-- union拼接后数据的字段名为第一个查询字段名，即上述查询后的数据字段名为 ename;
+- union 拼接后数据的字段名为第一个查询字段名，即上述查询后的数据字段名为 ename;
 
-- **union拼接的数据字段数必须一致，即前后拼接数据的列一致**，否则无法拼接，例：
+- **union 拼接的数据字段数必须一致，即前后拼接数据的列一致**，否则无法拼接，例：
 
  ```mysql
  # 拼接的数据必须两两相对应。不能一张表是一个数据，另一张表是两个数据，这样无法拼接！
@@ -1010,7 +1010,7 @@ select dname from dept;
 
 ## 5、limit (重点中的重点，以后分页查询全靠它了。)
 
-### 5.1、limit 是 mysql 特有的，其他数据库中没有，不通用。（Oracle中有一个相同的机制，叫做 rownum ）
+### 5.1、limit 是 mysql 特有的，其他数据库中没有，不通用。（Oracle 中有一个相同的机制，叫做 rownum ）
 
 ### 5.2、limit 取结果集中的部分数据，这是它的作用。
 
@@ -1058,15 +1058,15 @@ select ename,sal from emp order by sal desc limit 3,6;
 
 第5页：12, 3
 
-每页显示pageSize条记录：
+每页显示 pageSize 条记录：
 
-**第pageNo页：(pageNo - 1) * pageSize, pageSize**
+**第 pageNo页：(pageNo - 1) * pageSize, pageSize**
 
-- pageSize是什么？是每页显示多少条记录
+- pageSize 是什么？是每页显示多少条记录
 
-- pageNo是什么？显示第几页
+- pageNo 是什么？显示第几页
 
-java代码 {
+java 代码 {
 
 ​    int pageNo = 2; // 页码是2
 
@@ -1091,7 +1091,7 @@ create table 表名(
 
 ​    关于MySQL当中字段的数据类型？以下只说常见的
 
-​       **`int `**     整数型 (java 中的 int )
+​       **`int `**     整数型 ( java 中的 int )
 
 ​       **`bigint`**  长整型 ( java 中的 long )
 
@@ -1109,13 +1109,13 @@ create table 表名(
 
 ​       ......
 
-​    **char和 varchar 怎么选择？**
+​    **char 和 varchar 怎么选择？**
 
-​       **在实际的开发中，当某个字段中的数据长度不发生改变的时候，是定长的，例如：性别、生日等都是采用char。**
+​       **在实际的开发中，当某个字段中的数据长度不发生改变的时候，是定长的，例如：性别、生日等都是采用 char。**
 
-​       **当一个字段的数据长度不确定，例如：简介、姓名等都是采用varchar。**
+​       **当一个字段的数据长度不确定，例如：简介、姓名等都是采用 varchar。**
 
-​    BLOB和CLOB类型的使用？
+​    BLOB 和 CLOB 类型的使用？
 
 ​       电影表: t_movie
 
@@ -1129,7 +1129,7 @@ create table t_movie(
 );
 ```
 
-​    **表名在数据库当中一般建议以：t_ 或者 tbl\_ 开始。**
+​    **表名在数据库当中一般建议以：t_  或者 tbl\_  开始。**
 
 ​    创建学生表：
 
@@ -1147,12 +1147,12 @@ create table t_student(
 );
 ```
 
-## 7、insert语句插入数据
+## 7、insert 语句插入数据
 
 ​    语法格式：
 
 ```mysql
-insert into 表名(字段名1,字段名2,字段名3,....) values(值1,值2,值3,....)
+insert into 表名(字段名1, 字段名2, 字段名3,....) values(值1, 值2, 值3,....)
 ```
 
 ​	插入：
@@ -1172,7 +1172,7 @@ insert into 表名(字段名1,字段名2,字段名3,....) values(值1,值2,值3,
    
    insert into t_student(name,sex,classno,birth,no) values('lisi','1','gaosan1ban', '1950-10-12',2);
    
-   insert into t_student(name) values('wangwu'); # 除name字段之外，剩下的所有字段自动插入NULL。
+   insert into t_student(name) values('wangwu'); # 除 name 字段之外，剩下的所有字段自动插入 NULL。
    
    insert into t_student(no) values(3); 
    
@@ -1210,7 +1210,7 @@ create table 表名 as select 语句;
 ## 9、将查询结果插入到一张表中？
 
 ```mysql
-insert into dept1 select * from dept; # 将select后面的查询结果插入到dept1中
+insert into dept1 select * from dept; # 将 select 后面的查询结果插入到 dept1 中
 select * from dept1;
 ```
 
@@ -1292,9 +1292,9 @@ drop table 表名;（通用）  或  drop table if exists 表名;
 
 ​       **唯一约束 (unique)：**约束的字段不能重复
 
-​       **主键约束 (primary key)：**约束的字段既不能为NULL，也不能重复（简称PK）
+​       **主键约束 (primary key)：**约束的字段既不能为 NULL，也不能重复（简称 PK）
 
-​       **外键约束 (foreign key)：**...（简称FK）
+​       **外键约束 (foreign key)：**...（简称 FK）
 
 ​       检查约束(check)：注意 Oracle 数据库有check 约束，但是 mysql 没有，目前 mysql 不支持该约束。
 
@@ -1374,7 +1374,7 @@ create table t_user(
 );
 ```
 
-   id是主键，因为添加了**主键约束，主键字段中的数据不能为 null，也不能重复。**
+   id 是主键，因为添加了**主键约束，主键字段中的数据不能为 null，也不能重复。**
 
 **主键相关的术语？**
 
@@ -1549,13 +1549,13 @@ CREATE TABLE t_x (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8; 
 ```
 
-   注意：在MySQL当中，凡是标识符使用飘号（反引号）括起来的。最好别用，不通用。
+   注意：在 MySQL 当中，凡是标识符使用飘号（反引号）括起来的。最好别用，不通用。
 
    建表的时候可以指定存储引擎，也可以指定字符集。
 
-  ==**mysql默认使用的存储引擎是 InnoDB 方式。**==
+  ==**mysql 默认使用的存储引擎是 InnoDB 方式。**==
 
-   **默认采用的字符集是UTF-8。**
+   **默认采用的字符集是 UTF-8。**
 
 ###   2.2、什么是存储引擎呢？
 
@@ -1590,11 +1590,11 @@ Savepoints: NO
 
 ​    MyISAM 采用三个文件组织一个表：
 
-​      	xxx.frm(存储格式的文件)
+​      	xxx.frm (存储格式的文件)
 
-​          xxx.MYD(存储表中数据的文件)
+​          xxx.MYD (存储表中数据的文件)
 
-​          xxx.MYI(存储表中索引的文件)
+​          xxx.MYI (存储表中索引的文件)
 
 ​    优点：可被压缩，节省存储空间。并且可以转换为只读表，提高检索效率。
 
@@ -1669,13 +1669,13 @@ update t_act set balance = balance + 10000 where actno = 'act-002';
 
 事务包括四大特性：**ACID**
 
-​    **A:原子性**：事务是最小的工作单元，不可再分。
+​    **A : 原子性**：事务是最小的工作单元，不可再分。
 
-​    **B:一致性**：事务必须保证多条 DML 语句同时成功或者同时失败。
+​    **B : 一致性**：事务必须保证多条 DML 语句同时成功或者同时失败。
 
-​    **C:隔离性**：事务 A 与事务 B 之间具有隔离。
+​    **C : 隔离性**：事务 A 与事务 B 之间具有隔离。
 
-​    **D:持久性**：持久性说的是最终数据必须持久化到硬盘中，事务才算成功结束。
+​    **D : 持久性**：持久性说的是最终数据必须持久化到硬盘中，事务才算成功结束。
 
 ###   3.5、关于事务之间的隔离性？
 
@@ -1899,7 +1899,7 @@ mysql> explain select ename,sal from emp where sal = 5000;
 ```mysql
 create index emp_sal_index on emp(sal);
 
-mysql> explain select ename,sal from emp where sal = 5000;    # rows检索次数减少了
+mysql> explain select ename,sal from emp where sal = 5000;    # rows 检索次数减少了
 ```
 
 ###   4.6、索引底层采用的数据结构是：B + Tree
@@ -1951,7 +1951,7 @@ create view myview as select empno,ename from emp;
 drop view myview;
 ```
 
-  注意：只有DQL语句才能以试图对象的方式创建出来。
+  注意：只有 DQL 语句才能以试图对象的方式创建出来。
 
 ###   5.3、对试图进行增删改查，会影响到原表数据。(通过视图影响原表数据，不是直接操作的原表)
 
@@ -2006,7 +2006,7 @@ source D:\bjpowernode.sql   	# 导入数据库
 
 - **第一范式：任何一张表都应该有主键，并且每一个字段原子性不可再分。**
 
-- **第二范式：建立在第一范式的基础上，所有非主键字段完全依赖主键，不能产生部份依赖。**
+- **第二范式：建立在第一范式的基础上，所有非主键字段完全依赖主键，不能产生部分依赖。**
 
 ​      多对多？三张表，关系表两个外键。
 
