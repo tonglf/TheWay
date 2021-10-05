@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
         sys_err("socket error");
     }
 
-    // 给服务器socket绑定地址结构（IP+port)
+    // 给服务器socket 绑定地址结构（IP+port)
     ret = bind(lfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     if (ret == -1) 
     {
