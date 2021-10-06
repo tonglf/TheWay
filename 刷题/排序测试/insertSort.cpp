@@ -6,19 +6,18 @@ using namespace std;
 void insertSort(vector<int>& nums)
 {
     int i, j;
-    for (int i = 1; i < nums.size(); ++i)
+    for (i = 1; i < nums.size(); ++i)
     {
-        int temp = nums[i];
-        for (int j = i - 1; j >= 0; --j)	
+        for (j = i - 1; j >= 0; --j)	
         {
-            if (temp < nums[j])		// ĞŞ¸Ä£ºtemp > nums[j - 1]
+            if (temp < nums[j])			// ĞŞ¸Ä£ºtemp > nums[j - 1]
             {
                 nums[j + 1] = nums[j];	
             }
             else
                 break;
         }
-        nums[j] = temp;
+        nums[j] = nums[i];
     }
 }
 
