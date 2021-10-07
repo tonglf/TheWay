@@ -180,7 +180,7 @@ inndb是聚簇索引；data域存放的是完整的数据记录，只有数据�
 
 事务：要做的事情，对数据库进行读写操作。事务是并发控制的基本单位，一个程序包含多个事务
 
-A(Atomicity)C(Consistency)I(Isolation)D(Durability)==>原子性，一致性，隔离性，持久性
+**A** (Atomicity) **C** (Consistency) **I** (Isolation) **D** (Durability)==>原子性，一致性，隔离性，持久性
 
  
 
