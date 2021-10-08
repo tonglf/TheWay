@@ -477,7 +477,7 @@ void test01()
 
 ​	**类模板在模板参数列表中可以有默认参数**
 
-​	**C++11新特性：函数模板参数列表中也可以有默认参数**
+​	**C++11 新特性：函数模板参数列表中也可以有默认参数**
 
 **示例：**
 
@@ -670,7 +670,7 @@ class Base {
 };
 
 //class Son : public Base  // 错误，c++ 编译需要给子类分配内存，必须知道父类中 T 的类型才可以向下继承
-class Son :public Base<int> // 必须指定一个类型
+class Son : public Base<int> // 必须指定一个类型
 {
 };
 void test01()
@@ -680,7 +680,7 @@ void test01()
 
 //类模板继承类模板 ,可以用 T2 指定父类中的 T 类型
 template<class T1, class T2>
-class Son2 :public Base<T2>
+class Son2 : public Base<T2>
 {
 public:
 	Son2()
@@ -911,9 +911,10 @@ public:
 	}
 
 	//重载 = 操作符  防止浅拷贝问题
-	MyArray& operator=(const MyArray& myarray) {
-
-		if (this->pAddress != NULL) {
+	MyArray& operator=(const MyArray& myarray) 
+    {
+		if (this->pAddress != NULL) 
+        {
 			delete[] this->pAddress;
 			this->m_Capacity = 0;
 			this->m_Size = 0;
@@ -922,7 +923,8 @@ public:
 		this->m_Capacity = myarray.m_Capacity;
 		this->m_Size = myarray.m_Size;
 		this->pAddress = new T[this->m_Capacity];
-		for (int i = 0; i < this->m_Size; i++) {
+		for (int i = 0; i < this->m_Size; i++) 
+        {
 			this->pAddress[i] = myarray[i];
 		}
 		return *this;
@@ -3315,7 +3317,7 @@ void test01() {
 ```c++
 #include <algorithm>
 #include <vector>
-#include <ctime>
+#include <ctime>					// 包含头文件
 
 class myPrint
 {
@@ -3328,7 +3330,7 @@ public:
 
 void test01()
 {
-	srand((unsigned int)time(NULL));
+	srand((unsigned int)time(NULL));	// 随机种子
 	vector<int> v;
 	for(int i = 0 ; i < 10;i++)
 	{
@@ -3401,7 +3403,7 @@ void test01()
 }
 ```
 
-**总结：****merge合并的两个容器必须的有序序列**
+**总结：merge合并的两个容器必须的有序序列**
 
 #### 5.3.4 reverse
 
