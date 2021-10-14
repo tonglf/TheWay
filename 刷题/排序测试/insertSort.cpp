@@ -3,21 +3,22 @@
 
 using namespace std;
 
-void insertSort(vector<int>& nums)
+void insertSort(vector<int> &nums)
 {
     int i, j;
     for (i = 1; i < nums.size(); ++i)
     {
-        for (j = i - 1; j >= 0; --j)	
+        int temp = nums[i];
+        for (j = i - 1; j >= 0; --j)
         {
-            if (temp < nums[j])			// ÐÞ¸Ä£ºtemp > nums[j - 1]
+            if (temp < nums[j]) // ÐÞ¸Ä£ºtemp > nums[j - 1]
             {
-                nums[j + 1] = nums[j];	
+                nums[j + 1] = nums[j];
             }
             else
                 break;
         }
-        nums[j] = nums[i];
+        nums[j + 1] = temp;
     }
 }
 
