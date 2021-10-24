@@ -4,13 +4,17 @@ select 原理：  借助内核， select 来监听， 客户端连接、数据�
 
 **select优缺点：**
 
-- 优点：跨平台
+**优点：**
 
-- 缺点：
+- 跨平台
+- 内核监听 fd，并将 fd_set 置位，速度快
 
-  ​	监听上限受文件描述符限制。 最大 1024.
+**缺点：**
 
-  ​	检测满足条件的fd， 自己添加业务逻辑提高小。 提高了编码难度。
+- **1024 bitmap，监听上限受文件描述符限制**
+- **fd_set 不可重用**
+- **不知道哪个文件描述符有事件发生，需要每次循环遍历 fd_set，时间复杂度 O(n)**
+- **不断地将 fd_set 从用户态复制到内核态，再由内核态复制到用户态，当 fd_set 比较大时，开销大**
 
 ```cpp
 #include <stdio.h>
@@ -59,8 +63,8 @@ int main(int argc, char *argv[])
     while (1) 
     {   
         rset = allset;                                          // 每次循环时都从新设置 select 监控信号集 
-        nready = select(maxfd + 1, &rset, NULL, NULL, NULL);
-        if (nready < 0)
+        nready = select(maxfd + 1, &rset, NULL, NULL, NULL);	// rset 从用户态复制到内核态，监听读事件后，再从内核态复制回用户态
+        if (nready < 0)											// 此时， rset 都是有事件发生的 fd，与 allset 不同了
             perr_exit("select error");
 
         if (FD_ISSET(listenfd, &rset))                          // 说明有新的客户端链接请求 

@@ -47,14 +47,14 @@ int main(int argc, char *argv[])
     
     listen(listenfd, 20);
 
-    efd = epoll_create(OPEN_MAX);               // 创建epoll模型, efd 指向红黑树根节点
+    efd = epoll_create(OPEN_MAX);               // 创建 epoll 模型, efd 指向红黑树根节点
     if (efd == -1)
         perr_exit("epoll_create error");
 
     struct epoll_event tep, ep[OPEN_MAX];       // tep: epoll_ctl 参数  ep[] : epoll_wait 参数
 
     tep.events = EPOLLIN; 
-    tep.data.fd = listenfd;           //指定 lfd 的监听时间为"读"
+    tep.data.fd = listenfd;           // 指定 lfd 的监听时间为"读"
 
     res = epoll_ctl(efd, EPOLL_CTL_ADD, listenfd, &tep);  // 将 lfd 及对应的结构体设置到树上, efd 可找到该树
     if (res == -1)
