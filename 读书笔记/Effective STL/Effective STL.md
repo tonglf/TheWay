@@ -68,6 +68,66 @@
 
 ## 2、不要试图编写独立于容器类型的代码
 
+> **不要试图编写独立于容器类型的代码**
+
+很多成员函数仅当其容器为某一类型时才存在，即一些成员函数是一些容器所特有的。
+
+假设你想编写对大多数通用的容器都适用的代码，那么显然，你的程序只能使用它们功能的交集，这会使得一些成员函数、迭代器等等都不可使用，这使得你的容器效率大大降低，达不到想要的效果。
+
+> **当你意识到自己选择的容器类型不是最佳的，想要使用另一种容器类型，应该如何操作呢？**
+
+我们平时通常如下定义：
+
+```cpp
+class Widget{...};		// 自定义类型
+
+vector<Widget> vw;
+
+Widget bestWidget;
+...
+vector<Widget>::iterator i = find(vw.begin(), vw.end(), bestWidget);
+```
+
+假设以上代码，我们不想使用 `vector` 存储 `Widget` 了，那如何修改呢？只能将所有的`vector` 替换成 `list` 或者其他，这种修改是麻烦的。
+
+所以要如下定义：
+
+```cpp
+class Widget{...};		// 自定义类型
+
+typedef vector<Widget> WidgetContainer;
+WidgetContainer cw;
+
+Widget bestWidget;
+...
+WidgetContainer::iterator i = find(cw.begin(), cw.end(), bestWidget);
+```
+
+这样就使得改变容器类型要容易的多，只需将第三行的`vector` 替换成 `list`，仅仅一处修改。
+
+这就是封装的效果。
+
+**要想减少在替换容器类型时所需要修改的代码，可以把容器隐藏到一个类中，并尽量减少那些通过类接口（而使外部）可见的、与容器相关的信息。**
+
+比如，你想创建一个顾客列表，不要直接使用`list`。相反，创建一个 `CustomerList` 类，并把 `list` 隐藏在其私有部分：
+
+```cpp
+class CustomerList {
+private:
+    typedef list<Customer> CustomerContainer;
+    typedef CustomerContainer::iterator CCIterator;
+    
+    CustomerContainer customers;
+    
+public:
+    ...
+};
+```
+
+当然，以上这些改变，仍需要检查更改之后的容器与更改之前的容器在使用成员函数、迭代器等方面是否受到影响，如果在封装方面的实现细节做的很好，那么更改容器类型所受的影响应该可以减至最小。
+
+## 3、确保容器中的对象拷贝正确而高效
+
 
 
 # vector 和 string
