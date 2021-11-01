@@ -66,6 +66,8 @@
 
   ​	这是非常特殊的情形， 但如果你面对的情形正是如此， 则 deque 是你所希望的容器。（有意思的是， 当插入操作仅在容器末尾发生时， deque 的迭代器有可能会变为无效。deque 是惟—的、 迭代器可能会变为无效而指针和引用不会变为无效的 STL 标准容器）。
 
+
+
 ## 2、不要试图编写独立于容器类型的代码
 
 > **不要试图编写独立于容器类型的代码**
@@ -126,6 +128,8 @@ public:
 
 当然，以上这些改变，仍需要检查更改之后的容器与更改之前的容器在使用成员函数、迭代器等方面是否受到影响，如果在封装方面的实现细节做的很好，那么更改容器类型所受的影响应该可以减至最小。
 
+
+
 ## 3、确保容器中的对象拷贝正确而高效
 
 一旦一个对象被保存到容器中，它经常会进一步被拷贝。当 `vector`、`string`、`deque` 进行元素的插入或删除操作时，现有元素的位置通常会被移动（复制）。
@@ -136,11 +140,72 @@ public:
 
 使拷贝动作高效、正确，并防止剥离问题的发生的一个简单办法是**使用容器包含指针而不是对象**。进一步，避免内存泄漏可以传入智能指针。
 
+
+
 ## 4、调用 empty 而不是检查 size() 是否为 0
 
 **`empty` 对所有的标准容器都是常数时间操作，而对一些 `list` 实现，`size` 耗费线性时间。**
 
-## 5、
+
+
+## 5、区间成员函数优先与之对应的单元素成员函数
+
+区间成员函数是指像 STL 算法一样，使用两个迭代器参数来确定该成员操作所执行的区间。
+
+例如：给定 v1 和 v2 两个`vector`，使 v1 的内容和 v2 的后半部分相同的最简单的操作是什么？
+
+```cpp
+// 1.
+v1.assign(v2.begin() + v2.size() / 2, v2.end);
+
+// 2.
+for (vector<Widget>::const_iterator ci = v2.begin() + v2.size() / 2; ci != v2.end(); ++ci)
+    vi.push_back(*ci);
+```
+
+上述两种方法显然第一种方法更好，省去了显式的循环以及频繁的调用 `push_back` 函数。
+
+**在哪些情况下使用区间操作大有好处？**
+
+- **区间创建：** 所有标准容器都提供了如下形式的构造函数
+
+```cpp
+container::container(InputIterator begin, InputIterator end);
+```
+
+- **区间插入：** 
+
+```cpp
+// 标准序列容器
+void container::insert(iterator position, InputIterator begin, InputIterator end);
+
+// 标准关联容器
+void container::insert(InputIterator begin, InputIterator end);
+
+// 使用区间的 insert，省去了 push_front、push_back、front_inserter、back_inserter 的循环调用
+```
+
+- **区间删除：**
+
+```cpp
+// 标准序列容器
+iterator container::erase(iterator begin, iterator end);	// 返回下一个有效的迭代器
+	
+// 标准关联容器
+void container::erase(iterator begin, iterator end);		// 当前迭代器失效，后面的迭代器不失效
+```
+
+- **区间赋值:**
+
+```cpp
+void container::assign(InputIterator begin, InputIterator end);
+```
+
+**区间成员函数的优点：**
+
+1. 区间成员函数写起来更容易；
+2. 更能清楚表达你的意图；
+3. 效率更高（使用单元素的成员函数比使用区间成员函数需要更多地调用内存分配子，更频繁的拷贝对象，或者做冗余的操作）。
 
 
 
