@@ -209,7 +209,73 @@ void container::assign(InputIterator begin, InputIterator end);
 
 
 
-## 6、
+## 6、当心 C++ 编译器最烦人的分析机制
+
+下面的代码声明了一个带 `double` 参数并返回 `int` 的函数：
+
+```cpp
+int f(double d);
+
+int f(double (d));		// 参数 d 两边的括号是多余的
+
+int f(double)			// 省略了参数名称
+```
+
+再看三个函数声明：
+
+```cpp
+int g(double(*pf)());	// 函数 g，它的参数是一个指向不带任何参数的函数指针，该函数返回 double
+
+int g(double pf());		// pf 用非指针的形式来声明，跟上面的声明意思一样
+
+int g(double ());		// 参数名 pf 被忽略了
+```
+
+假设你有一个存有整数的文件，想把这个文件复制到一个 `list` 中，下面的做法：
+
+```cpp
+ifstream dataFile("ints.dat");
+list<int> data(istram_iterator<int>(dataFile), istream_iterator<int>());
+```
+
+这种做法的思路是把一对 `istream_iterator` 传入到 `list` 的构造函数中，从而把文件中的整数复制到 `list` 中。
+
+但这是错误的，达不到你想要的效果。
+
+这里只是声明了一个函数，`data`，其返回值是 `list<int>`。这个 `data` 函数有两个参数：
+
+- 第一个参数的名称是 `dataFile`。它的类型为 `istram_iterator<int>`。`dataFile` 两边的括号是多余的，会被忽略。
+- 第二个参数没有名称。它的类型是指向不带参数的函数的指针，该函数返回一个 `istream_iterator<int>`。
+
+你也曾遇到过下面这个错误：
+
+```cpp
+class Widget {...};		// 假定 Widget 有默认构造函数
+Widget W();
+```
+
+它没有声明为 `w` 的 `Widget`，而是声明了一个名为 `w` 的函数，该函数不带任何参数，并返回 `Widget`。
+
+现在，我们想用文件的内容初始化 `list<int>` 对象，必须绕过某一种分析机制。
+
+把形式参数的声明用括号括起来是非法的，但给函数参数加上括号却是合法的，所以通过增加一对括号，强迫编译器按我们的方式来工作：
+
+```cpp
+list<int> data((istram_iterator<int>(dataFile)), istream_iterator<int>());
+```
+
+这种声明 `data` 的方式是正确的，但是，有些编译器不能通过编译。
+
+更好的方式是在对  `data`  的声明中避免使用匿名的 `istram_iterator` 对象（尽管匿名对象是一种趋势），而是给这些迭代器一个名称：
+
+```cpp
+ifstream dataFile("ints.dat");
+istram_iterator<int> dataBegin(dataFile);
+istream_iterator<int> dataEnd;
+list<int> data(dataBegin, dataEnd);
+```
+
+这种命名的迭代器对象与通常的 `STL` 程序风格相违背，但使得编译器没有二义性。
 
 
 
