@@ -356,7 +356,18 @@ void doSomethin()
 
 
 
-## 8、
+## 8、切勿创建包含 auto_ptr 的容器对象
+
+当你复制一个 `auto_ptr` 时，它所指向得对象所有权被移交到复制的 `auto_ptr` 上，而它自身被置为 `NULL`，即：复制一个 `auto_ptr` 意味着改变它的值：
+
+```cpp
+auto_ptr<Widget> pw1(new Widget);	// pw1 指向一个 Widget
+auto_ptr<Widget> pw2(pw1);			// pw2 指向 pw1 的 Widget；pw1 被置为 NULL( Widget 的所有权从 pw1 转移到 pw2 上)
+
+pw1 = pw2;							// 现在 pw1 又指向 Widget 了； pw2 被置为 NULL
+```
+
+C++ 11 已经将 `auto_ptr`  抛弃了。
 
 
 
@@ -369,6 +380,12 @@ void doSomethin()
 
 
 ## 11、
+
+
+
+## 12、
+
+
 
 
 
