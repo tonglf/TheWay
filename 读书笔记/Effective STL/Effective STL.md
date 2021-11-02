@@ -279,7 +279,80 @@ list<int> data(dataBegin, dataEnd);
 
 
 
-## 7、
+## 7、如果容器中包含了通过 new 操作创建的指针，切记在容器对象析构前将指针 delete 掉
+
+下面的代码直接导致内存泄漏：
+
+```cpp
+void doSomething()
+{
+    vector<Widget*> vwp;
+    for (int i = 0; i < SOME_MAGIC_NUMBER; ++i)
+        vwp.push_back(new Widget);
+    ...
+}
+```
+
+你可以这样删除它们：
+
+```cpp
+void doSomething()
+{
+    vector<Widget*> vwp;
+    ...							// 同上
+    for (vector<Widget*>::iterator i = vwp.begin(); i != vwp.end(); ++i)
+        delete *i;
+}
+```
+
+而这种 `for` 循环不如 `for_each` 看起来那么清楚：
+
+```cpp
+struct DeleteObject{
+    template<typename T>
+    void operator()(const T* ptr) const
+    {
+        delete ptr;
+    }
+};
+
+void doSomething()
+{
+    vector<Widget*> vwp;
+    ...							// 同上
+    for_each(vwp.begin(), vwp.end(), DeleteObject());
+}
+```
+
+但这两种解决方法仍然不是异常安全的。如果 `Widget` 已经被创建出来而对 `for_each` 的调用还没有开始时有异常抛出，则会有资源泄漏发生。
+
+使用智能指针可解决该问题：
+
+```cpp
+void doSomethin()
+{
+    typedef std::shared_ptr<Widget> SPW;
+    vector<SPW> vwp;
+    for (int i = 0; i < SOME_MAGIC_NUMBER; ++i)
+    {
+        vwp.push_back(SPW(new Widget));
+    }
+}
+
+// 或
+
+void doSomethin()
+{
+    vector<std::shared_ptr<Widget>> vwp;
+    for (int i = 0; i < SOME_MAGIC_NUMBER; ++i)
+    {
+        std::shared_ptr<Widget> p(new Widget);
+        vwp.push_back(p);
+    }
+}
+```
+
+**当你使用指针的容器，而其中的指针应该被删除时，为了避免内存泄漏，你必须使用引用计数形式的智能指针对象代替指针，或者当容器被析构时手动删除其中的每个指针**。
 
 
 
