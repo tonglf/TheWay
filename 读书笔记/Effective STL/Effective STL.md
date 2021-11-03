@@ -367,11 +367,114 @@ auto_ptr<Widget> pw2(pw1);			// pw2 指向 pw1 的 Widget；pw1 被置为 NULL( 
 pw1 = pw2;							// 现在 pw1 又指向 Widget 了； pw2 被置为 NULL
 ```
 
+不要创建包含 `auto_ptr` 的容器对象，因为在 STL 中，某些算法（如：` sort`）在底层实现的时候可能会定义临时的变量，将值传递到临时变量时，自身的值已经不存在了，这会导致错误。
+
 C++ 11 已经将 `auto_ptr`  抛弃了。
 
 
 
-## 9、
+## 9、慎重选择删除元素的方法
+
+**要产出容器中的元素应该怎么做？**
+
+- **要删除容器中有特定值的所有对象：**
+  如果容器是 vector 、 string 或 deque, 则使用 erase-remove 习惯用法。
+  如果容器是 list 则使用 list::remove。
+  如果容器是一个标准关联容器， 则使用它的 erase 成员函数。
+
+```cpp
+// vector 、 string 或 deque
+c.erase(remove(c.begin(), c.end(), 1936), c.end());
+
+// list
+c.remove(1936);
+
+// 关联容器
+c.erase(1936);
+```
+
+>**remove 函数：**
+>
+>​	从范围 `[first, last)` 移除所有满足特定判别标准的元素（**将需要移出的元素移动到容器的末尾，保持剩余元素的相对顺序而容器的物理大小保持不变**），并返回范围新结尾的尾后迭代器。
+>
+>```cpp
+>#include <algorithm>
+>#include <string>
+>#include <iostream>
+>#include <cctype>
+> 
+>int main()
+>{
+>    std::string str1 = "Text with some   spaces";
+>    str1.erase(std::remove(str1.begin(), str1.end(), ' '), str1.end());
+>    std::cout << str1 << '\n';
+> 
+>    std::string str2 = "Text\n with\tsome \t  whitespaces\n\n";
+>    str2.erase(std::remove_if(str2.begin(), 
+>                              str2.end(),
+>                              [](unsigned char x){return std::isspace(x);}), 
+>               str2.end());
+>    std::cout << str2 << '\n';
+>}
+>```
+>
+>输出：
+>
+>```cpp
+>Textwithsomespaces
+>Textwithsomewhitespaces
+>```
+
+- **要删除容器中满足特定判别式（条件）的所有对象：**
+  如果容器是 vector、 string 或 deque, 则使用 erase-remove_if 习惯用法。
+  如果容器是 list. 则使用 list::remove_if。
+  如果容器是一个标准关联容器， 则使用 remove_copy _if 和 swap, 或者写一个循环来 遍历容器中的元素， 记住当把迭代器传给 erase 时， 要对它进行后缀递增。
+
+```cpp
+// 特定判别式（条件）
+bool badValue(int );
+
+// vector、string 或 deque
+c.erase(remove_if(c.begin(), c.end(), badValue), c.end());
+
+// list
+c.remove_if(badValue);
+
+// 关联容器
+AssocContainer<int> c;
+...
+AssocContainer<int> goodValues;		// 保存不被删除的值的临时容器
+romove_copy_if(c.begin(), c.end(), inserter(goodValues, goodValues.end()), badValue);
+c.swap(goodValues);			// 交换 c 和 goodValues 内容
+```
+
+- **要在循环内部做某些（除了删除对象之外的）操作：**
+  如果容器是一个标准序列容器， 则写一个循环来遍历容器中的元素， 记住每次调 用 erase 时， 要用它的返回值更新迭代器。
+  如果容器是一个标准关联容器， 则写一个循环来遍历容器中的元素， 记住当把迭代器传给 erase 时， 要对迭代器做后缀递增。
+
+```cpp
+// 序列容器 vector、 string 或 deque
+for (SeqContainer<int>::iterator i = c.begin(); i != c.end(); )
+{
+    if (badValue(*i))
+    {
+        i = erase(i);		// 序列容器删除某个迭代器，当前迭代器与其之后的迭代器会失效，但会返回下一个有效的迭代器
+    }
+    else
+        ++i;
+}
+
+// 关联容器
+for (SeqContainer<int>::iterator i = c.begin(); i != c.end(); )
+{
+    if (badValue(*i))
+    {
+        erase(i++);		// 关联容器删除某个迭代器，当前迭代器失效，但其之后的迭代器不会失效，利用 i++ 指向下一个迭代器即可
+    }
+    else
+        ++i;
+}
+```
 
 
 
