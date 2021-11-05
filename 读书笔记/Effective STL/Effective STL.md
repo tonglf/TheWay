@@ -478,21 +478,114 @@ for (SeqContainer<int>::iterator i = c.begin(); i != c.end(); )
 
 
 
-## 10、
+## 10、了解分配子（allocator）的约定和限制
+
+**如果你希望编写自 定义的分配子，都需要记住哪些内容：**
+
+- 你的分配子是—个模板，模板参数 T 代表你为它分配内存的对象的类型。
+- 提供类型定义 pointer 和 reference，但是始终让 pointer 为 T*，reference 为 T&。
+- 千万别让你的分配子拥有随对象而不同的状态（per-objectstate）。通常，分配子不应该有非静态的数据成员。
+- 记住，传给分配子的 allocate 成员函数的是那些要求内存的对象的个数，而不是所需的字节数。同时要记住，这些函数返回 T* 指针（通过 pointer 类型定义），即使尚未有 T 对象被构造出来。
+
+- 一定要提供嵌套的 rebind 模板，因为标准容器依赖该模板。
 
 
 
-## 11、
+## 11、理解自定义分配子的合理用法
 
 
 
-## 12、
 
 
+## 12、切勿对 STL 容器的线程安全性有不切实际的依赖
+
+现在考虑下面的代码。它在一个 `vector<int>` 中查找值为 5 的第一个元素，如果找到了，就把该元素究为 0。
+
+```cpp
+vector<int> v;
+...
+vector<int>::iterator first5(find(v.begin(), v.end(), 5));	// 第 1 行
+if (first5 != v.end())										// 第 2 行
+    *first5 = 0;											// 第 3 行
+```
+
+在一个多线程环境中，可能在第 1 行刚刚完成后，另一个不同的线程会更改 v 中的数据。如果这种更改真的发生了， 那么第 2 行对 first5 和 v.end 是否相等的检查将会变得没有意义， 因为 v 的值将会与在第 1 行结束时不同。 事实上， 这一检查会产生不确定的行为，因为另外一个线程可能会夹在第 1 行和第 2 行中间，使 first5 变得无效， 这第二个线程或许会执行一个插入操作使得 vector 重新分配它的内存（这会使 vector 所有的迭代器变得无效）。类似地， 第 3 行对 *first5 的赋值也是不安全的，因为另一个线程可能在第 2 行和第 3 行之间执行， 该线程可能会使 first5 无效， 例如可能会删除它所指向的元素（或者至少是曾经指向过的元素）。
+
+上面的代码要做到线程安全， v 必须从第 1 行到第 3 行始终保持在锁住状态。在这种情况下， 你必须手工做同步控制。
+
+ ```cpp
+ vector<int> v;
+ ...
+ getMutexFor(v);
+ vector<int>::iterator first5(find(v.begin(), v.end(), 5));	// 第 1 行
+ if (first5 != v.end())										// 第 2 行
+     *first5 = 0;											// 第 3 行
+ releaseMutexFor(v);
+ ```
+
+为面向对象的方案是创建个 Lock 类， 它在构造函数中获得一个互斥体，在析构函数中释放它， 从而尽可能地减少 getMutexFor 调用没有相对应的 releaseMutexFor 调用的可能性。
+
+```cpp
+template<typename Container> 
+class Lock{ 
+public: 
+    Lock(const Container& container) : c (container)
+    {
+        getMutexFor(c);
+    }
+    ~Lock()
+    {
+        releaseMutexFor(c);
+    }
+private:
+    const Container c;
+};
+
+vector<int> v;
+...
+{										// 创建新的代码块
+    Lock<vector<int>> lock(v);			// 获取互斥体
+	vector<int>::iterator first5(find(v.begin(), v.end(), 5));	// 第 1 行
+	if (first5 != v.end())										// 第 2 行
+    	*first5 = 0;											// 第 3 行
+}										// 代码块结束，自动释放互斥体
+```
+
+使用类（如 Lock）来管理资源的生存期的思想通常被称为＂获得资源时即初始化” (resource acquisition is initialization) 。
 
 
 
 # vector 和 string
+
+## 13、vector 和 string 优先于动态分配的数组
+
+如果使用 `new` 来分配内存时，你通常需要搭配 `delete`，并且需要正确的配对。
+
+`vector` 和 `string` 消除了上述的负担，因为它们自己管理内存。当元素被加入到容器中时，它们内存会增长；而当 `vector` 和 `string` 被析构时，它们的析构函数会自动析构容器中的元素并释放包含这些元素的内存。而且，`vector` 和 `string`  是功能完全的 `STL` 序列容器，凡是适合于序列容器的 `STL` 算法，都可以使用。
+
+如果你正在动态的分配数组，那么你可能要做更多的工作，为了减轻自己的负担，请使用 `vector` 或 `string`。
+
+
+
+## 14、
+
+
+
+## 15、
+
+
+
+## 16、
+
+
+
+## 17、
+
+
+
+## 18、
+
+
 
 
 
