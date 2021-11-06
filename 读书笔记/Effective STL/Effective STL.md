@@ -567,25 +567,175 @@ vector<int> v;
 
 
 
-## 14、
+## 14、使用 reserve 来避免不必要的重新分配
+
+STL 容器，它们会自动增长以便容纳下放入其中的数据，对于 `vector` 和 `string`，增长过程是这样来实现的：每当需要更多空间时，就调 用与 `realloc` 类似的操作。这一类似于 `realloc` 的操作分为 4 部分：
+
+> 1. 分配一块大小为当前容量的某个倍数的新内存。在大多数实现中，`vector` 和 `string`的容量每次以 2（Linux 为 2 倍，VS 2017 为 1.5 倍） 的倍数增长，即，每当容器前要扩张时，它们的容量即加倍。
+> 2. 把容器的所有元索从旧的内存拷贝到新的内存中。
+> 3. 析构掉旧内存中的对象。
+> 4. 释放旧内存。
+
+考虑到以上这些分配、释放、拷贝和析构步骤，这个过程会非常耗时。
+
+通常有两种方式来使用 reserve 以避免不必要的重新分配。
+
+- 第一种方式是， 若能确切知道或大致预计容器中最终会有多少元素， 则此时可使用 reserve。 在这种情况下， 可以简单地预留适当大小的空间。 
+- 第二种方式是， 先预留足够大的空间（根据你的需要而定）， 然后，当把所有数据都加入以后，再去除多余的容量。 
 
 
 
-## 15、
+## 15、注意 string 实现的多样性
+
+string 实现的方式是多样的，这些不同实现的区别如下：
+
+- string 的值可能会被引用计数，也可能不会。很多实现在默认情况下会使用引用计数 但它们通常提供了关闭默认选择的方法， 往往是通过预处理宏来做到这一点。第13 条给出了你想将其关闭的一种特殊情况，但其他的原因也可能会让你这样做。 比如，**只有当字符串被频繁拷贝时，引用计数才有用**，而有些应用并不经常拷贝内存，这就不值得使用引用计数了。
+- string 对象大小的范围可以是一个 `char*` 指针的大小的 1 倍到 7 倍。
+- 创建一个新的字符串值可能需要零次、一次或两次动态分配内存。
+- string 对象可能共享，也可能不共享其大小和容量信息。
+- string 可能支持，也可能不支持针对单个对象的分配子。
+- 不同的实现对字符内存的最小分配单位有不同的策略。
 
 
 
-## 16、
+## 16、了解如何把 vector 和 string 数据传给旧的 API
+
+人们一直试图从数组中解放出来，转向使用 vector；同样努力地试图从 `char*` 指针转向 string 对象 。但障碍仍然存在， 最常见的一个障碍是， 旧的 C API 还存在， 它们使用数组和 `char*`  指针来进行数据交换而不是 vector 或 string 对象。
+
+**解决方法：**
+
+> 如果你有一 个 vector v，而你需耍得到一个指向 v 中数据的指针， 从而可把 v 中的数据作为数组来对待， 那么只需使用 `&v[0]` 就可以了。对于siring s，对应的形式是 `s.c_str()`。
+
+如果我们希望把 v 传给一个如下所示的 C API：
+
+```cpp
+void doSomething(const int* pInts, size_t numInts); 
+```
+
+正确的做法是这样：
+
+```cpp
+if (!v.empty())		// 避免 v.size() 为 0，那么 &v[0] 会产生一个指向不存在东西的指针
+{
+    doSomething(&v[0], v.size());		
+    // doSomething(&*v.begin(), v.size()); // 直接使用迭代器不行，需要解引用再引用，故不建议使用迭代器
+}
+```
+
+`&v[0]` 这种得到容器中数据指针的方式对于 vector 是适用的，但对于 string 却是不可靠的。 因为： 
+
+1. string 中的数据不一定存储在连续的内存中： 
+2. string 的内部表示不一定是以空字符结尾的。 这也正说明了为什么在 string 中存在成员函数 c_str。 c_str 函数返回一个指向字符串的值的指针，而且该指针可用于 C。 囚此， 我们可以把一个字符串 s 传给下面的函数：
+
+```cpp
+void doSomething(const char* pString); 
+
+doSomething(s.c_str());
+```
+
+**利用 vector，使其他容器与 C API 相容：**
+
+```cpp
+size_t fillArray(double* pArray, size_t arraySize); // 使用 fillArray 向 vd 中写入数据
+vector<double> vd(maxNumDoubles); 
+vd.resize(fillArray(&vd[O],vd.size()));
+
+deque<double> d(vd.begin(), vd.end()); 	// 把数据拷贝到 deque 中
+list<double> l(vd.begin(), vd.end()); 	// 把数据拷贝到 list 中
+set<double> s(vd. begin(), vd. end());  // 把数据拷贝到 set 中                  
+```
+
+而且这意味着，除了 vector 和 string 以外的其他 STL 容器也能把它们的数据传递给 C API。你只需把每个容器的元素拷贝到一个 vector中，然后传给该 API：
+
+```cpp
+void doSomething(const int* plnts, size_t numlnts);
+set<int> intSet;
+...
+vector<int> V(intSet.begin(),intSet.end()); // 把 set 的数据拷贝到 vector 
+if (!v.empty())
+    doSomething(&v[0], v.size()); // 把数据传给API   
+```
 
 
 
-## 17、
+## 17、使用 “swap 技巧” 除去多余的容量
+
+为了避免 vector、string 仍占用不再需要的内存，你希望有一种方法能把它的容量从以前的最大值缩减到当前需要的数量。这种对容量的缩减通常被称为"**shrink to fit**" (压缩至适当大小）。
+
+```cpp
+class Contestant {...};
+vector<Contestant> contestants;
+contestants.push_back(...);				// 大量的 push_back
+contestants.erase(...);/pop_back();		// 删除其中一部分数据    
+
+// 使用 swap 去除多余的容量
+vector<Contestant> (contestants).swap(contestants);
+// vector<Contestant> temp(contestants).swap(contestants);	有名正常的 vector
+// vector<Contestant> (contestants).swap(contestants);		匿名临时的 vector，都调用拷贝构造函数
+```
+
+表达式 `vector<Contestant> (contestants)` 创建一个临时的向量，它是 `contestants` 的拷贝：这是由 vector 的拷贝构造函数来完成的。然而，**vector 的拷贝构造函数只为所拷贝的元素分配所需要的内存，所以这个临时向量没有多余的容量。**然后我们把临时向量中的数据和 `contestants` 中的数据做 `swap` 操作，在这之后，`contestants` 具有了被去除之后的容量，即原先临时变量的容量，而临时变l量的容量则变成了原先 `contestants` 腌肿的容量。到这时（在语句结尾）， 临时向量被析构，从而释放了先前为 `contestants` 所占据的内存。
+
+同样的方式也适用于 string：
+
+```cpp
+string s;
+...					// 让 s 变大，然后删除它的大部分字符
+string(s).swap(s); // 对 s 做 shrink-to-fit
+```
+
+swap 技巧的一种变化形式可以用来消除一个容器，并使其容量变为该实现下的最小值。只要与一个用默认构造函数创建的 vector 或string 做交换 (swap) 就可以了：
+
+```cpp
+vector<Contestant> v;
+string s; 
+...
+vector<Contestant> ().swap(v); 
+string ().swap(s); 
+```
+
+关于 swap 技巧， 或者关于一般性的 swap，在做 swap 的时候， 不仅两个容器的内容被交换，同时它们的迭代器、指针和引用也将被交换 ( string 除外）。在 swap 发生后， 原先指向某容器中元素的迭代器、 指针和引用依然有效， 并指向同样的元素，但是， 这些元素已经在另一个容器中了。
+
+其实，在 C++ 11 中，已经有了 `shrink_to_fit` 函数，对于想清楚容器多余的容量，可以直接调用该函数：
+
+```cpp
+vector<Contestant> v;
+string s; 
+...
+// 清除多余容量    
+v.shrink_to_fit();
+s.shrink_to_fit();
+
+// 将容器清空
+v.clear();
+s.clear();
+
+v.shrink_to_fit();
+s.shrink_to_fit();
+```
 
 
 
-## 18、
+## 18、避免使用 vector\<bool>
 
+作为—个STL容器， `vector<bool>` 只有两点不对。 首先，它不是一个 STL 容器。 其次，它并不存储 `bool`。
 
+如果 `vector<bool>` 是一个容器， 那么下面这段代码必须可以被编译：
+
+```cpp
+vector<bool> v; 
+bool *pb = &v[0];	// 编译错误
+```
+
+但是它不能编译。 不能编译的原因是， `vector<bool>` 是 一个假的容器，它并不真的储存 `bool`， 相反，为了节省空间，它储存的是 `bool` 的紧凑表示。在一个典型的实现中，储存在 `vector` 中的每个 `bool` 仅占一个二进制位，一个 8 位的字节可容纳 8 个 `bool` 。在内部，`vector<bool>` 使用了与位域（bitfield）一样的思想， 来表示它所存储的那些 `bool` ，实际上它只是假装存储了这些 `bool`。
+
+位域与 `bool` 相似，它只能表示两个可能的值，但是在 `bool` 和看似 `bool` 的位域之间有一个很重要的区别：你可以创建一个指向 `bool` 的指针， 而指向单个位的指针则是不允许的。
+
+**那么当你需要 `vector<bool>` 时， 应该使用什么呢？**
+
+- 第一种是 `deque<bool>`，`deque<bool>` 是一个 STL 容器， 而且它确实存储 `bool`。
+
+- 第二种可以替代 `vector<bool>`的选择是 `bitset`。`bitset` 不是 STL 容器， 但它是标准 C++ 库的一部分。与 STL 容器不同的是， 它的大小（即元素的个数）在编译时就确定了，所以它不支持插入和删除元素，也不支持迭代器。但是， 与 `vector<bool>` 一样， 它使用了 一种紧凑表示，只为所包含的每个值提供一位空间。 它提供了 `vector<bool>` 特有的加成员函数， 以及其他 一些特有的、对位的集合有意义的成员函数。如果你不需要迭代器和动态地改变大小， 那么你可能会发现 `bitset` 很适合你的需要。
 
 
 
