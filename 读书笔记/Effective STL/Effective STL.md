@@ -741,6 +741,270 @@ bool *pb = &v[0];	// 编译错误
 
 # 关联容器
 
+## 19、理解相等（equality）和等价（equivalence）的区别
+
+在实际操作中，相等的概念是基于 `operator==` 的。如果表达式 `x == y` 返回真，则 x 和 y 的值相等，否则就不相等。
+
+`set::insert` 对“相同”的定义是等价，是以 `operator<` 为基础的，即：
+
+```cpp
+!(x < y) && !(y < x)	
+```
+
+若返回 `true`，则它们等价。
+
+
+
+## 20、为包含指针的关联容器指定比较类型
+
+当创建包含指针的关联容器时，容器将会按照指针的值进行排序，所以要创建函数子类作为该容器的比较类型 (comparison type) 。
+
+```CPP
+struct StringPtrLess : public binary_function<const string*, const string*, bool>
+{
+    bool operator()(const string *ps1, const string *ps2) const
+    {
+        return *ps1 < *ps2;
+    }
+};
+
+set<string*, StringPtrLess> StringPtrSet;
+...
+```
+
+为啥要创建一个函数子类，而不直接使用函数呢？
+
+```cpp
+bool StringPtrLess(const string *ps1, const string *ps2) const
+{
+    return *ps1 < *ps2;
+}
+
+set<string*, StringPtrLess> StringPtrSet;	// 编译错误
+...
+```
+
+这里的问题是，set 模板的三个参数每个都是一个类型。不幸的是，stringPtrless 不是一个类型它是一个函数。这就是为什么试图用 stringPtrLess 作为 set 的比较函数无法通过编译的原因。set 不需要一个函数，它需要的是一个类型，并在内部用它创建—个函数。
+
+每当创建包含指针的关联容器时，请记住，你可能同时也要指定容器的比较类型。大多数情况下，这个比较类型只是解除指针的引用，并对所指向的对象进行比较（就像上面的 StringPtrless 那样）。考虑到这种情况，你最好手头上为这样的比较函数子准备一个模板。 就像这样：
+
+```cpp
+struct DereferenceLess
+{
+    template<typename PtrType>
+    bool operator()(PtrType pT1, PtrType pT2) const
+    {
+        return *pT1 < *pT2;
+    }
+};
+
+set<string*, DereferenceLess> ssp; // 与 set<string*, StringPtrLess> StringPtrSet 行为相同
+...
+```
+
+
+
+## 21、总是让比较函数在等值情况下返回 false
+
+在关联容器中，键需要有序排列时，排列函数需要严格的大于、小于，不能大于等于、小于等于，即使是 `multiset`、`multimap`。
+
+```cpp
+set<int, less_equal<int>> s;
+s.insert(10);
+s.insert(10);
+
+/*
+集合会检查下面的表达式是否为真：
+	!(10 <= 10) && !(10 <= 10)
+	!(true) && !(true)
+	false && false
+*/
+```
+
+即 set 判断前后插入的 10 为两个不等价的键，都会将其插入进去，导致错误。
+
+在 multiset 中：
+
+```cpp
+multiset<int, less_equal<int>> s;
+s.insert(10);
+s.insert(10);
+```
+
+看似合理，因为 multiset 允许有重复的键，都插入进去也没错，但是经过上述的判断，判断两个键是不等价的键（应该是等价的键，可以同时插入），也破坏了 multiset 的本意。
+
+
+
+## 22、切勿直接修改 set 或 multiset 中的键
+
+如果你想以一种总是可行而且安全的方式来修改 set、multiset、map 和 multimap 中的元索，则可以分 5 个简单步骤来进行：
+
+1. 找到你想修改的容器的元索。
+2. 为将要被修改的元素做一份拷贝。在 map 或 multimap 的悄况下，请记件，不要把该拷贝的第一个部分声明为 const。毕竟，你想要改变它。
+3.	修改该拷贝，使它具有你期望它在容器中的值。
+4. 把该元素从容器中删除，通常是通过调用 erase 来进行的（见第9条）。
+5. 把新的值插入到容器中。如果按照容器的排列顺序，新元素的位置可能与被删除元紊的位宜相同或紧邻，则使用“提示"(hint) 形式的 insert，以便把插入的效 率从对数时间提高到常数时间。把你从第 1 步得来的迭代器作为提示信息。
+
+下面是同样的 Employee 例子，这次是用安全的、可移植的方式来编写的：
+
+```cpp
+class Employee 
+{
+public:
+    ...
+    const string& name() const: 
+	void setName (const string& name); 
+    const string& title() const; 
+	void secTitle (const string& title); 
+    int idNumber() const; 
+    ...
+};
+
+EmpIDSet se; 
+Employee selectedID;
+...
+EmpIDSet::iterator i = se.find(selectedID);
+if(i != se.end())
+{
+    Employee e(*i); 
+	se.setTitle("Corporate Deity"); 
+    se.erase(i++);
+	se.inserc(i, e); 
+}
+```
+
+
+
+## 23、考虑用排序的 vector 替代关联容器
+
+当**查找操作几乎从不跟插入和删除操作混在一起**时，可以使用排序的 vector 替代关联容器。
+
+使用排序的 vector 替代关联容器的好处？
+
+> 1. 大小的问题：关联容器底层是红黑树，这样的树由树节点构成，每个节点不仅包含对象，还有多个指针，空间开销大。
+> 2. 引用的局域性：假设数据结构足够大，它们被分割后将跨越多个内存页面，但 vector 将比关联容器需要更少的页面，使用 vector 可使内存页面切换次数减少。
+
+**使用排序的 vector 替代 set：**
+
+```cpp
+vector<Widget> vw;
+...
+
+sort(vw.begin(), vw.end());
+
+Widget w;
+...
+if (binary_search(vw.begin(), vw,end(), w))
+    ...
+    
+vector<Widget>::iterator i = lower_bound(vw.begin(), vw.end(), w);
+if (i != vw.end() && !(w < *i))
+    ...
+    
+pair<vector<Widget>::iterator, vector<Widget::iterator>> range = equal_range(vw.begin(), vw.end(), w);    
+if (range.first != range.second)
+    ...							// 结束查找阶段
+sort(vw.begin(), vw.end());		// 开始新的查找阶段
+```
+
+如果你决定用一个 vector 来替换 map 或 muttimap，vector 必须要存放 pair 对象。如果你声明了一个 `map<K,V>` （或者与它对应的multimap）类型的对象， 那么 map 中存估的对象类型是 `pair<const K, V>` ，为了用 vector来模仿 map 或 multimap， 你必须要省去 const，因为当你对这个 vector 行排序时， 它的元素的值将通过赋值操作被移动， 这意味 pair 的两个部分都必须是可以被赋值的。 所以， 当使用 vector 来模仿 `map<K, V>` 时， 存储在 vector 中的数据必须是`pair<K,V>`，而不是 `pair<const K, V>`。
+
+map 和 multimap 总是保持自己的元素是排序的，它在排序时只看元素的键部分。当你对 vector 做排序时，也必须这么做。你需要为自己的 pair 写一个自定义 的比较函数， 因为 pair 的 `operator<` 对 pair 的两部分都要检查。
+
+**使用排序的 vector 替代 map：**
+
+```cpp
+typedef pair<string, int> Data; 
+
+class DataCompare {
+public: 
+    bool operator()(const Data& lhs, const Data& rhs) const		// 用于排序的比较函数
+    {
+        return KeyLess(lhs.first, rhs.first);
+    }
+    bool operator() (const Data& lhs, const Data::first_type& k) const	// 用于查找的比较函数，第一种形式
+    {
+        return KeyLess(lhs.first, k);
+    }
+    bool operator() (const Data::first_type& k, const Data& rhs) const	// 用于查找的比较函数，第二种形式
+    {
+        return KeyLess(k, rhs.first);
+    }
+private:
+    bool operator() (const Data::first_type& k1, const Data::first_type& k2) const	// 实际的比较函数
+    {
+        return k1 < k2;
+    }
+};
+
+vector<Data> vd;
+...
+
+sort(vd.begin(), vd.end());
+
+string s;
+...
+if (binary_search(vd.begin(), vd,end(), s, DataCompare()))
+    ...
+    
+vector<Data>::iterator i = lower_bound(vd.begin(), vd.end(), s, DataCompare());
+if (i != vd.end() && !DataCompare()(s, *i))
+    ...
+    
+pair<vector<Data>::iterator, vector<Data::iterator>> range = equal_range(vd.begin(), vd.end(), s, DataCompare());    
+if (range.first != range.second)
+    ...							// 结束查找阶段
+sort(vd.begin(), vd.end(), DataCompare());		// 开始新的查找阶段
+```
+
+注：关注使用排序的 vector 替代关联容器的前提。
+
+
+
+## 24、当效率至关重要时，请在 map::oprator[] 与 map::insert 之间谨慎做出选择
+
+结论：**当向映射表中添加元素时，要优先选用 insert；当更新已经在映射表中的元素的值时， 要优先选择 operator[]。**
+
+**添加元素：**
+
+> ```cpp
+> map<int, Widget> m;
+> 
+> // map::oprator[]
+> m[1] = 1.50;
+> // 等同于
+> typedef map<int, Widget> IntWidgetMap;
+> pair<IntWidgetMap::iterator, bool> result = m.insert(IntWidgetMap::value_type(1, Widget()));
+> result.first->second = 1.50;		
+>     
+> // map::insert
+> m.insert(IntWidgetMap::value_type(1, 1.50));
+> ```
+>
+> **map::oprator[]**：先默认构造一个 Widget，然后赋值。
+>
+> **map::insert**：直接使用需要的值构造一个 Widget。
+>
+> insert 相对于 oprator[] 通常会节省三个函数的调用：一个用于创建默认构造的临时 Widget 对象，一个用于析构该临时对象，另一个是调用 Widget 的赋值操作符。 这些函数调用的代价越高，使用 map::insert 代替 map::operator[] 节省的开销就越大。
+
+**更新元素：**
+
+> ```cpp
+> // map::oprator[]
+> m[k] = v;	
+>     
+> // map::insert
+> m.insert(IntWidgetMap::value_type(k, v)).first->second = v;
+> ```
+>
+> insert 调用需要一个 `lntWidgetMap::value_type` 类型的参数（即 `pair<int,Widget>` )，所以当我们调用 insert 时，我们必须构造和析构一个该类型的对象。这要付出一个 pair 构造函数和一 个 pair 析构函数的代价。而这又会导致对 Widget 的构造和析构动作，因为 `pair<int,Widget>`  本身又包含了一个Widget 对象。而 `operator[]` 不使用 pair 对象，所以它不会构造和析构任何 pair 或 Widget。
+
+
+
+## 25、熟悉非标准得散列容器
+
+在 C++ 11 中，已经引入了标准的散列容器，分别为：`unoreded_set`、`unoreded_multiset`、`unoreded_map`、`unoreded_multimap`。这些标准的散列容器底层基于哈希表，解决哈希冲突的方法为拉链法，查询时间复杂度为 O(1)，但不稳定，最坏为 O(n)。
+
 
 
 # 迭代器
