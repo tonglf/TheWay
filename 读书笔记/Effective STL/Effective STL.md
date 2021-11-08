@@ -1003,20 +1003,293 @@ sort(vd.begin(), vd.end(), DataCompare());		// 开始新的查找阶段
 
 ## 25、熟悉非标准得散列容器
 
-在 C++ 11 中，已经引入了标准的散列容器，分别为：`unoreded_set`、`unoreded_multiset`、`unoreded_map`、`unoreded_multimap`。这些标准的散列容器底层基于哈希表，解决哈希冲突的方法为拉链法，查询时间复杂度为 O(1)，但不稳定，最坏为 O(n)。
+在 C++ 11 中，已经引入了标准的散列容器，分别为：`unoreded_set`、`unoreded_multiset`、`unoreded_map`、`unoreded_multimap`。这些标准的散列容器底层基于哈希表，解决哈希冲突的方法为拉链法，采用单向迭代器，查询时间复杂度为 O(1)，但不稳定，最坏为 O(n)。
 
 
 
 # 迭代器
 
+## 26、iterator 优先于 const_iterator、 reverse_iterator 以及 const_reverse_iterator
+
+在作者新书 《Effective Modern C++》中，条款 13：优先选用 const_iterator，而非 iterator 。
+
+有矛盾？这是因为在新版本的 C++ 中，标准库对 const_iterator 进行了完善，使它们好用了起来。故现在的标准为：
+
+**任何时候需要一个迭代器而其指涉及到的内容没有修改必要，就应该使用 const_iterator。**
+
+
+
+## 27、使用 distance 和 advance 将容器的 const_iterator 转换成 iterator
+
+直接转换：
+
+```cpp
+typedef deque<int> IntDeque;
+typedef IntDeque::iterator Iter;
+typedef IntDeque::const_iterator ConstIter;
+
+ConstIter ci;
+...
+Iter i(ci);							// 编译错误，类型不匹配
+Iter i(const_cast<Iter>(ci));		// 编译错误
+```
+
+间接转换：
+
+```cpp
+typedef deque<int> IntDeque;
+typedef IntDeque::iterator Iter;
+typedef IntDeque::const_iterator ConstIter;
+
+IntDeque d;
+ConstIter ci;
+...
+Iter i(d.begin());
+advance(i, distance(i, ci));
+```
+
+
+
+## 28、正确理解由 reverse_iterator 的 base() 成员函数所产生的 iterator 的用法
+
+- 如果要在一个 reverse_iterator ri 指定的位置上插入新元素，则只需在 ri.base() 位置处插入元素即可。对于插入操作而言，ri 和 ri.base() 是等价的，ri.base() 是真正与 ri 对应的 iterator。
+
+- 如果要在一个 reverse_iterator ri 指定的位置上删除一个元素，则需要在 ri.base() 前面如果要在一个 reverse_iterator ri 指定的位置上删除的位置上执行删除操作。对于删除操作而言，ri 和 ri.base() 是不等价的，ri.base() 不是与 ri 对应的 iterator。
+
+
+
+## 29、对于逐个字符的输入请考虑使用 istreambuf_iterator
+
+如果你需要从一个输入流中逐个读取字符， 那么就不必使用格式化输入；如果你关心的是读取流的时间开销， 那么使用 istreambuf_iterator 取代 istream_iterator 只是多输入了三个字符， 却可以获得明显的性能改善。 对于非格式化的逐个字符输入过程， 你总是应该考虑使用 istreambuf_iterator。
+
+同样地，对于非格式化的逐个字符输出过程，你也应该考虑使用 ostreambuf_iterator。它可以避免因使用 ostream_iterator 而带来的额外负担（但同时也损失了格式化输出的灵活性），从而具有更为优越的性能。
+
 
 
 # 算法
+
+## 30、确保目标区间足够大
+
+无论何时，如果所使用的算法需要指定一个目标区间，那么必须确保目标区间足够大，或者确保它会随着算法的运行而增大。
+
+
+
+## 31、了解各种与排序有关的选择
+
+总结一下所有这些排序选择：
+
+- 如果需要对 vector、 string 、 deque 或者数组中的元素执行一次完全排序， 那么可以使用 sort（不稳定）或者 stable_sort（稳定）。（随机迭代器）
+- 如果有一个 vector、 string 、 deque 或者数组， 并且只需要对等价性最前面的 n 个元索进行排序，那么可以使用 partiat_sort。（随机迭代器）
+
+```cpp
+partiat_sort(widget.begin(), widget.begin() + n, widget.end(), cmp);
+```
+
+- 如果有一个 vector、 string 、 deque 或者数组， 并且需要找到第 n 个位控上的元素， 或者， 需要找到等价性最前面的 n 个元素但又不必对这 n 个元素进行排序， 那么， nth_element 正是你所需要的函数。（随机迭代器）
+
+```cpp
+nth_element(widget.begin(), widget.begin() + n - 1, widget.end(), cmp);
+```
+
+- 如果需要将--个标准序列容器中的元素按照足否满足某个特定的条件区分开来， 那么， partition 和 stable_partition 可能正是你所需要的。（双向迭代器）
+
+```cpp
+bool hasAcceptableQuality(const Widget& w)
+{
+	// 判断 w 的质量值是否为 2 或者更好
+}
+
+// 返回一个指向第一个不满足条件的 Widget 的迭代器
+vector<Widget>::iterator goodEnd = partition(widget.begin(), widget.end(), hasAcceptableQuality); 
+```
+
+- 如果你的数据在一个 list 中， 那么你仍然可以直接调用 partition 和 stable_partilion 算法：你可以用 list::sort 来替代 sort 和 stable_sort 算法。但是，如果你需要获得 partial_sort 或 nth_element 算法的效果，那么，有一些间接的途径来完成这项任务（将 list 中的元素复制到一个提供随机访问迭代器的容器中）。
+
+**排序算法性能排序：**
+
+1. partition
+2. stable_partition（稳定）
+3. nth_element
+4. patial_sort
+5. sort
+6. stable_sort（稳定）
+
+
+
+## 32、如果确实需要删除元素，则需要在 remove 这一类算法之后调用 erase
+
+remove 不是真正的删除，只是将不被删除的元素移动到容器前面，后面位置的元素保持不变：
+
+```cpp
+// 假设数组元素为：1 2 3 99 5 99 7 8 9 99
+
+remove(v.begin(), v.end(), 99);
+
+// 数组变为：1 2 3 5 7 8 9 8 9 99
+```
+
+通常来说，当调用了 remove 以后，从区间中被删除的那些元素可能在也可能不在区间中。
+
+remove 返回一个迭代器，这个迭代器指向最后一个“不用被删除”的元素之后的元素。
+
+利用 remove 返回的迭代器，搭配 erase 函数，可以将剩余区间的元素真正的删除掉：
+
+```cpp
+erase(remove(v.being(), v.end(), 99), v.end());
+// 数组变为：1 2 3 5 7 8 9
+```
+
+以上的 remove 函数是非成员函数，但 list 内部有 remove 成员函数，它可以真正的删除元素，且参数为对象：
+
+```cpp
+list<int> li;
+...
+li.remove(99);
+```
+
+
+
+## 33、对包含指针的容器使用 remove 这一类算法时要特别小心
+
+如果你的容器里存的是指针，当你使用 remove 函数时，想要被删除的指针被覆盖，再用 erase 函数做真正的删除，那么那些被删除的指针将不再被找到，进而造成内存泄漏。
+
+解决方法：
+
+1. ```cpp
+   // 首先将要被删除的指针调用 delete，并置为 nulltr
+   // remove 的删除判断条件为指针是否为 nullptr
+   // 调用 erase 删除
+   
+   void delAndNullifyUncertified(Widget*& pWidget)
+   {
+       if (!pWidget->isCertified())
+       {
+           delete pWidget;
+           pWidget = nullptr;
+       }
+   }
+   for_each(v.begin(), v.end(), delAndNullifyUncertified);
+   erase(remove(v.begin(), v.end(), nullptr), v.end());
+   ```
+
+   但这样不能将原本为 nullptr 却并不想被删除的指针删除了。
+
+2. 采用具有引用计数功能的智能指针可以避免内存泄漏。
+
+
+
+## 34、了解哪些算法要求使用排序的区间作为参数
+
+要求排序区间的 STL 算法：
+
+```cpp
+binary_search	lower_bound 
+upper_bound		equal_range 
+set_union		set_intersection 
+set_difference 	set_symmetric_difference
+merge			inplace_merge
+includes    
+```
+
+不定要求排序的区间， 但通常情况下会与排序区间一起使用的 STL 算法：
+
+```cpp
+unique			unique_copy
+```
+
+
+
+## 35、通过 mismatch 或 lexicographical_compare 实现简单的忽略大小写的字符串比较
+
+
+
+
+
+## 36、理解 copy_if 算法的正确实现
+
+
+
+
+
+## 37、使用 accmulate 或者 for_each 进行区间统计
+
+
 
 
 
 # 函数子、函数子类、函数及其他
 
+## 38、
+
+
+
+## 39、
+
+
+
+
+
+## 40、
+
+
+
+
+
+## 41、
+
+
+
+
+
+## 42、
+
 
 
 # 在程序中使用 STL
+
+## 43、
+
+
+
+
+
+## 44、
+
+
+
+
+
+## 45、
+
+
+
+
+
+## 46、
+
+
+
+
+
+## 47、
+
+
+
+
+
+## 48、
+
+
+
+
+
+## 49、
+
+
+
+
+
+## 50、
+
+
+
