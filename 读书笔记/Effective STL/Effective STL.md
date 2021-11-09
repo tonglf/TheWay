@@ -1207,89 +1207,241 @@ unique			unique_copy
 
 ## 36、理解 copy_if 算法的正确实现
 
+```cpp
+template<class InputIt, class OutputIt>
+OutputIt copy(InputIt first, InputIt last, OutputIt d_first)
+{
+    while (first != last) 
+    {
+        *d_first++ = *first++;
+    }
+    return d_first;
+}
 
+// C++ 11
+template<class InputIt, class OutputIt, class UnaryPredicate>
+OutputIt copy_if(InputIt first, InputIt last, OutputIt d_first, UnaryPredicate pred)
+{
+    while (first != last) 
+    {
+        if (pred(*first))
+            *d_first++ = *first;
+        ++first;
+    }
+    return d_first;
+}
+
+// 测试
+int main()
+{
+    vector<int> to_vector{1, 2, 3, 4, 5, 6, 7, 8, 9}
+    std::copy_if(to_vector.begin(), to_vector.end(), std::ostream_iterator<int>(std::cout, " "),
+                 [](int x) { return (x % 2) == 1; });    
+    return 0;
+}
+// 输出：1 3 5 7 9
+```
 
 
 
 ## 37、使用 accmulate 或者 for_each 进行区间统计
 
+```cpp
+vector<int> v;
+...
+int sum = accumulate(v.begin(), v.end(), 0);	// 计算区间值
 
+void print(int val) 
+{
+	cout << val << " ";
+}
+for_each(v.begin(), v.end(), print01);			// 打印区间值
+```
 
 
 
 # 函数子、函数子类、函数及其他
 
-## 38、
+## 38、遵循按值传递的原则来设计函数子类
+
+函数对象在 STL 中作为参数传递或者返回的时候总是按值方式被拷贝的。这意味着两件事情：第一，使它们小巧；第二，使它们成为单态的。
 
 
 
-## 39、
+## 39、确保判别式是 “纯函数 ”
+
+一个纯函数(pure function)是指返回值仅仅依赖于其参数的函数。 例如， 假设 f 是一个纯函数，x 和 y 是两个对象，那么只有当 x 或者 y 的值发生变化的时候， f(x,y) 的返回值才可能发生变化。
+在 C++ 中， 纯函数所能访问的数据应该仅局限于参数以及常量（在函数生命期内不会被改变， 自然地，这样的常量数据应该被声明为 const)。如果一个纯函数需要访问那些可能会在两次调用之间发生变化的数据， 那么用相同的参数在不同的时刻调用该函数就有可能会得到不同的结果，这将与纯函数的定义相矛盾。
+
+```cpp
+bool anotherBadPredicate(const Widget&, const Widget&)
+{
+    static int timesCalled = 0;		// 不可如此！！！ 判别式应该是纯函数，纯函数应该没有状态
+    return ++timesCalled == 3;
+}
+```
 
 
 
-
-
-## 40、
-
+## 40、若一个类是函数子，则应使它可配接
 
 
 
-
-## 41、
-
+## 41、理解 ptr_fun、 mem_fun 和 mem_fun_ref 的来由
 
 
 
+## 42、确保 less\<T> 与 operator< 具有相同的语义
 
-## 42、
+应该尽量避免修改 less 的行为，因为这样做很可能会误导其他的程序员。如果你使用了 less, 无论是显式地或是隐式地，你都需要确保它与 operator< 具有相同的意义。如果你希望以一种特殊的方式来排序对象， 那么最好创建一个特殊的函数子类， 它的名字不能是 less。
 
 
 
 # 在程序中使用 STL
 
-## 43、
+## 43、算法调用优先于手写的循环
+
+调用算法通常是最好的选择，它往往优先于任何一个手写循环，有如下三个理由：
+
+- 效率：算法通常比程序员自己写的循环效率更高。
+- 正确性：自己写循环比使用算法更容易出错。
+- 可维护性：使用算法的代码通常比手写循环的代码更加间接明了。
+
+任何时候都应该尽量用较高层次的 insert、find 和 for_each 来替换较低层次的 for、while 和 do，因为这样我们就提高了软件的抽象层次，从而使我们的软件更易于编写，更易于消化，也更易于扩展和维护。
+
+
+
+## 44、容器的成员函数优先于同名的算法
+
+大多数情况下，你应该使用成员函数， 而不是相应的 STL 算法。 这里有两个理: 第一， 成员函数往往速度快；第二，成员函数通常与容器（特别是关联容器）结合得更加紧密， 这是算法所不能比的。 
+
+对于标准的关联容器， 选择成员函数而不选择对应的同名算法， 这可以带来几方面的好处。 第一，你可以获得对数时间的性能， 而不是线性时间的性能。 第二，你可以使用等价性来确定两个值是否 ” 相同 ”，而等价性是关联容器的一个本质定义。 第三，你在使用 map 和 multimap 的时候，将很自然地只考虑元素的键部分， 而不是完整的 (key, value) 对。
+
+
+
+## 45、正确区分 count、 find、 binary_search、 lower_bound、 upper_bound 和 equal_range
+
+如果区间是排序的，那么通过 binary_search 、 lowe_bound、 uppe_bound 和 equal_ range，你可以获得更快的查找速度（通常是对数时间的效率——见第 34 条）。 如果迭代器并没有指定一个排序的区间， 那么你的选择范围将局限于 count、count_if、find 以及 find_if，而这些算法仅能提供线性时间的效率。
+
+**如果有一个未排序的区间， 那么你的选择是 count 或 find。**
+
+> 由于它们同答的问题有些不同，所以值得更仔细地看一看这两个算法。count 回答的问题是 “区间中是否存在某个特定的值？如果存在的话， 有多少个拷贝？ ” 而 find 回答的问题则是＂区间中有这样的值吗？ 如果有的话，它在哪里？ ” 
+>
+> ```cpp
+> list<Widget> lw;
+> Widget w;
+> ...
+> if (count(lw.begin(), lw.end(), w) != 0) {} 	// w 在 lw 中
+> 
+> if(find(lw.bwgin(), lw.end(), w) != lw.end())	// w 在 lw 中
+> ```
+>
+> find 找到第一个匹配结果后马上就返回了 ， 而 count 必须到达区间的末尾，以便找到所有的匹配。
+
+**对于有序区间：**
+
+> **binary_search** 仅仅返回一个 bool 值：是否找到了特定的值。
+>
+> **lower_bound** 回答的是这样的问题：这个值在区间中吗？如果在，它的第一份拷贝在哪里？如果不在，它该往哪里插入？
+>
+> **upper_bound** 指向该区间中与所查找的值等价的最后一个元素的下一个位置。
+>
+> **equal_range** 返回一对迭代器：第一个迭代器等于 lower_bound 返回的迭代器， 第二个迭代器等于 upper_bound 返回的迭代器。
+>
+> ```cpp
+> vector<Widget> vw;
+> ...
+> sort(vw.begin(), vw.end());
+> Widget w;
+> ...
+> if (binary_search(vw.begin(), vw.end(), w)) {}
+> 
+> vector<Widget>::iterator i = lower_bound(vw.begin(), vw.end(), w);
+> 
+> typedef vector<Widget>::iterator VWIter;
+> typedef pair<VWIter, VWIter> VWIterPair;
+> VWIterPair p = equal_range(vw.begin(), vw.end(), w);
+> if (p.first != p.second) {}		// 区间非空，即存在 w
+> ```
+
+**针对关联容器，应该使用同名的成员函数。**
+
+**总结：**
+
+| 想知道什么                                           | 使用算法        | 使用算法                    | 使用成员函数  | 使用成员函数            |
+| ---------------------------------------------------- | --------------- | --------------------------- | ------------- | ----------------------- |
+|                                                      | 对未排序区间    | 对排序区间                  | 对 set 或 map | 对 multiset 或 multimap |
+| 特定的值存在吗？                                     | find            | binary_search               | count         | find                    |
+| 特定的值存在吗？若存在，那第一个有该值的对象在哪里？ | find            | equal_range                 | find          | find 或  lower_bound    |
+| 第一个不超过特定值的对象在哪里？                     | find_if         | lower_bound                 | lower_bound   | lower_bound             |
+| 第一个在某个特定值之后的对象在哪里？                 | find_if         | upper_bound                 | upper_bound   | upper_bound             |
+| 具有特定值的对象有多少个？                           | count           | equal_range  (然后distance) | count         | count                   |
+| 具有特定值的对象都在哪里？                           | find (反复调用) | equal_range                 | equal_range   | equal_range             |
+
+
+
+## 46、考虑使用函数对象而不是函数作为 STL 算法的参数
+
+假定需要将一个包含 double 类型数据按降序排列：
+
+```cpp
+vector<double> v;
+...
+    
+// 方法一：函数对象
+sort(v.begin(), v.end(), greater<double>());
+
+// 方法二：函数
+inline
+bool doubleGreater(double d1, double d2)
+{
+    return d1 > d2;
+}
+sort(v.begin(), v.end(), doubleGreater);
+```
+
+两种方法哪种方法效率更高？答案是第一种。
+
+**函数对象方法：**函数 `greater<double>::operator()` 是一个内联函数，所以编译器在 sort 的实例化过程中将其内联展开。最终结果是，sort 中不包含函数调用，编译器就可以对这段不包含函数调用的代码进行优化。
+
+**函数方法：**由于sort 函数第三个参数只是一个指向函数的指针，所以在 sort 内部每次第三个参数被用到的时候，编译器都会产生一个间接的函数调用，即通过指针发出的调用。**大多数编译器不会试图对通过函数指针执行的函数调用进行内联优化**，即使像本例中那样，函数已经被声明为 inline 并且优化看起来也是直截了当的，即函数指针参数抑制了内联机制。
+
+**拓展：**
+
+既然函数作为参数不会被内敛展开，函数对象则会，如果在对应的参数直接采用 lambda 表达式，也不会发生指针调用函数，那么效率应该与函数对象一样高。
+
+
+
+## 47、避免产生 “直写型" (write-only) 的代码
+
+当你编写代码的时候， 它看似非常直接和简捷，因为它是由某些基本想法（比如， erase-remove 习惯用法加上在 find 中使用 reverse_iterator 的概念）自然而形成的。然而，阅读代码的人却很难将最终的语句还原成它所依据的思路， 这就是 “直写型的代码” 叫法的来历： 虽然很容易编写， 但是难以阅读和理解。
+
+避免产生 “直写型" (write-only) 的代码，将复杂的代码语句拆分开来，利于阅读与理解。
+
+
+
+## 48、总是包含(#include)正确的头文件
+
+为了帮助你记住什么时候需要包含哪些头文件，下面总结了每个与 STL 有关的标准头文件中所包含的内容：
+
+- 几乎所有的标准 STL 容器都被声明在与之同名的头文件中，比如 vector 被声明在 \<vector> 中，list 被声明在 \<list> 中，等等。但是 \<set> 和 \<map> 是个例外，\<set> 中声明了 set 和 multiset，\<map> 中声明了 map 和 multimap。
+
+- 除了 4 个 STL 算法以外，其他所有的算法都被声明在 \<algorithm> 中，这 4 个算法是 accumulate (参见第37条）、inner_product、adjacent_difference 和 partial_sum，它们被声明在头文件 \<numeric> 中。
+- 特殊类型的迭代器，包括 istream_lterator 和 istreambuf_iterator（见第29条），被声明在 \<iterator> 中。
+- 标准的函数子（比如 less\<T> ）和函数子配接器（比如 not1、bind2nd）被声明在头文件 \<functional> 中。
+
+
+
+## 49、学会分析与 STL 相关的编译器诊断信息
 
 
 
 
 
-## 44、
+## 50、熟悉与 STL 相关的 Web 站点
 
+- **SGI STL 站点： **http://www.sgi.com/tech/stl/（有误）
 
+- **STLport 站点：** http://www.stlport.org
 
-
-
-## 45、
-
-
-
-
-
-## 46、
-
-
-
-
-
-## 47、
-
-
-
-
-
-## 48、
-
-
-
-
-
-## 49、
-
-
-
-
-
-## 50、
-
-
-
+- **Boost 站点：** http://www.boost.org
