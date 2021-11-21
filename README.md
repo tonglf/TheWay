@@ -75,6 +75,7 @@
 - [shared_ptr](./手撕代码/shared_ptr代码实现.md)
 - [vector 简单实现](./手撕代码/vector简单实现.md)
 - [LRU Cache](./手撕代码/LRUCache.md)
+- [LFU Cache](./手撕代码/LFUCache.md)
 
 ## Linux 杂谈
 
