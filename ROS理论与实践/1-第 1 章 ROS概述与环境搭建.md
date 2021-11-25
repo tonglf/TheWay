@@ -20,9 +20,9 @@
 
 案例演示：
 
-1.ROS安装成功后,可以运行内置案例:该案例是通过键盘控制乌龟运动![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/01_ROS%E6%A1%88%E4%BE%8B%E6%BC%94%E7%A4%BA.gif)2.集成开发环境使用了VScode，可以提高开发效率
+1.ROS安装成功后,可以运行内置案例:该案例是通过键盘控制乌龟运动![img](Image/1-1ROS案例演示.gif)2.集成开发环境使用了VScode，可以提高开发效率
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/vscode.gif)
+![img](Image/1-2vscode.gif)
 
 ## 1.1 ROS简介
 
@@ -30,7 +30,7 @@
 
 > 机器人是一种高度复杂的系统性实现，机器人设计包含了机械加工、机械结构设计、硬件设计、嵌入式软件设计、上层软件设计....是各种硬件与软件集成，甚至可以说机器人系统是当今工业体系的集大成者。
 
-![12\_前言](http://www.autolabor.com.cn/book/ROSTutorials/assets/12_%E5%89%8D%E8%A8%80.jpg)
+![12\_前言](Image/1-3前言.jpg)
 
 > 机器人体系是相当庞大的，其复杂度之高，以至于没有任何个人、组织甚至公司能够独立完成系统性的机器人研发工作。
 >
@@ -38,7 +38,7 @@
 
 在此大背景下，于 **2007** 年，一家名为 **柳树车库（Willow Garage）**的机器人公司发布了 ***ROS***(机器人操作系统)，ROS是一套机器人通用软件框架，可以提升功能模块的复用性，并且随着该系统的不断迭代与完善，如今 ROS 已经成为机器人领域的事实标准。
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/13_%E5%89%8D%E8%A8%80.png)
+![img](Image/1-4前言.png)
 
 ### 1.1.1ROS概念
 
@@ -49,7 +49,7 @@
 - 还提供了用于在**多台计算机**上获取，构建，编写和运行代码的工具和库，ROS在某些方面类似于“机器人框架”；
 - ROS设计者将ROS表述为“ROS = Plumbing + Tools + Capabilities + Ecosystem”，即ROS是通讯机制、工具软件包、机器人高层技能以及机器人生态系统的集合体。
 
-![05ROS简介](http://www.autolabor.com.cn/book/ROSTutorials/assets/05ROS%E7%AE%80%E4%BB%8B.png)
+![05ROS简介](Image/1-5ROS简介.png)
 
 ### 1.1.2ROS设计目标
 
@@ -79,7 +79,7 @@
 
 ------
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E7%89%88%E6%9C%AC.png)
+![img](Image/1-6版本.png)
 
 ------
 
@@ -139,7 +139,7 @@ Ubuntu 安装完毕后，就可以安装 ROS 操作系统了，大致步骤如�
 
 打开后按照下图进行配置（确保勾选了"restricted"， "universe，" 和 "multiverse."）
 
-![00ROS安装之ubuntu准备](http://www.autolabor.com.cn/book/ROSTutorials/assets/00ROS%E5%AE%89%E8%A3%85%E4%B9%8Bubuntu%E5%87%86%E5%A4%87.png)
+![00ROS安装之ubuntu准备](Image/1-7ROS安装之ubuntu准备.png)
 
 #### 2.设置安装源
 
@@ -190,7 +190,7 @@ sudo apt install ros-noetic-desktop-full
 
 等待......(比较耗时)
 
-友情提示: 由于网络原因,导致连接超时，可能会安装失败，如下所示:![09\_安装异常](http://www.autolabor.com.cn/book/ROSTutorials/assets/09_%E5%AE%89%E8%A3%85%E5%BC%82%E5%B8%B8.PNG)可以多次重复调用 更新 和 安装命令，直至成功。
+友情提示: 由于网络原因,导致连接超时，可能会安装失败，如下所示:![09\_安装异常](Image/1-8安装异常.PNG)可以多次重复调用 更新 和 安装命令，直至成功。
 
 #### 5.配置环境变量
 
@@ -243,15 +243,15 @@ rosdep update
 
 如果一切顺利的话，rosdep 初始化与更新的打印结果如下:
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/rosdep%E6%AD%A3%E5%B8%B8%E5%88%9D%E5%A7%8B%E5%8C%96.PNG)
+![img](Image/1-9rosdep正常初始化.PNG)
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/rosdep%E6%AD%A3%E5%B8%B8%E6%9B%B4%E6%96%B0.PNG)
+![img](Image/1-10rosdep正常更新.PNG)
 
 ------
 
 但是，在 rosdep 初始化时，多半会抛出异常。
 
-**问题:**![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/noetic%E5%BC%82%E5%B8%B8%E6%8F%90%E7%A4%BA.PNG)
+**问题:**![img](Image/1-11noetic异常提示.PNG)
 
 **原因:**
 
@@ -267,7 +267,7 @@ rosdep update
 
 1.先打开资源备份路径:https://gitee.com/zhao-xuzuo/rosdistro，打开 rosdistro/**rosdep**/**sources.list.d**/**20-default.list**文件留作备用(主要是复用URL的部分内容:gitee.com/zhao-xuzuo/rosdistro/raw/master)。
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/gitee%E8%B5%84%E6%BA%90.PNG)
+![img](Image/1-12gitee资源.PNG)
 
 2.进入"/usr/lib/python3/dist-packages/" 查找rosdep中和`raw.githubusercontent.com`相关的内容，调用命令:
 
@@ -275,7 +275,7 @@ rosdep update
 find . -type f | xargs grep "raw.githubusercontent"
 ```
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/noetic_%E6%9F%A5%E6%89%BE%E5%8C%85%E5%90%ABgithubusercontent%E7%9A%84%E6%96%87%E4%BB%B6.PNG)
+![img](Image/1-13noetic_查找包含githubusercontent的文件.PNG)
 
 3.修改相关文件，主要有: ./rosdistro/__init__.py、./rosdep2/gbpdistro_support.py、./rosdep2/sources_list.py 、./rosdep2/rep3.py。可以使用`sudo gedit`命令修改文件:
 
@@ -301,7 +301,7 @@ ROS 内置了一些小程序，可以通过运行这些小程序以检测 ROS �
 
 最终结果如下所示:
 
-![01ROS环境测试](http://www.autolabor.com.cn/book/ROSTutorials/assets/01ROS%E7%8E%AF%E5%A2%83%E6%B5%8B%E8%AF%95.png)注意：光标必须聚焦在键盘控制窗口，否则无法控制乌龟运动。
+![01ROS环境测试](Image/1-14ROS环境测试.png)注意：光标必须聚焦在键盘控制窗口，否则无法控制乌龟运动。
 
 ### 1.2.6 资料:其他ROS版本安装
 
@@ -313,7 +313,7 @@ ROS 内置了一些小程序，可以通过运行这些小程序以检测 ROS �
 
 首先打开“软件和更新”对话框，打开后按照下图进行配置（确保你的"restricted"， "universe，" 和 "multiverse."前是打上勾的）
 
-![00ROS安装之ubuntu准备](http://www.autolabor.com.cn/book/ROSTutorials/assets/00ROS%E5%AE%89%E8%A3%85%E4%B9%8Bubuntu%E5%87%86%E5%A4%87.png)
+![00ROS安装之ubuntu准备](Image/1-15ROS安装之ubuntu准备.png)
 
 #### 2.**安装源**
 
@@ -417,7 +417,7 @@ Website may be down.
 
 2.查询域名ip，搜索框中输入: raw.githubusercontent.com，自由复制一个查询到的IP
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E5%9F%9F%E5%90%8Dip%E6%9F%A5%E8%AF%A2.PNG)
+![img](Image/1-16域名ip查询.PNG)
 
 3.修改 /etc/hosts 文件，命令:
 
@@ -427,15 +427,15 @@ sudo gedit /etc/hosts
 
 添加内容:151.101.76.133 raw.githubusercontent.com (查询到的ip与域名)，保存并退出。
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/hosts%E6%96%87%E4%BB%B6%E4%BF%AE%E6%94%B9.PNG)
+![img](Image/1-17hosts文件修改.PNG)
 
 或者，也可以使用 vi 或 vim 修改。
 
 4.重新执行rosdep初始化与更新命令，如果rosdep update 抛出异常，基本都是网络原因导致的(建议使用手机热点)，多尝试几次即可。
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/rosdep%E5%88%9D%E5%A7%8B%E5%8C%96%E6%88%90%E5%8A%9F.PNG)
+![img](Image/1-18rosdep初始化成功.PNG)
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/rosdepupdate%E6%88%90%E5%8A%9F.PNG)
+![img](Image/1-19rosdepupdate成功.PNG)
 
 ------
 
@@ -630,7 +630,7 @@ rosrun 包名 自定义文件名.py
 
 在 ROS 中，需要频繁的使用到终端，且可能需要同时开启多个窗口，推荐一款较为好用的终端:**Terminator。**效果如下:
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/terminator%E6%95%88%E6%9E%9C.PNG)
+![img](Image/1-20terminator效果.PNG)
 
 #### 1.安装
 
@@ -719,13 +719,13 @@ sudo dpkg --purge  code
 
 使用 VScode 开发 ROS 程序，需要先安装一些插件，常用插件如下:
 
-![06vscode插件](http://www.autolabor.com.cn/book/ROSTutorials/assets/vscode.jpg)
+![06vscode插件](Image/1-21vscode.jpg)
 
 #### 4.vscode 使用_基本配置
 
 ##### 4.1 创建 ROS 工作空间
 
-```
+```shell
 mkdir -p xxx_ws/src(必须得有 src)
 cd xxx_ws
 catkin_make
@@ -735,7 +735,7 @@ catkin_make
 
 进入 xxx_ws 启动 vscode
 
-```
+```shell
 cd xxx_ws
 code .
 ```
@@ -744,7 +744,7 @@ code .
 
 快捷键 ctrl + shift + B 调用编译，选择:`catkin_make:build`
 
-可以点击配置设置为默认，修改.vscode/tasks.json 文件
+可以点击配置设置为默认，修改.vscode/tasks.json 文件(没有 .vscode 文件就重启 vscode，没有 tasks.json 文件就新建一个)
 
 ```json
 {
@@ -770,10 +770,6 @@ code .
 ##### 4.4 创建 ROS 功能包
 
 选定 src 右击 ---> create catkin package
-
-**设置包名 添加依赖**
-
-![07vscode\_新建ROS包](file:///D:/ROS%E8%AF%BE%E7%A8%8B/ROS%E8%AE%B2%E4%B9%89_Noetic/ROS01_%E6%A6%82%E8%BF%B0%E4%B8%8E%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/img/07vscode_%E6%96%B0%E5%BB%BAROS%E5%8C%85.PNG?lastModify=1594352429)
 
 ##### 4.5 C++ 实现
 
@@ -821,7 +817,7 @@ setlocale(LC_ALL, "");
 
 在 功能包 下新建 scripts 文件夹，添加 python 文件，**并添加可执行权限**
 
-```py
+```python
 #! /usr/bin/env python
 """
     Python 版本的 HelloVScode，执行在控制台输出 HelloVScode
@@ -845,10 +841,11 @@ if __name__ == "__main__":
 
 C++ 配置:
 
-```
+```cmake
 add_executable(节点名称
   src/C++源文件名.cpp
 )
+
 target_link_libraries(节点名称
   ${catkin_LIBRARIES}
 )
@@ -856,7 +853,7 @@ target_link_libraries(节点名称
 
 Python 配置:
 
-```
+```cmake
 catkin_install_python(PROGRAMS scripts/自定义文件名.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
@@ -868,7 +865,7 @@ catkin_install_python(PROGRAMS scripts/自定义文件名.py
 
 执行: 和之前一致，只是可以在 VScode 中添加终端，首先执行:`source ./devel/setup.bash`
 
-![08vscode\_执行](file:///D:/ROS%E8%AF%BE%E7%A8%8B/ROS%E8%AE%B2%E4%B9%89_Noetic/ROS01_%E6%A6%82%E8%BF%B0%E4%B8%8E%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/img/08vscode_%E6%89%A7%E8%A1%8C.PNG?lastModify=1594352429)PS:
+PS:
 
 如果不编译直接执行 python 文件，会抛出异常。
 
@@ -900,11 +897,11 @@ Roboware 参考:http://www.roboware.me/#/(PS: Roboware 已经停更了，可惜.
 
 1. 选定功能包右击 ---> 添加 launch 文件夹
 
-2. 选定 launch 文件夹右击 ---> 添加 launch 文件
+2. 选定 launch 文件夹右击 ---> 添加 launch 文件(xml文件，命名随意)
 
 3. 编辑 launch 文件内容
 
-   ```
+   ```xml
    <launch>
        <node pkg="helloworld" type="demo_hello" name="hello" output="screen" />
        <node pkg="turtlesim" type="turtlesim_node" name="t1"/>
@@ -914,7 +911,7 @@ Roboware 参考:http://www.roboware.me/#/(PS: Roboware 已经停更了，可惜.
 
    - node ---> 包含的某个节点
    - pkg -----> 功能包
-   - type ----> 被运行的节点文件
+   - type ----> 被运行的节点文件（cpp 文件不需要加后缀名，py 文件需要加后缀名）
    - name --> 为节点命名
    - output-> 设置日志的输出目标
 
@@ -996,7 +993,7 @@ ROS**设计者**将ROS表述为“ROS = Plumbing + Tools + Capabilities + Ecosys
 
 ROS文件系统级指的是在硬盘上ROS源代码的组织形式，其结构大致可以如下图所示：
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F.jpg)
+![img](Image/1-22文件系统.jpg)
 
 ```
 WorkSpace --- 自定义的工作空间
@@ -1388,7 +1385,7 @@ rosed 包名 文件名 === 修改功能包文件
 
 #### 5.执行
 
-##### 5.1roscore
+##### 5.1 roscore
 
 **roscore ===** 是 ROS 的系统先决条件节点和程序的集合， 必须运行 roscore 才能使 ROS 节点进行通信。
 
@@ -1400,23 +1397,23 @@ roscore 将启动:
 
 用法:
 
-```
+```shell
 roscore
 ```
 
 或(指定端口号)
 
-```
+```shell
 roscore -p xxxx
 ```
 
-##### 5.2rosrun
+##### 5.2 rosrun
 
 **rosrun 包名 可执行文件名** === 运行指定的ROS节点
 
-**比如:**`rosrun turtlesim turtlesim_node`
+**比如:** `rosrun turtlesim turtlesim_node`
 
-##### 5.3roslaunch
+##### 5.3 roslaunch
 
 **roslaunch 包名 launch文件名** === 执行某个包下的 launch 文件
 
@@ -1436,16 +1433,16 @@ rosrun rqt_graph rqt_graph
 
 如果未安装则在终端（terminal）中输入
 
-```
+```shell
 $ sudo apt install ros-<distro>-rqt
 $ sudo apt install ros-<distro>-rqt-common-plugins
 ```
 
-请使用你的ROS版本名称（比如:kinetic、melodic、Noetic等）来替换掉<distro>。
+请使用你的ROS版本名称（比如:kinetic、melodic、Noetic等）来替换掉\<distro>。
 
 例如当前版本是 Noetic,就在终端窗口中输入
 
-```
+```shell
 $ sudo apt install ros-noetic-rqt
 $ sudo apt install ros-noetic-rqt-common-plugins
 ```
@@ -1456,8 +1453,9 @@ $ sudo apt install ros-noetic-rqt-common-plugins
 
 首先，按照前面所示，运行案例
 
-然后，启动新终端，键入: rqt_graph 或 rosrun rqt_graph rqt_graph，可以看到类似下图的网络拓扑图，该图可以显示不同节点之间的关系。![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E8%AE%A1%E7%AE%97%E5%9B%BE.PNG)
+然后，启动新终端，键入: rqt_graph 或 rosrun rqt_graph rqt_graph，可以看到类似下图的网络拓扑图，该图可以显示不同节点之间的关系。![img](Image/1-23计算图.PNG)
 
 ## 1.6 本章小结
 
 本章内容主要介绍了ROS的相关概念、设计目标、发展历程等理论知识，安装了 ROS 并搭建了 ROS 的集成开发环境，编写了第一个 ROS小程序，对ROS实现架构也有了宏观的认识。ROS的大门已经敞开，接下来就要步入新的征程了。
+
