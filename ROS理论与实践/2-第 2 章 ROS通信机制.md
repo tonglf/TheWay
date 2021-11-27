@@ -2,7 +2,7 @@
 
 # 第 2 章 ROS通信机制
 
-机器人是一种高度复杂的系统性实现，在机器人上可能集成各种传感器(雷达、摄像头、GPS...)以及运动控制实现，为了解耦合，在ROS中每一个功能点都是一个单独的进程，每一个进程都是独立运行的。更确切的讲，**ROS是进程（也称为*****Nodes*****）的分布式框架。** 因为这些进程甚至还可分布于不同主机，不同主机协同工作，从而分散计算压力。不过随之也有一个问题: 不同的进程是如何通信的？也即不同进程间如何实现数据交换的？在此我们就需要介绍一下ROS中的通信机制了。
+机器人是一种高度复杂的系统性实现，在机器人上可能集成各种传感器(雷达、摄像头、GPS...)以及运动控制实现，为了解耦合，在ROS中每一个功能点都是一个单独的进程，每一个进程都是独立运行的。更确切的讲，**ROS是进程（也称为*Nodes***）的分布式框架。 因为这些进程甚至还可分布于不同主机，不同主机协同工作，从而分散计算压力。不过随之也有一个问题: 不同的进程是如何通信的？也即不同进程间如何实现数据交换的？在此我们就需要介绍一下ROS中的通信机制了。
 
 ROS 中的基本通信机制主要有如下三种实现策略:
 
@@ -223,8 +223,6 @@ int main(int argc, char  *argv[])
         //暂无应用
         ros::spinOnce();
     }
-
-
     return 0;
 }
 ```
@@ -479,6 +477,383 @@ catkin_install_python(PROGRAMS
 3.启动订阅节点。
 
 运行结果与引言部分的演示案例1类似。
+
+------
+
+PS：可以使用 rqt_graph 查看节点关系。
+
+### 2.1.4 话题通信自定义msg
+
+在 ROS 通信协议中，数据载体是一个较为重要组成部分，ROS 中通过 std_msgs 封装了一些原生的数据类型,比如:String、Int32、Int64、Char、Bool、Empty.... 但是，这些数据一般只包含一个 data 字段，结构的单一意味着功能上的局限性，当传输一些复杂的数据，比如: 激光雷达的信息... std_msgs 由于描述性较差而显得力不从心，这种场景下可以使用自定义的消息类型
+
+msgs只是简单的文本文件，每行具有字段类型和字段名称，可以使用的字段类型有：
+
+- int8, int16, int32, int64 (或者无符号类型: uint*)
+- float32, float64
+- string
+- time, duration
+- other msg files
+- variable-length array[] and fixed-length array[C]
+
+ROS中还有一种特殊类型：`Header`，标头包含时间戳和ROS中常用的坐标帧信息。会经常看到msg文件的第一行具有`Header标头`。
+
+------
+
+**需求:**创建自定义消息，该消息包含人的信息:姓名、身高、年龄等。
+
+**流程:**
+
+1. 按照固定格式创建 msg 文件
+2. 编辑配置文件
+3. 编译生成可以被 Python 或 C++ 调用的中间文件
+
+#### 1.定义msg文件
+
+功能包下新建 msg 目录，添加文件 Person.msg
+
+```
+string name
+uint16 age
+float64 height
+```
+
+#### 2.编辑配置文件
+
+**package.xml**中添加编译依赖与执行依赖
+
+```xml
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <!-- 
+  exce_depend 以前对应的是 run_depend 现在非法
+  -->
+```
+
+**CMakeLists.txt**编辑 msg 相关配置
+
+```
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  rospy
+  std_msgs
+  message_generation
+)
+# 需要加入 message_generation,必须有 std_msgs
+## 配置 msg 源文件
+add_message_files(
+  FILES
+  Person.msg
+)
+# 生成消息时依赖于 std_msgs
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+#执行时依赖
+catkin_package(
+#  INCLUDE_DIRS include
+#  LIBRARIES demo02_talker_listener
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
+#  DEPENDS system_lib
+)
+```
+
+#### 3.编译
+
+**编译后的中间文件查看:**
+
+C++ 需要调用的中间文件(.../工作空间/devel/include/包名/xxx.h)
+
+![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/05vscode_%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B6%88%E6%81%AF%E7%9A%84%E4%B8%AD%E9%97%B4%E6%96%87%E4%BB%B6%28C++%29.PNG)
+
+Python 需要调用的中间文件(.../工作空间/devel/lib/python3/dist-packages/包名/msg)
+
+![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/06vscode_%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B6%88%E6%81%AF%E7%9A%84%E4%B8%AD%E9%97%B4%E6%96%87%E4%BB%B6%28Python%29.PNG)
+
+后续调用相关 msg 时，是从这些中间文件调用的
+
+### 2.1.5 话题通信自定义msg调用A(C++)
+
+**需求:**
+
+> 编写发布订阅实现，要求发布方以10HZ(每秒10次)的频率发布自定义消息，订阅方订阅自定义消息并将消息内容打印输出。
+
+**分析:**
+
+在模型实现中，ROS master 不需要实现，而连接的建立也已经被封装了，需要关注的关键点有三个:
+
+1. 发布方
+2. 接收方
+3. 数据(此处为自定义消息)
+
+**流程:**
+
+1. 编写发布方实现；
+2. 编写订阅方实现；
+3. 编辑配置文件；
+4. 编译并执行。
+
+#### 0.vscode 配置
+
+为了方便代码提示以及避免误抛异常，需要先配置 vscode，将前面生成的 head 文件路径配置进 c_cpp_properties.json 的 includepath属性:
+
+```json
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/opt/ros/noetic/include/**",
+                "/usr/include/**",
+                "/xxx/yyy工作空间/devel/include/**" //配置 head 文件的路径 
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
+```
+
+#### 1.发布方
+
+```cpp
+/*
+    需求: 循环发布人的信息
+
+*/
+
+#include "ros/ros.h"
+#include "demo02_talker_listener/Person.h"
+
+int main(int argc, char *argv[])
+{
+    setlocale(LC_ALL,"");
+
+    //1.初始化 ROS 节点
+    ros::init(argc,argv,"talker_person");
+
+    //2.创建 ROS 句柄
+    ros::NodeHandle nh;
+
+    //3.创建发布者对象
+    ros::Publisher pub = nh.advertise<demo02_talker_listener::Person>("chatter_person",1000);
+
+    //4.组织被发布的消息，编写发布逻辑并发布消息
+    demo02_talker_listener::Person p;
+    p.name = "sunwukong";
+    p.age = 2000;
+    p.height = 1.45;
+
+    ros::Rate r(1);
+    while (ros::ok())
+    {
+        pub.publish(p);
+        p.age += 1;
+        ROS_INFO("我叫:%s,今年%d岁,高%.2f米", p.name.c_str(), p.age, p.height);
+
+        r.sleep();
+        ros::spinOnce();
+    }
+
+
+
+    return 0;
+}
+```
+
+#### 2.订阅方
+
+```cpp
+/*
+    需求: 订阅人的信息
+
+*/
+
+#include "ros/ros.h"
+#include "demo02_talker_listener/Person.h"
+
+void doPerson(const demo02_talker_listener::Person::ConstPtr& person_p){
+    ROS_INFO("订阅的人信息:%s, %d, %.2f", person_p->name.c_str(), person_p->age, person_p->height);
+}
+
+int main(int argc, char *argv[])
+{   
+    setlocale(LC_ALL,"");
+
+    //1.初始化 ROS 节点
+    ros::init(argc,argv,"listener_person");
+    //2.创建 ROS 句柄
+    ros::NodeHandle nh;
+    //3.创建订阅对象
+    ros::Subscriber sub = nh.subscribe<demo02_talker_listener::Person>("chatter_person",10,doPerson);
+
+    //4.回调函数中处理 person
+
+    //5.ros::spin();
+    ros::spin();    
+    return 0;
+}
+```
+
+#### 3.配置 CMakeLists.txt
+
+需要添加 **add_dependencies** 用以设置所依赖的消息相关的中间文件。
+
+```cmake
+add_executable(person_talker src/person_talker.cpp)
+add_executable(person_listener src/person_listener.cpp)
+
+
+
+add_dependencies(person_talker ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(person_listener ${PROJECT_NAME}_generate_messages_cpp)
+
+
+target_link_libraries(person_talker
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(person_listener
+  ${catkin_LIBRARIES}
+)
+```
+
+#### 4.执行
+
+1.启动 roscore;
+
+2.启动发布节点;
+
+3.启动订阅节点。
+
+运行结果与引言部分的演示案例2类似。
+
+------
+
+PS：可以使用 rqt_graph 查看节点关系。
+
+### 2.1.6 话题通信自定义msg调用B(Python)
+
+**需求:**
+
+> 编写发布订阅实现，要求发布方以1HZ(每秒1次)的频率发布自定义消息，订阅方订阅自定义消息并将消息内容打印输出。
+
+**分析:**
+
+在模型实现中，ROS master 不需要实现，而连接的建立也已经被封装了，需要关注的关键点有三个:
+
+1. 发布方
+2. 接收方
+3. 数据(此处为自定义消息)
+
+**流程:**
+
+1. 编写发布方实现；
+2. 编写订阅方实现；
+3. 为python文件添加可执行权限；
+4. 编辑配置文件；
+5. 编译并执行。
+
+#### 0.vscode配置
+
+为了方便代码提示以及误抛异常，需要先配置 vscode，将前面生成的 python 文件路径配置进 settings.json
+
+```json
+{
+    "python.autoComplete.extraPaths": [
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/xxx/yyy工作空间/devel/lib/python3/dist-packages"
+    ]
+}
+```
+
+#### 1.发布方
+
+```py
+#! /usr/bin/env python
+"""
+    发布方:
+        循环发送消息
+
+"""
+import rospy
+from demo02_talker_listener.msg import Person
+
+
+if __name__ == "__main__":
+    #1.初始化 ROS 节点
+    rospy.init_node("talker_person_p")
+    #2.创建发布者对象
+    pub = rospy.Publisher("chatter_person",Person,queue_size=10)
+    #3.组织消息
+    p = Person()
+    p.name = "葫芦瓦"
+    p.age = 18
+    p.height = 0.75
+
+    #4.编写消息发布逻辑
+    rate = rospy.Rate(1)
+    while not rospy.is_shutdown():
+        pub.publish(p)  #发布消息
+        rate.sleep()  #休眠
+        rospy.loginfo("姓名:%s, 年龄:%d, 身高:%.2f",p.name, p.age, p.height)
+```
+
+#### 2.订阅方
+
+```py
+#! /usr/bin/env python
+"""
+    订阅方:
+        订阅消息
+
+"""
+import rospy
+from demo02_talker_listener.msg import Person
+
+def doPerson(p):
+    rospy.loginfo("接收到的人的信息:%s, %d, %.2f",p.name, p.age, p.height)
+
+
+if __name__ == "__main__":
+    #1.初始化节点
+    rospy.init_node("listener_person_p")
+    #2.创建订阅者对象
+    sub = rospy.Subscriber("chatter_person",Person,doPerson,queue_size=10)
+    rospy.spin() #4.循环
+```
+
+#### 3.权限设置
+
+终端下进入 scripts 执行:`chmod +x *.py`
+
+#### 4.配置 CMakeLists.txt
+
+```cmake
+catkin_install_python(PROGRAMS
+  scripts/talker_p.py
+  scripts/listener_p.py
+  scripts/person_talker.py
+  scripts/person_listener.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+```
+
+#### 5.执行
+
+1.启动 roscore;
+
+2.启动发布节点;
+
+3.启动订阅节点。
+
+运行结果与引言部分的演示案例2类似。
 
 ------
 
