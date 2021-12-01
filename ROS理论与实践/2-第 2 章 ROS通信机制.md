@@ -24,19 +24,19 @@ ROS 中的基本通信机制主要有如下三种实现策略:
 
 控制小乌龟做圆周运动
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/01_%E6%A1%88%E4%BE%8B01_%E4%B9%8C%E9%BE%9F%E7%94%BB%E5%9C%86.gif)
+![img](Image/2-1_案例01_乌龟画圆.gif)
 
 获取乌龟位姿
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E6%A1%88%E4%BE%8B02_%E4%B9%8C%E9%BE%9F%E4%BD%8D%E5%A7%BF.gif)
+![img](Image/2-2案例02_乌龟位姿.gif)
 
 2.服务演示案例:在指定位置生成乌龟
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/02_%E6%A1%88%E4%BE%8B2_%E7%94%9F%E6%88%90%E5%B0%8F%E4%B9%8C%E9%BE%9F.PNG)
+![img](Image/2-3_案例2_生成小乌龟.PNG)
 
 3.参数演示案例:改变乌龟窗口的背景颜色
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/03_%E6%A1%88%E4%BE%8B3_%E6%94%B9%E5%8F%98%E8%83%8C%E6%99%AF%E8%89%B2.PNG)
+![img](Image/2-4_案例3_改变背景色.PNG)
 
 ## 2.1 话题通信
 
@@ -65,11 +65,11 @@ ROS 中的基本通信机制主要有如下三种实现策略:
 
 1.实现最基本的发布订阅模型，发布方以固定频率发送一段文本，订阅方接收文本并输出。(2.1.2 -- 2.1.3)
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/02.01_%E7%AE%80%E5%8D%95%E6%B6%88%E6%81%AF%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85.gif)
+![img](Image/2-5_简单消息发布订阅.gif)
 
 2.实现对自定义消息的发布与订阅。(2.1.4 -- 2.1.6)
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/02.02_%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B6%88%E6%81%AF%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85.gif)
+![img](Image/2-6_自定义消息发布订阅.gif)
 
 ------
 
@@ -89,7 +89,7 @@ ROS 中的基本通信机制主要有如下三种实现策略:
 
 ROS Master 负责保管 Talker 和 Listener 注册的信息，并匹配话题相同的 Talker 与 Listener，帮助 Talker 与 Listener 建立连接，连接建立后，Talker 可以发布消息，且发布的消息会被 Listener 订阅。
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/01%E8%AF%9D%E9%A2%98%E9%80%9A%E4%BF%A1%E6%A8%A1%E5%9E%8B.jpg)整个流程由以下步骤实现:
+![img](Image/2-7话题通信模型.jpg)整个流程由以下步骤实现:
 
 #### 0.Talker注册
 
@@ -564,11 +564,11 @@ catkin_package(
 
 C++ 需要调用的中间文件(.../工作空间/devel/include/包名/xxx.h)
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/05vscode_%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B6%88%E6%81%AF%E7%9A%84%E4%B8%AD%E9%97%B4%E6%96%87%E4%BB%B6%28C++%29.PNG)
+![img](Image/2-8vscode_自定义消息的中间文件(C++).PNG)
 
 Python 需要调用的中间文件(.../工作空间/devel/lib/python3/dist-packages/包名/msg)
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/06vscode_%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B6%88%E6%81%AF%E7%9A%84%E4%B8%AD%E9%97%B4%E6%96%87%E4%BB%B6%28Python%29.PNG)
+![img](Image/2-9vscode_自定义消息的中间文件(Python).PNG)
 
 后续调用相关 msg 时，是从这些中间文件调用的
 
@@ -885,7 +885,7 @@ PS：可以使用 rqt_graph 查看节点关系。
 
 实现两个数字的求和，客户端节点，运行会向服务器发送两个数字，服务器端节点接收两个数字求和并将结果响应回客户端。
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/02.03_%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94.gif)
+![img](Image/2-10_请求响应.gif)
 
 ------
 
@@ -905,7 +905,7 @@ PS：可以使用 rqt_graph 查看节点关系。
 
 ROS Master 负责保管 Server 和 Client 注册的信息，并匹配话题相同的 Server 与 Client ，帮助 Server 与 Client 建立连接，连接建立后，Client 发送请求信息，Server 返回响应信息。
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/02_%E6%9C%8D%E5%8A%A1%E9%80%9A%E4%BF%A1%E6%A8%A1%E5%9E%8B.jpg)
+![img](Image/2-11_服务通信模型.jpg)
 
 整个流程由以下步骤实现:
 
@@ -1004,11 +1004,11 @@ generate_messages(
 
 C++ 需要调用的中间文件(.../工作空间/devel/include/包名/xxx.h)
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/07vscode_%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B6%88%E6%81%AF%E7%9A%84%E4%B8%AD%E9%97%B4%E6%96%87%E4%BB%B6%28C++%29.PNG)
+![img](Image/2-12vscode_自定义消息的中间文件(C++).PNG)
 
 Python 需要调用的中间文件(.../工作空间/devel/lib/python3/dist-packages/包名/srv)
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/08vscode_%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B6%88%E6%81%AF%E7%9A%84%E4%B8%AD%E9%97%B4%E6%96%87%E4%BB%B6%28Python%29.PNG)
+![img](Image/2-13vscode_自定义消息的中间文件(Python).PNG)
 
 后续调用相关 srv 时，是从这些中间文件调用的
 
@@ -1443,7 +1443,7 @@ catkin_install_python(PROGRAMS
 
 ROS Master 作为一个公共容器保存参数，Talker 可以向容器中设置参数，Listener 可以获取参数。
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/03ROS%E9%80%9A%E4%BF%A1%E6%9C%BA%E5%88%B603_%E5%8F%82%E6%95%B0%E6%9C%8D%E5%8A%A1%E5%99%A8.jpg)
+![img](Image/2-14ROS通信机制03_参数服务器.jpg)
 
 整个流程由以下步骤实现:
 
@@ -1872,7 +1872,7 @@ if __name__ == "__main__":
 
 - http://wiki.ros.org/ROS/CommandLineTools
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/ROS%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7.PNG)
+![img](Image/2-15ROS命令行工具.PNG)
 
 ### 2.4.1 rosnode
 
@@ -2289,7 +2289,7 @@ rosparam list    列出所有参数
 
 **结果演示:**
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/01_%E6%A1%88%E4%BE%8B01_%E4%B9%8C%E9%BE%9F%E7%94%BB%E5%9C%86.gif)
+![img](Image/2-16_案例01_乌龟画圆.gif)
 
 **实现分析:**
 
@@ -2478,25 +2478,25 @@ if __name__ == "__main__":
 
 **弧度:** 单位弧度定义为圆弧长度等于半径时的圆心角。
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E5%BC%A7%E5%BA%A6.png)
+![img](Image/2-17弧度.png)
 
 **补充资料2:**偏航、翻滚与俯仰
 
 坐标系图解:
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E6%AC%A7%E6%8B%89%E8%A7%921.png)
+![img](Image/2-18欧拉角1.png)
 
 偏航:
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E6%AC%A7%E6%8B%89%E8%A7%922.gif)
+![img](Image/2-19欧拉角2.gif)
 
 俯仰:
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E6%AC%A7%E6%8B%89%E8%A7%923.gif)
+![img](Image/2-20欧拉角3.gif)
 
 翻滚:
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E6%AC%A7%E6%8B%89%E8%A7%924.gif)
+![img](Image/2-21欧拉角4.gif)
 
 ### 2.5.2 实操02_话题订阅
 
@@ -2504,7 +2504,7 @@ if __name__ == "__main__":
 
 **结果演示:**
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/%E6%A1%88%E4%BE%8B02_%E4%B9%8C%E9%BE%9F%E4%BD%8D%E5%A7%BF.gif)
+![img](Image/2-22案例02_乌龟位姿.gif)
 
 **实现分析:**
 
@@ -2600,7 +2600,7 @@ int main(int argc, char *argv[])
 
 **实现方案B:** Python
 
-```py
+```python
 #! /usr/bin/env python
 """
     订阅小乌龟的位姿: 时时获取小乌龟在窗体中的坐标并打印
@@ -2654,7 +2654,7 @@ if __name__ == "__main__":
 
 **结果演示:**
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/02_%E6%A1%88%E4%BE%8B2_%E7%94%9F%E6%88%90%E5%B0%8F%E4%B9%8C%E9%BE%9F.PNG)
+![img](Image/2-23_案例2_生成小乌龟.PNG)
 
 **实现分析:**
 
@@ -2724,7 +2724,6 @@ string name
         5.等待服务启动
         6.发送请求
         7.处理响应
-
 */
 
 #include "ros/ros.h"
@@ -2757,7 +2756,6 @@ int main(int argc, char *argv[])
         ROS_INFO("乌龟生成失败！！！");
     }
 
-
     return 0;
 }
 ```
@@ -2766,7 +2764,7 @@ int main(int argc, char *argv[])
 
 **实现方案B:**Python
 
-```py
+```python
 #! /usr/bin/env python
 """
     生成一只小乌龟
@@ -2808,6 +2806,7 @@ if __name__ == "__main__":
         rospy.loginfo("乌龟创建成功!，叫:%s",response.name)
     except expression as identifier:
         rospy.loginfo("服务调用失败")
+        
 ```
 
 权限设置以及配置文件此处略
@@ -2828,7 +2827,7 @@ if __name__ == "__main__":
 
 **结果演示:**
 
-![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/03_%E6%A1%88%E4%BE%8B3_%E6%94%B9%E5%8F%98%E8%83%8C%E6%99%AF%E8%89%B2.PNG)
+![img](Image/2-24_案例3_改变背景色.PNG)
 
 **实现分析:**
 
@@ -2846,13 +2845,13 @@ if __name__ == "__main__":
 
 **获取参数列表:**
 
-```
+```shell
 rosparam list
 ```
 
 **响应结果:**
 
-```
+```shell
 /turtlesim/background_b
 /turtlesim/background_g
 /turtlesim/background_r
@@ -2869,7 +2868,6 @@ rosparam list
 */
 #include "ros/ros.h"
 
-
 int main(int argc, char *argv[])
 {
     ros::init(argc,argv,"haha");
@@ -2885,7 +2883,6 @@ int main(int argc, char *argv[])
     nh.setParam("background_g",0);
     nh.setParam("background_b",0);
 
-
     return 0;
 }
 ```
@@ -2894,7 +2891,7 @@ int main(int argc, char *argv[])
 
 **实现方案B:**Python
 
-```py
+```python
 #! /usr/bin/env python
 
 import rospy
@@ -2981,7 +2978,7 @@ rosrun turtlesim turtlesim_node _background_r:=100 _background_g:=0 _background_
 | 同步性   | 异步                                  | 同步                                         |
 | 底层协议 | ROSTCP/ROSUDP                         | ROSTCP/ROSUDP                                |
 | 缓冲区   | 有                                    | 无                                           |
-| 时时性   | 弱                                    | 强                                           |
+| 实时性   | 弱                                    | 强                                           |
 | 节点关系 | 多对多                                | 一对多(一个 Server)                          |
 | 通信数据 | msg                                   | srv                                          |
 | 使用场景 | 连续高频的数据发布与接收:雷达、里程计 | 偶尔调用或执行某一项特定功能：拍照、语音识别 |
