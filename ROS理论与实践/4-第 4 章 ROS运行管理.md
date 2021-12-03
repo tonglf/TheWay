@@ -467,3 +467,655 @@ BUG 说明:
 
 > 当在 .bashrc 文件中 source 多个工作空间后，可能出现的情况，在 ROS PACKAGE PATH 中只包含两个工作空间，可以删除自定义工作空间的 build 与 devel 目录，重新 catkin_make，然后重新载入 .bashrc 文件，问题解决。
 
+## 4.4 ROS节点名称重名
+
+> 场景:ROS 中创建的节点是有名称的，C++初始化节点时通过API:`ros::init(argc,argv,"xxxx");`来定义节点名称，在Python中初始化节点则通过 `rospy.init_node("yyyy")` 来定义节点名称。在ROS的网络拓扑中，是不可以出现重名的节点的，因为假设可以重名存在，那么调用时会产生混淆，这也就意味着，不可以启动重名节点或者同一个节点启动多次，的确，在ROS中如果启动重名节点的话，之前已经存在的节点会被直接关闭，但是如果有这种需求的话，怎么优化呢？
+
+在ROS中给出的解决策略是使用命名空间或名称重映射。
+
+------
+
+命名空间就是为名称添加前缀，名称重映射是为名称起别名。这两种策略都可以解决节点重名问题，两种策略的实现途径有多种:
+
+- rosrun 命令
+- launch 文件
+- 编码实现
+
+以上三种途径都可以通过命名空间或名称重映射的方式，来避免节点重名，本节将对三者的使用逐一演示，三者要实现的需求类似。
+
+#### 案例
+
+启动两个 turtlesim_node 节点，当然如果直接打开两个终端，直接启动，那么第一次启动的节点会关闭，并给出提示:
+
+```shell
+[ WARN] [1578812836.351049332]: Shutdown request received.
+[ WARN] [1578812836.351207362]: Reason given for shutdown: [new node registered with same name]
+```
+
+因为两个节点不能重名，接下来将会介绍解决重名问题的多种方案。
+
+### 4.4.1 rosrun设置命名空间与重映射
+
+#### 1.rosrun设置命名空间
+
+##### 1.1设置命名空间演示
+
+语法: rosrun 包名 节点名 __ns:=新名称
+
+```shell
+rosrun turtlesim turtlesim_node __ns:=/xxx
+rosrun turtlesim turtlesim_node __ns:=/yyy
+```
+
+两个节点都可以正常运行
+
+##### 1.2运行结果
+
+`rosnode list`查看节点信息,显示结果:
+
+```shell
+/xxx/turtlesim
+/yyy/turtlesim
+```
+
+#### 2.rosrun名称重映射
+
+##### 2.1为节点起别名
+
+语法: rosrun 包名 节点名 __name:=新名称
+
+```shell
+rosrun turtlesim  turtlesim_node __name:=t1 
+# 或者
+rosrun turtlesim   turtlesim_node /turtlesim:=t1(不适用于python)
+
+rosrun turtlesim  turtlesim_node __name:=t2 
+# 或者
+rosrun turtlesim   turtlesim_node /turtlesim:=t2(不适用于python)
+```
+
+两个节点都可以运行
+
+##### 2.2运行结果
+
+`rosnode list`查看节点信息,显示结果:
+
+```shell
+/t1
+/t2
+```
+
+#### 3.rosrun命名空间与名称重映射叠加
+
+##### 3.1设置命名空间同时名称重映射
+
+语法: rosrun 包名 节点名 __ns:=新名称 __name:=新名称
+
+```shell
+rosrun turtlesim turtlesim_node __ns:=/xxx __name:=tn
+```
+
+##### 3.2运行结果
+
+`rosnode list`查看节点信息,显示结果:
+
+```shell
+/xxx/tn
+```
+
+> 使用环境变量也可以设置命名空间,启动节点前在终端键入如下命令:
+>
+> export ROS_NAMESPACE=xxxx
+
+### 4.4.2 launch文件设置命名空间与重映射
+
+介绍 launch 文件的使用语法时，在 node 标签中有两个属性: name 和 ns，二者分别是用于实现名称重映射与命名空间设置的。使用launch文件设置命名空间与名称重映射也比较简单。
+
+#### 1.launch文件
+
+```xml
+<launch>
+    <node pkg="turtlesim" type="turtlesim_node" name="t1" />
+    <node pkg="turtlesim" type="turtlesim_node" name="t2" />
+    <node pkg="turtlesim" type="turtlesim_node" name="t1" ns="hello"/>
+</launch>
+```
+
+在 node 标签中，name 属性是必须的，ns 可选。
+
+#### 2.运行
+
+`rosnode list`查看节点信息,显示结果:
+
+```shell
+/t1
+/t2
+/t1/hello
+```
+
+### 4.4.3 编码设置命名空间与重映射
+
+如果自定义节点实现，那么可以更灵活的设置命名空间与重映射实现。
+
+------
+
+#### 1.C++ 实现:重映射
+
+##### 1.1名称别名设置
+
+核心代码:`ros::init(argc,argv,"zhangsan",ros::init_options::AnonymousName);`
+
+##### 1.2执行
+
+会在名称后面添加时间戳。
+
+#### 2.C++ 实现:命名空间
+
+##### 2.1命名空间设置
+
+核心代码
+
+```cpp
+  std::map<std::string, std::string> map;
+  map["__ns"] = "xxxx";
+  ros::init(map,"wangqiang");
+```
+
+##### 2.2执行
+
+节点名称设置了命名空间。
+
+------
+
+#### 3.Python 实现:重映射
+
+##### 3.1名称别名设置
+
+核心代码:`rospy.init_node("lisi",anonymous=True)`
+
+##### 3.2执行
+
+会在节点名称后缀时间戳。
+
+## 4.5 ROS话题名称设置
+
+在ROS中节点名称可能出现重名的情况，同理话题名称也可能重名。
+
+> 在 ROS 中节点终端，不同的节点之间通信都依赖于话题，话题名称也可能出现重复的情况，这种情况下，系统虽然不会抛出异常，但是可能导致订阅的消息非预期的，从而导致节点运行异常。这种情况下需要将两个节点的话题名称由相同修改为不同。
+>
+> 又或者，两个节点是可以通信的，两个节点之间使用了相同的消息类型，但是由于，话题名称不同，导致通信失败。这种情况下需要将两个节点的话题名称由不同修改为相同。
+
+在实际应用中，按照逻辑，有些时候可能需要将相同的话题名称设置为不同，也有可能将不同的话题名设置为相同。在ROS中给出的解决策略与节点名称重命类似，也是使用名称重映射或为名称添加前缀。根据前缀不同，有全局、相对、和私有三种类型之分。
+
+- 全局(参数名称直接参考ROS系统，与节点命名空间平级)
+- 相对(参数名称参考的是节点的命名空间，与节点名称平级)
+- 私有(参数名称参考节点名称，是节点名称的子级)
+
+------
+
+名称重映射是为名称起别名，为名称添加前缀，该实现比节点重名更复杂些，不单是使用命名空间作为前缀、还可以使用节点名称最为前缀。两种策略的实现途径有多种:
+
+- rosrun 命令
+- launch 文件
+- 编码实现
+
+本节将对三者的使用逐一演示，三者要实现的需求类似。
+
+#### 案例
+
+在ROS中提供了一个比较好用的键盘控制功能包: ros-noetic-teleop-twist-keyboard，该功能包，可以控制机器人的运动，作用类似于乌龟的键盘控制节点，可以使用 sudo apt install ros-noetic-teleop-twist-keyboard 来安装该功能包，然后执行: rosrun teleop_twist_keyboard teleop_twist_keyboard.py，在启动乌龟显示节点，不过此时前者不能控制乌龟运动，因为，二者使用的话题名称不同，前者使用的是 `cmd_vel`话题，后者使用的是 `/turtle1/cmd_vel`话题。需要将话题名称修改为一致，才能使用，如何实现？
+
+### 4.5.1 rosrun设置话题重映射
+
+**rosrun名称重映射语法: rorun 包名 节点名 话题名:=新话题名称**
+
+实现teleop_twist_keyboard与乌龟显示节点通信方案由两种：
+
+##### 1.方案1
+
+将 teleop_twist_keyboard 节点的话题设置为`/turtle1/cmd_vel`
+
+启动键盘控制节点:`rosrun teleop_twist_keyboard teleop_twist_keyboard.py /cmd_vel:=/turtle1/cmd_vel`
+
+启动乌龟显示节点: `rosrun turtlesim turtlesim_node`
+
+二者可以实现正常通信
+
+##### 2.方案2
+
+将乌龟显示节点的话题设置为 `/cmd_vel`
+
+启动键盘控制节点:`rosrun teleop_twist_keyboard teleop_twist_keyboard.py`
+
+启动乌龟显示节点: `rosrun turtlesim turtlesim_node /turtle1/cmd_vel:=/cmd_vel`
+
+二者可以实现正常通信
+
+### 4.5.2 launch文件设置话题重映射
+
+**launch 文件设置话题重映射语法:**
+
+```xml
+<node pkg="xxx" type="xxx" name="xxx">
+    <remap from="原话题" to="新话题" />
+</node>
+```
+
+实现teleop_twist_keyboard与乌龟显示节点通信方案由两种：
+
+##### 1.方案1
+
+将 teleop_twist_keyboard 节点的话题设置为`/turtle1/cmd_vel`
+
+```xml
+<launch>
+
+    <node pkg="turtlesim" type="turtlesim_node" name="t1" />
+    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="key">
+        <remap from="/cmd_vel" to="/turtle1/cmd_vel" />
+    </node>
+
+</launch>
+```
+
+二者可以实现正常通信
+
+##### 2.方案2
+
+将乌龟显示节点的话题设置为 `/cmd_vel`
+
+```xml
+<launch>
+    <node pkg="turtlesim" type="turtlesim_node" name="t1">
+        <remap from="/turtle1/cmd_vel" to="/cmd_vel" />
+    </node>
+    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="key" />
+
+</launch>
+```
+
+二者可以实现正常通信
+
+### 4.5.3 编码设置话题名称
+
+话题的名称与节点的命名空间、节点的名称是有一定关系的，话题名称大致可以分为三种类型:
+
+- 全局(话题参考ROS系统，与节点命名空间平级)
+- 相对(话题参考的是节点的命名空间，与节点名称平级)
+- 私有(话题参考节点名称，是节点名称的子级)
+
+结合编码演示具体关系。
+
+------
+
+#### 1.C++ 实现
+
+演示准备:
+
+1.初始化节点设置一个节点名称
+
+```cpp
+ros::init(argc,argv,"hello")
+```
+
+2.设置不同类型的话题
+
+3.启动节点时，传递一个 __ns:= xxx
+
+4.节点启动后，使用 rostopic 查看话题信息
+
+##### 1.1全局名称
+
+**格式:**以`/`开头的名称，和节点名称无关
+
+**比如:**/xxx/yyy/zzz
+
+**示例1:**`ros::Publisher pub = nh.advertise<std_msgs::String>("/chatter",1000);`
+
+**结果1:**`/chatter`
+
+**示例2:**`ros::Publisher pub = nh.advertise<std_msgs::String>("/chatter/money",1000);`
+
+**结果2:**`/chatter/money`
+
+##### 1.2相对名称
+
+**格式:**非`/`开头的名称,参考命名空间(与节点名称平级)来确定话题名称
+
+**示例1:**`ros::Publisher pub = nh.advertise<std_msgs::String>("chatter",1000);`
+
+**结果1:**`xxx/chatter`
+
+**示例2:**`ros::Publisher pub = nh.advertise<std_msgs::String>("chatter/money",1000);`
+
+**结果2:**`xxx/chatter/money`
+
+##### 1.3私有名称
+
+**格式:**以`~`开头的名称
+
+**示例1:**
+
+```cpp
+ros::NodeHandle nh("~");
+ros::Publisher pub = nh.advertise<std_msgs::String>("chatter",1000);
+```
+
+**结果1:**`/xxx/hello/chatter`
+
+**示例2:**
+
+```cpp
+ros::NodeHandle nh("~");
+ros::Publisher pub = nh.advertise<std_msgs::String>("chatter/money",1000);
+```
+
+**结果2:**`/xxx/hello/chatter/money`
+
+*PS:当使用*`~`*,而话题名称有时*`/`*开头时，那么话题名称是绝对的*
+
+**示例3:**
+
+```cpp
+ros::NodeHandle nh("~");
+ros::Publisher pub = nh.advertise<std_msgs::String>("/chatter/money",1000);
+```
+
+**结果3:**`/chatter/money`
+
+------
+
+#### 2.Python 实现
+
+演示准备:
+
+1.初始化节点设置一个节点名称
+
+```python
+rospy.init_node("hello")
+```
+
+2.设置不同类型的话题
+
+3.启动节点时，传递一个 __ns:= xxx
+
+4.节点启动后，使用 rostopic 查看话题信息
+
+##### 2.1全局名称
+
+**格式:**以`/`开头的名称，和节点名称无关
+
+**示例1:**`pub = rospy.Publisher("/chatter",String,queue_size=1000)`
+
+**结果1:**`/chatter`
+
+**示例2:**`pub = rospy.Publisher("/chatter/money",String,queue_size=1000)`
+
+**结果2:**`/chatter/money`
+
+##### 2.2相对名称
+
+**格式:**非`/`开头的名称,参考命名空间(与节点名称平级)来确定话题名称
+
+**示例1:**`pub = rospy.Publisher("chatter",String,queue_size=1000)`
+
+**结果1:**`xxx/chatter`
+
+**示例2:**`pub = rospy.Publisher("chatter/money",String,queue_size=1000)`
+
+**结果2:**`xxx/chatter/money`
+
+##### 2.3私有名称
+
+**格式:**以`~`开头的名称
+
+**示例1:**`pub = rospy.Publisher("~chatter",String,queue_size=1000)`
+
+**结果1:**`/xxx/hello/chatter`
+
+**示例2:**`pub = rospy.Publisher("~chatter/money",String,queue_size=1000)`
+
+**结果2:**`/xxx/hello/chatter/money`
+
+### 4.6 ROS参数名称设置
+
+在ROS中节点名称话题名称可能出现重名的情况，同理参数名称也可能重名。
+
+> 当参数名称重名时，那么就会产生覆盖，如何避免这种情况？
+
+关于参数重名的处理，没有重映射实现，为了尽量的避免参数重名，都是使用为参数名添加前缀的方式，实现类似于话题名称，有全局、相对、和私有三种类型之分。
+
+- 全局(参数名称直接参考ROS系统，与节点命名空间平级)
+- 相对(参数名称参考的是节点的命名空间，与节点名称平级)
+- 私有(参数名称参考节点名称，是节点名称的子级)
+
+------
+
+设置参数的方式也有三种:
+
+- rosrun 命令
+- launch 文件
+- 编码实现
+
+三种设置方式前面都已经有所涉及，但是之前没有涉及命名问题，本节将对三者命名的设置逐一演示。
+
+#### 案例
+
+启动节点时，为参数服务器添加参数(需要注意参数名称设置)。
+
+### 4.6.1 rosrun设置参数
+
+rosrun 在启动节点时，也可以设置参数:
+
+**语法:** rosrun 包名 节点名称 _参数名:=参数值
+
+#### 1.设置参数
+
+启动乌龟显示节点，并设置参数 A = 100
+
+```shell
+rosrun turtlesim turtlesim_node _A:=100
+```
+
+#### 2.运行
+
+`rosparam list`查看节点信息,显示结果:
+
+```shell
+/turtlesim/A
+/turtlesim/background_b
+/turtlesim/background_g
+/turtlesim/background_r
+```
+
+结果显示，参数A前缀节点名称，也就是说rosrun执行设置参数参数名使用的是私有模式
+
+### 4.6.2 launch文件设置参数
+
+通过 launch 文件设置参数的方式前面已经介绍过了，可以在 node 标签外，或 node 标签中通过 param 或 rosparam 来设置参数。在 node 标签外设置的参数是全局性质的，参考的是 / ，在 node 标签中设置的参数是私有性质的，参考的是 /命名空间/节点名称。
+
+#### 1.设置参数
+
+以 param 标签为例，设置参数
+
+```xml
+<launch>
+    <param name="p1" value="100" />
+    <node pkg="turtlesim" type="turtlesim_node" name="t1">
+        <param name="p2" value="100" />
+    </node>
+</launch>
+```
+
+#### 2.运行
+
+`rosparam list`查看节点信息,显示结果:
+
+```
+/p1
+/t1/p1
+```
+
+运行结果与预期一致。
+
+### 4.6.3 编码设置参数
+
+编码的方式可以更方便的设置:全局、相对与私有参数。
+
+------
+
+#### 1.C++实现
+
+在 C++ 中，可以使用 ros::param 或者 ros::NodeHandle 来设置参数。
+
+##### 1.1ros::param设置参数
+
+设置参数调用API是ros::param::set，该函数中，参数1传入参数名称，参数2是传入参数值，参数1中参数名称设置时，如果以 / 开头，那么就是全局参数，如果以 ~ 开头，那么就是私有参数，既不以 / 也不以 ~ 开头，那么就是相对参数。代码示例:
+
+```cpp
+ros::param::set("/set_A",100); //全局,和命名空间以及节点名称无关
+ros::param::set("set_B",100); //相对,参考命名空间
+ros::param::set("~set_C",100); //私有,参考命名空间与节点名称
+```
+
+运行时，假设设置的 namespace 为 xxx，节点名称为 yyy，使用 rosparam list 查看:
+
+```shell
+/set_A
+/xxx/set_B
+/xxx/yyy/set_C
+```
+
+##### 1.2ros::NodeHandle设置参数
+
+设置参数时，首先需要创建 NodeHandle 对象，然后调用该对象的 setParam 函数，该函数参数1为参数名，参数2为要设置的参数值，如果参数名以 / 开头，那么就是全局参数，如果参数名不以 / 开头，那么，该参数是相对参数还是私有参数与NodeHandle 对象有关，如果NodeHandle 对象创建时如果是调用的默认的无参构造，那么该参数是相对参数，如果NodeHandle 对象创建时是使用:
+
+ros::NodeHandle nh("~")，那么该参数就是私有参数。代码示例:
+
+```cpp
+ros::NodeHandle nh;
+nh.setParam("/nh_A",100); //全局,和命名空间以及节点名称无关
+
+nh.setParam("nh_B",100); //相对,参考命名空间
+
+ros::NodeHandle nh_private("~");
+nh_private.setParam("nh_C",100);//私有,参考命名空间与节点名称
+```
+
+运行时，假设设置的 namespace 为 xxx，节点名称为 yyy，使用 rosparam list 查看:
+
+```shell
+/nh_A
+/xxx/nh_B
+/xxx/yyy/nh_C
+```
+
+------
+
+#### 2.python实现
+
+python 中关于参数设置的语法实现比 C++ 简洁一些，调用的API时 rospy.set_param，该函数中，参数1传入参数名称，参数2是传入参数值，参数1中参数名称设置时，如果以 / 开头，那么就是全局参数，如果以 ~ 开头，那么就是私有参数，既不以 / 也不以 ~ 开头，那么就是相对参数。代码示例:
+
+```python
+rospy.set_param("/py_A",100)  #全局,和命名空间以及节点名称无关
+rospy.set_param("py_B",100)  #相对,参考命名空间
+rospy.set_param("~py_C",100)  #私有,参考命名空间与节点名称
+```
+
+运行时，假设设置的 namespace 为 xxx，节点名称为 yyy，使用 rosparam list 查看:
+
+```shell
+/py_A
+/xxx/py_B
+/xxx/yyy/py_C
+```
+
+## 4.7 ROS分布式通信
+
+ROS是一个分布式计算环境。一个运行中的ROS系统可以包含分布在多台计算机上多个节点。根据系统的配置方式，任何节点可能随时需要与任何其他节点进行通信。
+
+因此，ROS对网络配置有某些要求：
+
+- 所有端口上的所有机器之间必须有完整的双向连接。
+- 每台计算机必须通过所有其他计算机都可以解析的名称来公告自己。
+
+#### **实现**
+
+##### 1.准备
+
+先要保证不同计算机处于同一网络中，最好分别设置固定IP，如果为虚拟机，需要将网络适配器改为桥接模式；
+
+##### 2.配置文件修改
+
+分别修改不同计算机的 /etc/hosts 文件，在该文件中加入对方的IP地址和计算机名:
+
+主机端:
+
+```
+从机的IP    从机计算机名
+```
+
+从机端:
+
+```
+主机的IP    主机计算机名
+```
+
+设置完毕，可以通过 ping 命令测试网络通信是否正常。
+
+> IP地址查看名: ifconfig
+>
+> 计算机名称查看: hostname
+
+##### 3.配置主机IP
+
+配置主机的 IP 地址
+
+~/.bashrc 追加
+
+```shell
+export ROS_MASTER_URI=http://主机IP:11311
+export ROS_HOSTNAME=主机IP
+```
+
+##### 4.配置从机IP
+
+配置从机的 IP 地址，从机可以有多台，每台都做如下设置:
+
+~/.bashrc 追加
+
+```shell
+export ROS_MASTER_URI=http://主机IP:11311
+export ROS_HOSTNAME=从机IP
+```
+
+#### **测试**
+
+1.主机启动 roscore(必须)
+
+2.主机启动订阅节点，从机启动发布节点，测试通信是否正常
+
+3.反向测试，主机启动发布节点，从机启动订阅节点，测试通信是否正常
+
+## 4.8 本章小结
+
+本章主要介绍了ROS的运行管理机制，内容如下:
+
+- 如何通过元功能包关联工作空间下的不同功能包
+- 使用 launch 文件来管理维护 ROS 中的节点
+- 在 ROS 中重名是经常出现的，重名时会导致什么情况？以及怎么避免重名？
+- 如何实现 ROS 分布式通信？
+
+本章的重点是"重名"相关的内容：
+
+- 包名重复，会导致覆盖。
+- 节点名称重复，会导致先启动的节点关闭
+- 话题名称重复，无语法异常，但是可能导致通信实现出现逻辑问题
+- 参数名称重复，会导致参数设置的覆盖
+
+解决重名问题的实现方案有两种:
+
+- 重映射(重新起名字)
+- 为命名添加前缀
+
+本章介绍的内容还是偏向语法层面的实现，下一章将开始介绍ROS中内置的一些较为实用的组件。
