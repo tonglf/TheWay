@@ -105,7 +105,7 @@
 - [epoll 事件模型 LT、ET](./Linux杂谈/Linux网络编程/epoll事件模型LT、ET.md)
 - [CS 模型 - UDP](./Linux杂谈/Linux网络编程/CS模型-UDP.md)
 - [线程池](./Linux杂谈/Linux网络编程/线程池/线程池.md)
-- [手写线程池 - C语言版](./Linux杂谈/Linux网络编程/手写线程池 - C语言版.md)
+- [手写线程池 - C语言版](./Linux杂谈/Linux网络编程/手写线程池C语言版.md)
 - [网络编程实战](./Linux杂谈/Linux网络编程/网络编程实战.md)
 - [五大 IO 模型](./Linux杂谈/Linux网络编程/五大IO模型.md)
 - [select 、poll 和 epoll 对比](./Linux杂谈/Linux网络编程/select、poll和epoll对比.md)
@@ -126,7 +126,7 @@
 
 ## 刷题
 
-- [ACM 模式——输入输出练习](./刷题/ACM 模式——输入输出练习.md)
+- [ACM 模式——输入输出练习](./刷题/ACM 模式输入输出练习.md)
 - [二叉树前中后遍历--统一的递归、迭代写法](./刷题/二叉树前中后遍历--统一的递归、迭代写法.md)
 - [数组，找到每个元素后面比它大的第一个数](./刷题/数组，找到每个元素后面比它大的第一个数.md)
 - [剑指offer](./刷题/剑指offer.md)
@@ -142,10 +142,11 @@
 
 [More Effective C++](./读书笔记/MoreEffectiveC++/MoreEffectiveC++.md)
 
-[Effective STL](./读书笔记/Effective STL/Effective STL.md)
+[Effective STL](./读书笔记/EffectiveSTL/EffectiveSTL.md)
 
 秋招面经总结
 
-- [秋招面经总结 C++ 篇](./读书笔记/秋招面经总结C++/秋招面经总结 C++ 篇.md)
-- [秋招面经总结 STL 篇](./读书笔记/秋招面经总结C++/秋招面经总结 STL 篇.md)
-- [秋招面经总结 MySQL 篇](./读书笔记/秋招面经总结C++/秋招面经总结 MySQL 篇.md)
+- [秋招面经总结 C++ 篇](./读书笔记/八股文/秋招面经总结C++/秋招面经总结C++篇.md)
+- [秋招面经总结 STL 篇](./读书笔记/八股文/秋招面经总结C++/秋招面经总结STL篇.md)
+- [秋招面经总结 MySQL 篇](./读书笔记/八股文/秋招面经总结C++/秋招面经总结MySQL篇.md)
+
