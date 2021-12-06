@@ -1579,3 +1579,337 @@ TF 版静态坐标变换:`rosrun tf static_transform_publisher 0 0 0 0 0 0 /base
 
 5.当前 TF2 已经替换了 TF，官网建议直接学习 TF2，并且 TF 与 TF2 的使用流程与实现 API 比较类似，只要有任意一方的使用经验，另一方也可以做到触类旁通
 
+## 5.2 rosbag
+
+机器人传感器获取到的信息，有时我们可能需要时时处理，有时可能只是采集数据，事后分析，比如:
+
+> 机器人导航实现中，可能需要绘制导航所需的全局地图，地图绘制实现，有两种方式，方式1：可以控制机器人运动，将机器人传感器感知到的数据时时处理，生成地图信息。方式2：同样是控制机器人运动，将机器人传感器感知到的数据留存，事后，再重新读取数据，生成地图信息。两种方式比较，显然方式2使用上更为灵活方便。
+
+在ROS中关于数据的留存以及读取实现，提供了专门的工具: rosbag。
+
+------
+
+#### **概念**
+
+是用于录制和回放 ROS 主题的一个工具集。
+
+#### **作用**
+
+实现了数据的复用，方便调试、测试。
+
+#### **本质**
+
+rosbag本质也是ros的节点，当录制时，rosbag是一个订阅节点，可以订阅话题消息并将订阅到的数据写入磁盘文件；当重放时，rosbag是一个发布节点，可以读取磁盘文件，发布文件中的话题消息。
+
+------
+
+**另请参考:**
+
+- http://wiki.ros.org/rosbag
+
+### 5.2.1 rosbag使用_命令行
+
+**需求:**
+
+ROS 内置的乌龟案例并操作，操作过程中使用 rosbag 录制，录制结束后，实现重放
+
+**实现:**
+
+1.准备
+
+创建目录保存录制的文件
+
+```
+mkdir ./xxx
+cd xxx
+```
+
+2.开始录制
+
+```
+rosbag record -a -O 目标文件
+```
+
+操作小乌龟一段时间，结束录制使用 ctrl + c，在创建的目录中会生成bag文件。
+
+3.查看文件
+
+```
+rosbag info 文件名
+```
+
+4.回放文件
+
+```
+rosbag play 文件名
+```
+
+重启乌龟节点，会发现，乌龟按照录制时的轨迹运动。
+
+------
+
+**另请参考:**
+
+- http://wiki.ros.org/rosbag/Commandline
+
+### 5.2.2 rosbag使用_编码
+
+命令实现不够灵活，可以使用编码的方式，增强录制与回放的灵活性,本节将通过简单的读写实现演示rosbag的编码实现。
+
+------
+
+方案A:C++实现
+
+#### 1.写 bag
+
+```cpp
+#include "ros/ros.h"
+#include "rosbag/bag.h"
+#include "std_msgs/String.h"
+
+int main(int argc, char *argv[])
+{
+    ros::init(argc,argv,"bag_write");
+    ros::NodeHandle nh;
+    //创建bag对象
+    rosbag::Bag bag;
+    //打开
+    bag.open("/home/rosdemo/demo/test.bag",rosbag::BagMode::Write);
+    //写
+    std_msgs::String msg;
+    msg.data = "hello world";
+    bag.write("/chatter",ros::Time::now(),msg);
+    bag.write("/chatter",ros::Time::now(),msg);
+    bag.write("/chatter",ros::Time::now(),msg);
+    bag.write("/chatter",ros::Time::now(),msg);
+    //关闭
+    bag.close();
+
+    return 0;
+}
+```
+
+#### 2.读bag
+
+```cpp
+/*  
+    读取 bag 文件：
+
+*/
+#include "ros/ros.h"
+#include "rosbag/bag.h"
+#include "rosbag/view.h"
+#include "std_msgs/String.h"
+#include "std_msgs/Int32.h"
+
+int main(int argc, char *argv[])
+{
+    setlocale(LC_ALL,"");
+
+    ros::init(argc,argv,"bag_read");
+    ros::NodeHandle nh;
+
+    //创建 bag 对象
+    rosbag::Bag bag;
+    //打开 bag 文件
+    bag.open("/home/rosdemo/demo/test.bag",rosbag::BagMode::Read);
+    //读数据
+    for (rosbag::MessageInstance const m : rosbag::View(bag))
+    {
+        std_msgs::String::ConstPtr p = m.instantiate<std_msgs::String>();
+        if(p != nullptr){
+            ROS_INFO("读取的数据:%s",p->data.c_str());
+        }
+    }
+    //关闭文件流
+    bag.close();
+    return 0;
+}
+```
+
+------
+
+方案B:Python实现
+
+#### 1.写 bag
+
+```python
+#! /usr/bin/env python
+import rospy
+import rosbag
+from std_msgs.msg import String
+
+if __name__ == "__main__":
+    #初始化节点 
+    rospy.init_node("w_bag_p")
+
+    # 创建 rosbag 对象
+    bag = rosbag.Bag("/home/rosdemo/demo/test.bag",'w')
+
+    # 写数据
+    s = String()
+    s.data= "hahahaha"
+
+    bag.write("chatter",s)
+    bag.write("chatter",s)
+    bag.write("chatter",s)
+    # 关闭流
+    bag.close()
+```
+
+#### 2.读bag
+
+```python
+#! /usr/bin/env python
+import rospy
+import rosbag
+from std_msgs.msg import String
+
+if __name__ == "__main__":
+    #初始化节点 
+    rospy.init_node("w_bag_p")
+
+    # 创建 rosbag 对象
+    bag = rosbag.Bag("/home/rosdemo/demo/test.bag",'r')
+    # 读数据
+    bagMessage = bag.read_messages("chatter")
+    for topic,msg,t in bagMessage:
+        rospy.loginfo("%s,%s,%s",topic,msg,t)
+    # 关闭流
+    bag.close()
+```
+
+------
+
+**另请参考:**
+
+- [http://wiki.ros.org/rosbag/Code%20API](http://wiki.ros.org/rosbag/Code API)
+
+## 5.3 rqt工具箱
+
+之前，在 ROS 中使用了一些实用的工具,比如: ros_bag 用于录制与回放、tf2_tools 可以生成 TF 树 ..... 这些工具大大提高了开发的便利性，但是也存在一些问题: 这些工具的启动和使用过程中涉及到一些命令操作，应用起来不够方便，在ROS中，提供了rqt工具箱，在调用工具时以图形化操作代替了命令操作，应用更便利，提高了操作效率，优化了用户体验。
+
+------
+
+#### **概念**
+
+ROS基于 QT 框架，针对机器人开发提供了一系列可视化的工具，这些工具的集合就是rqt
+
+#### **作用**
+
+可以方便的实现 ROS 可视化调试，并且在同一窗口中打开多个部件，提高开发效率，优化用户体验。
+
+#### **组成**
+
+rqt 工具箱组成有三大部分
+
+- rqt——核心实现，开发人员无需关注
+- rqt_common_plugins——rqt 中常用的工具套件
+- rqt_robot_plugins——运行中和机器人交互的插件(比如: rviz)
+
+------
+
+**另请参考:**
+
+- http://wiki.ros.org/rqt
+
+### 5.3.1 rqt安装启动与基本使用
+
+#### 1.安装
+
+- 一般只要你安装的是desktop-full版本就会自带工具箱
+
+- 如果需要安装可以以如下方式安装
+
+    ```shell
+    $ sudo apt-get install ros-noetic-rqt
+    $ sudo apt-get install ros-noetic-rqt-common-plugins
+    ```
+
+#### 2.启动
+
+`rqt`的启动方式有两种:
+
+- 方式1:`rqt`
+- 方式2:`rosrun rqt_gui rqt_gui`
+
+#### 3.基本使用
+
+启动 rqt 之后，可以通过 plugins 添加所需的插件![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/13rqt%E5%B7%A5%E5%85%B7%E7%AE%B1.PNG)
+
+### 5.3.2 rqt常用插件:rqt_graph
+
+**简介:**可视化显示计算图
+
+**启动:**可以在 rqt 的 plugins 中添加，或者使用`rqt_graph`启动
+
+![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/02_rqt_graph%E6%8F%92%E4%BB%B6.png)
+
+### 5.3.3 rqt常用插件:rqt_console
+
+**简介:**rqt_console 是 ROS 中用于显示和过滤日志的图形化插件
+
+**准备:**编写 Node 节点输出各个级别的日志信息
+
+```cpp
+/*  
+    ROS 节点:输出各种级别的日志信息
+
+*/
+#include "ros/ros.h"
+
+int main(int argc, char *argv[])
+{
+    ros::init(argc,argv,"log_demo");
+    ros::NodeHandle nh;
+
+    ros::Rate r(0.3);
+    while (ros::ok())
+    {
+        ROS_DEBUG("Debug message d");
+        ROS_INFO("Info message oooooooooooooo");
+        ROS_WARN("Warn message wwwww");
+        ROS_ERROR("Erroe message EEEEEEEEEEEEEEEEEEEE");
+        ROS_FATAL("Fatal message FFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+        r.sleep();
+    }
+
+
+    return 0;
+}
+```
+
+**启动:**
+
+可以在 rqt 的 plugins 中添加，或者使用`rqt_console`启动![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/01_rqt_console%E6%8F%92%E4%BB%B6.png)
+
+### 5.3.4 rqt常用插件:rqt_plot
+
+**简介:**图形绘制插件，可以以 2D 绘图的方式绘制发布在 topic 上的数据
+
+**准备:**启动 turtlesim 乌龟节点与键盘控制节点，通过 rqt_plot 获取乌龟位姿
+
+**启动:**可以在 rqt 的 plugins 中添加，或者使用`rqt_plot`启动![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/03_rqt_plot%E6%8F%92%E4%BB%B6.png)
+
+### 5.3.5 rqt常用插件:rqt_bag
+
+**简介:**录制和重放 bag 文件的图形化插件
+
+**准备:**启动 turtlesim 乌龟节点与键盘控制节点
+
+**启动:**可以在 rqt 的 plugins 中添加，或者使用`rqt_bag`启动
+
+**录制:**![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/14rqt_bag_%E5%BD%95%E5%88%B6.png)
+
+**重放:**![img](http://www.autolabor.com.cn/book/ROSTutorials/assets/15rqt_bag_%E5%9B%9E%E6%94%BE.png)
+
+## 5.4 本章小结
+
+本章主要介绍了ROS中的常用组件，内容如下:
+
+- TF坐标变换(重点)
+- rosbag 用于ros话题的录制与回放
+- rqt工具箱，图形化方式调用组件，提高操作效率以及易用性
+
+其中 TF坐标变换是重点，也是难点，需要大家熟练掌握坐标变换的应用场景以及代码实现。下一章开始将介绍机器人系统仿真，我们将在仿真环境下，创建机器人、控制机器人运动、搭建仿真环境，并以机器人的视角去感知世界。
+
