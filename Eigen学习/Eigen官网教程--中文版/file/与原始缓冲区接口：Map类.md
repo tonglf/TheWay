@@ -21,7 +21,7 @@ Map<Matrix<typename Scalar, int RowsAtCompileTime, int ColsAtCompileTime> >
 要构造一个[Map](https://eigen.tuxfamily.org/dox/classEigen_1_1Map.html)变量，您需要另外两条信息：一个指向定义系数数组的内存区域的指针，以及矩阵或向量的所需形状。例如，要定义`float`大小在编译时确定的矩阵，您可以执行以下操作：
 
 ```cpp
-Map<MatrixXf> mf(pf,rows,columns);
+Map<MatrixXf> mf(pf,rows, columns);
 ```
 
 其中`pf`是`float` `*`指向内存数组。一个固定大小的只读整数向量可以声明为
@@ -51,9 +51,9 @@ Map<typename MatrixType,
 int array[8];
 for(int i = 0; i < 8; ++i) 
     array[i] = i;
-cout << "Column-major:\n" << Map<Matrix<int,2,4> >(array) << endl;
-cout << "Row-major:\n" << Map<Matrix<int,2,4,RowMajor> >(array) << endl;
-cout << "Row-major using stride:\n" << Map<Matrix<int,2,4>, Unaligned, Stride<1,4> >(array) << endl;
+cout << "Column-major:\n" << Map<Matrix<int, 2, 4>>(array) << endl;
+cout << "Row-major:\n" << Map<Matrix<int, 2, 4, RowMajor>>(array) << endl;
+cout << "Row-major using stride:\n" << Map<Matrix<int, 2, 4>, Unaligned, Stride<1, 4>>(array) << endl;
 ```
 
 输出：
@@ -79,7 +79,7 @@ Row-major using stride:
 例子：
 
 ```cpp
-typedef Matrix<float,1,Dynamic> MatrixType;
+typedef Matrix<float, 1, Dynamic> MatrixType;
 typedef Map<MatrixType> MapType;
 typedef Map<const MatrixType> MapTypeConst;   // a read-only map
 const int n_dims = 5;
@@ -88,14 +88,13 @@ MatrixType m1(n_dims), m2(n_dims);
 m1.setRandom();
 m2.setRandom();
 float *p = &m2(0);  // get the address storing the data for m2
-MapType m2map(p,m2.size());   // m2map shares data with m2
-MapTypeConst m2mapconst(p,m2.size());  // a read-only accessor for m2
+MapType m2map(p, m2.size());   // m2map shares data with m2
+MapTypeConst m2mapconst(p, m2.size());  // a read-only accessor for m2
  
 cout << "m1: " << m1 << endl;
 cout << "m2: " << m2 << endl;
-cout << "Squared euclidean distance: " << (m1-m2).squaredNorm() << endl;
-cout << "Squared euclidean distance, using map: " <<
-  (m1-m2map).squaredNorm() << endl;
+cout << "Squared euclidean distance: " << (m1 - m2).squaredNorm() << endl;
+cout << "Squared euclidean distance, using map: " << (m1 - m2map).squaredNorm() << endl;
 m2map(3) = 7;   // this will change m2, since they share the same array
 cout << "Updated m2: " << m2 << endl;
 cout << "m2 coefficient 2, constant accessor: " << m2mapconst(2) << endl;
@@ -122,10 +121,10 @@ m2 coefficient 2, constant accessor: 0.536
 例子：
 
 ```cpp
-int data[] = {1,2,3,4,5,6,7,8,9};
-Map<RowVectorXi> v(data,4);
+int data[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+Map<RowVectorXi> v(data, 4);
 cout << "The mapped vector v is: " << v << "\n";
-new (&v) Map<RowVectorXi>(data+4,5);
+new (&v) Map<RowVectorXi>(data + 4, 5);
 cout << "Now v is: " << v << "\n";
 ```
 
