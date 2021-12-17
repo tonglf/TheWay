@@ -42,6 +42,13 @@
 参考
 
 1. 核心模块
+    - [全局数组类型定义](file/全局数组类型定义.md)
+    - [全局矩阵类型定义](file/全局矩阵类型定义.md)
+    - Flags
+    - Enumerations
+    - aligned_allocator
+    - [Array](file/Array.md)
+    - 
 2. 雅可比模块
 3. 户主模块
 
