@@ -88,7 +88,15 @@
 
 ## 扩展、自定义 Eigen
 
+[扩展 MatrixBase（和其他类）](file/扩展MatrixBase（和其他类）.md)
 
+[从 Matrix 中继承](file/从Matrix中继承.md)
+
+[使用自定义标量类型](file/使用自定义标量类型.md)
+
+[通过空值表达式进行矩阵操作](file/通过空值表达式进行矩阵操作.md)
+
+[添加新的表达式类型](file/添加新的表达式类型.md)
 
 ## 一般主题
 
