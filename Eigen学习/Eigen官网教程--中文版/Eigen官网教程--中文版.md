@@ -10,7 +10,7 @@
 
 [矩阵和向量运算](file/矩阵和向量运算.md)
 
-[Array类和系数操作](file/Array类和系数操作.md)
+[Array 类和系数操作](file/Array类和系数操作.md)
 
 [块操作](file/块操作.md)
 
@@ -22,9 +22,9 @@
 
 [重塑](file/重塑.md)
 
-[STL迭代器和算法](file/STL迭代器和算法.md)
+[STL 迭代器和算法](file/STL迭代器和算法.md)
 
-[与原始缓冲区接口：Map类](file/与原始缓冲区接口：Map类.md)
+[与原始缓冲区接口：Map 类](file/与原始缓冲区接口：Map类.md)
 
 [别名](file/别名.md)
 
@@ -33,10 +33,10 @@
 对齐问题
 
 1. [未对齐数组的断言说明](file/未对齐数组的断言说明.md)
-2. [固定大小的可矢量化Eigen对象](file/固定大小的可矢量化Eigen对象.md)
-3. [具有Eigen成员的结构](file/具有Eigen成员的结构.md)
-4. [将STL容器与Eigen结合使用](file/将STL容器与Eigen结合使用.md)
-5. [将Eigen对象按值传递给函数](file/将Eigen对象按值传递给函数.md)
+2. [固定大小的可矢量化 Eigen 对象](file/固定大小的可矢量化Eigen对象.md)
+3. [具有 Eigen 成员的结构](file/具有Eigen成员的结构.md)
+4. [将 STL 容器与 Eigen 结合使用](file/将STL容器与Eigen结合使用.md)
+5. [将 Eigen 对象按值传递给函数](file/将Eigen对象按值传递给函数.md)
 6. [编译器对堆栈对齐做出错误假设](file/编译器对堆栈对齐做出错误假设.md)
 
 参考
@@ -72,11 +72,11 @@
 
 1. 乔列斯基模块
 
-2. LU模块
+2. LU 模块
 
 3. 二维码模块
 
-4. SVD模块
+4. SVD 模块
 
 5. 特征值模块
 
