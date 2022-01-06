@@ -43,17 +43,17 @@ int main()
     ArrayXXf  m(2,2);
 
     // assign some values coefficient by coefficient
-    m(0,0) = 1.0; 
-    m(0,1) = 2.0;
-    m(1,0) = 3.0; 
-    m(1,1) = m(0,1) + m(1,0);
+    m(0, 0) = 1.0; 
+    m(0, 1) = 2.0;
+    m(1, 0) = 3.0; 
+    m(1, 1) = m(0, 1) + m(1, 0);
 
     // print values to standard output
     cout << m << endl << endl;
 
     // using the comma-initializer is also allowed
-    m << 1.0,2.0,
-    	3.0,4.0;
+    m << 1.0, 2.0,
+    	3.0, 4.0;
 
     // print values to standard output
     cout << m << endl;
@@ -89,14 +89,14 @@ using namespace std;
 
 int main()
 {
-    ArrayXXf a(3,3);
-    ArrayXXf b(3,3);
-    a << 1,2,3,
-    	4,5,6,
-    	7,8,9;
-    b << 1,2,3,
-    	1,2,3,
-    	1,2,3;
+    ArrayXXf a(3, 3);
+    ArrayXXf b(3, 3);
+    a << 1, 2, 3,
+    	4, 5, 6,
+    	7, 8, 9;
+    b << 1, 2, 3,
+    	1, 2, 3,
+    	1, 2, 3;
 
     // Adding two arrays
     cout << "a + b = " << endl << a + b << endl << endl;
@@ -135,12 +135,12 @@ using namespace std;
  
 int main()
 {
-    ArrayXXf a(2,2);
-    ArrayXXf b(2,2);
-    a << 1,2,
-    	3,4;
-    b << 5,6,
-    	7,8;
+    ArrayXXf a(2, 2);
+    ArrayXXf b(2, 2);
+    a << 1, 2,
+    	3, 4;
+    b << 5, 6,
+    	7, 8;
     cout << "a * b = " << endl << a * b << endl;
 }
 ```
@@ -210,19 +210,19 @@ a.min(a.abs().sqrt()) =
   1.28
 ```
 
-在[快速参考指南中](https://eigen.tuxfamily.org/dox/group__QuickRefPage.html)可以找到更多的系数操作。
+在[快速参考指南](https://eigen.tuxfamily.org/dox/group__QuickRefPage.html)中可以找到更多的系数操作。
 
 # 数组和矩阵表达式之间的转换
 
 什么时候应该使用[Matrix](https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html)类的对象，什么时候应该使用[Array](https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html)类的对象？您不能对数组应用[矩阵](https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html)运算，也不能对[矩阵](https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html)应用[数组](https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html)运算。因此，如果您需要进行矩阵乘法等线性代数运算，那么您应该使用矩阵；如果您需要进行系数操作，那么您应该使用数组。但是，有时并不是那么简单，而是需要同时使用[矩阵](https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html)和[数组](https://eigen.tuxfamily.org/dox/classEigen_1_1Array.html)操作。在这种情况下，您需要将矩阵转换为数组或反向转换。无论选择将对象声明为数组还是矩阵，这都可以访问所有操作。
 
-[矩阵表达式](https://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html)有一个[.array()](https://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#a354c33eec32ceb4193d002f4d41c0497)方法，可以将它们“转换”为[数组表达式](https://eigen.tuxfamily.org/dox/classEigen_1_1ArrayBase.html)，因此可以轻松应用系数操作。相反，[数组表达式](https://eigen.tuxfamily.org/dox/classEigen_1_1ArrayBase.html)有一个[.matrix()](https://eigen.tuxfamily.org/dox/classEigen_1_1ArrayBase.html#af01e9ea8087e390af8af453bbe4c276c)方法。与所有[Eigen](https://eigen.tuxfamily.org/dox/namespaceEigen.html)表达式抽象一样，这没有任何运行时成本（前提是您让编译器优化）。既[.array（）](https://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#a354c33eec32ceb4193d002f4d41c0497)和[.matrix（）](https://eigen.tuxfamily.org/dox/classEigen_1_1ArrayBase.html#af01e9ea8087e390af8af453bbe4c276c)可被用作右值和作为左值。
+[矩阵表达式](https://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html)有一个[.array()](https://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#a354c33eec32ceb4193d002f4d41c0497)方法，可以将它们“转换”为[数组表达式](https://eigen.tuxfamily.org/dox/classEigen_1_1ArrayBase.html)，因此可以轻松应用系数操作。相反，[数组表达式](https://eigen.tuxfamily.org/dox/classEigen_1_1ArrayBase.html)有一个[.matrix()](https://eigen.tuxfamily.org/dox/classEigen_1_1ArrayBase.html#af01e9ea8087e390af8af453bbe4c276c)方法。与所有[Eigen](https://eigen.tuxfamily.org/dox/namespaceEigen.html)表达式抽象一样，这没有任何运行时成本（前提是您让编译器优化），即 [.array()](https://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#a354c33eec32ceb4193d002f4d41c0497) 和 [.matrix()](https://eigen.tuxfamily.org/dox/classEigen_1_1ArrayBase.html#af01e9ea8087e390af8af453bbe4c276c) 可被用作右值和作为左值。
 
 [Eigen](https://eigen.tuxfamily.org/dox/namespaceEigen.html)禁止在表达式中混合矩阵和数组。例如，您不能直接添加矩阵和数组；运算`+`符的操作数要么都是矩阵，要么都是数组。但是，使用[.array()](https://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#a354c33eec32ceb4193d002f4d41c0497)和[.matrix()](https://eigen.tuxfamily.org/dox/classEigen_1_1ArrayBase.html#af01e9ea8087e390af8af453bbe4c276c)很容易从一种转换到另一种。这条规则的例外是赋值运算符：允许将矩阵表达式赋值给数组变量，或者将数组表达式赋值给矩阵变量。
 
 以下示例显示如何通过使用[.array()](https://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#a354c33eec32ceb4193d002f4d41c0497)方法对[Matrix](https://eigen.tuxfamily.org/dox/classEigen_1_1Matrix.html)对象使用数组操作。例如，该语句采用两个矩阵和，将它们都转换为一个数组，用于将它们按系数相乘并将结果分配给矩阵变量（这是合法的，因为[Eigen](https://eigen.tuxfamily.org/dox/namespaceEigen.html)允许将数组表达式分配给矩阵变量）。`result = m.array() * n.array()`
 
-事实上，这种用法非常普遍，以至于[Eigen](https://eigen.tuxfamily.org/dox/namespaceEigen.html)为矩阵提供了一个[const .cwiseProduct(.)](https://eigen.tuxfamily.org/dox/group__TutorialArrayClass.html)方法来计算系数乘积。这也显示在示例程序中。
+事实上，这种用法非常普遍，以至于[Eigen](https://eigen.tuxfamily.org/dox/namespaceEigen.html)为矩阵提供了一个[const .cwiseProduct()](https://eigen.tuxfamily.org/dox/group__TutorialArrayClass.html)方法来计算系数乘积。这也显示在示例程序中。
 
 例子：
 
@@ -278,7 +278,7 @@ int main()
 
 类似地，如果`array1`和`array2`是数组，则表达式`array1.matrix() * array2.matrix()`计算它们的矩阵乘积。
 
-这是一个更高级的例子。该表达式`(m.array() + 4).matrix() * m`将矩阵中的每个系数加 4 ，然后计算结果与 `m` 的矩阵乘积。类似地，表达式`(m.array() * n.array()).matrix() * m`计算矩阵的系数之积`m`和`n`，然后用结果做矩阵积。
+这是一个更高级的例子。该表达式`(m.array() + 4).matrix() * m`将矩阵中的每个系数加 4 ，然后计算结果与 `m` 的矩阵乘积。类似地，表达式`(m.array() * n.array()).matrix() * m`计算矩阵的系数之积，然后用结果做矩阵积。
 
 例子：
 
@@ -291,7 +291,7 @@ using namespace std;
  
 int main()
 {
-    MatrixXf m(2,2);
+    MatrixXf m(2, 2);
     MatrixXf n(2,2);
     MatrixXf result(2,2);
 
