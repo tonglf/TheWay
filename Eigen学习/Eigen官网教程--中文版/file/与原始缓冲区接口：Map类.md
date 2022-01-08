@@ -112,7 +112,7 @@ Updated m2: -0.605  -0.33  0.536      7  0.108
 m2 coefficient 2, constant accessor: 0.536
 ```
 
-所有 Eigen 函数都被编写为接受[Map](https://eigen.tuxfamily.org/dox/classEigen_1_1Map.html)对象，就像其他 Eigen 类型一样。然而，编写自己的职能采取征类型时，这并*不会*自动发生：一个[Map](https://eigen.tuxfamily.org/dox/classEigen_1_1Map.html)类型不相同，其[Dense](https://eigen.tuxfamily.org/dox/structEigen_1_1Dense.html)等同。有关详细信息，请参阅[编写将特征类型作为参数的函数](https://eigen.tuxfamily.org/dox/TopicFunctionTakingEigenTypes.html)。
+所有 Eigen 函数都被编写为接受[Map](https://eigen.tuxfamily.org/dox/classEigen_1_1Map.html)对象，就像其他 Eigen 类型一样。然而，编写自己的职能采取征类型时，这并*不会*自动发生：一个[Map](https://eigen.tuxfamily.org/dox/classEigen_1_1Map.html)类型不相同，其[Dense](https://eigen.tuxfamily.org/dox/structEigen_1_1Dense.html)等同。有关详细信息，请参阅[编写将 Eigen 类型作为参数的函数](https://eigen.tuxfamily.org/dox/TopicFunctionTakingEigenTypes.html)。
 
 # 更改映射数组
 
