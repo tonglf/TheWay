@@ -156,7 +156,7 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
     bool halfPassed = false;
     int count = cloudSize;
     PointType point;
-    std::vector<pcl::PointCloud<PointType>> laserCloudScans(N_SCANS);   // 把每个点存储到对应的 线 上
+    std::vector<pcl::PointCloud<PointType>> laserCloudScans(N_SCANS);   // 把每个点存储到对应的 线 上，并增加强度信息
     for (int i = 0; i < cloudSize; i++)
     {
         point.x = laserCloudIn.points[i].x;
@@ -202,10 +202,12 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
         {
             printf("wrong scan number\n");
             ROS_BREAK();
-        }LessFlat;          // 剔除被标记为cornerLess特征 和 临近点 的所有点云的集合
+        }
+        //printf("angle %f scanID %d \n", angle, scanID);
 
-    float t_q_sort = 0;
-    for (int i = 0; i < N_SCANS; i++)                   
+        float ori = -atan2(point.y, point.x);
+        if (!halfPassed)
+        {                   
             if (ori < startOri - M_PI / 2)
             {
                 ori += 2 * M_PI;
@@ -269,7 +271,7 @@ void laserCloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg)
     pcl::PointCloud<PointType> cornerPointsSharp;       // 曲率大于0.1的激光雷达点中曲率最大的2个点(每个特征区域内)
     pcl::PointCloud<PointType> cornerPointsLessSharp;   // 曲率大于0.1的激光雷达点中曲率最大的前20个点(每个特征区域内)
     pcl::PointCloud<PointType> surfPointsFlat;                  // 曲率小于0.1的激光雷达点云中曲率最小的4个点(每个特征区域内)
-    pcl::PointCloud<PointType> surfPointsLessFlat;          // 剔除被标记为cornerLess特征 和 临近点 的所有点云的集合
+    pcl::PointCloud<PointType> surfPointsLessFlat;          // 剔除被标记为 cornerLess 特征所有点云的集合
 
     float t_q_sort = 0;
     for (int i = 0; i < N_SCANS; i++)                   // *********************** 特征提取 ******************************
