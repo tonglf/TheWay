@@ -1,14 +1,16 @@
 # LOAM Odometry
 
+**点到线的距离**
 
+![img](https://pic1.zhimg.com/80/v2-4ed8446d2061af27a33dadc1f9159550_720w.jpg)
 
+![img](https://pic2.zhimg.com/80/v2-73befb902774bf20b4c5fe39678b5e69_720w.png)
 
+**点到面的距离**
 
+![img](https://pic3.zhimg.com/80/v2-b479ad72f891dbfef9410c9f0c56bd9e_720w.jpg)
 
-
-
-
-
+![img](https://pic3.zhimg.com/80/v2-929c59440190a4fcdf0e786f6f2fa0ce_720w.jpg)
 
 # 点云配准
 

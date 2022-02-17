@@ -94,11 +94,11 @@ Eigen::Quaterniond q_w_curr(1, 0, 0, 0);
 Eigen::Vector3d t_w_curr(0, 0, 0);
 
 // q_curr_last(x, y, z, w), t_curr_last
-double para_q[4] = {0, 0, 0, 1};
-double para_t[3] = {0, 0, 0};
+double para_q[4] = {0, 0, 0, 1};        
+double para_t[3] = {0, 0, 0};         
 
-Eigen::Map<Eigen::Quaterniond> q_last_curr(para_q);
-Eigen::Map<Eigen::Vector3d> t_last_curr(para_t);
+Eigen::Map<Eigen::Quaterniond> q_last_curr(para_q);         // 旋转四元数
+Eigen::Map<Eigen::Vector3d> t_last_curr(para_t);                  // 平移向量
 
 std::queue<sensor_msgs::PointCloud2ConstPtr> cornerSharpBuf;
 std::queue<sensor_msgs::PointCloud2ConstPtr> cornerLessSharpBuf;
@@ -113,7 +113,7 @@ void TransformToStart(PointType const *const pi, PointType *const po)
     //interpolation ratio
     double s;
     if (DISTORTION)
-        s = (pi->intensity - int(pi->intensity)) / SCAN_PERIOD;
+        s = (pi->intensity - int(pi->intensity)) / SCAN_PERIOD;                 // float relTime = (ori - startOri) / (endOri - startOri);
     else
         s = 1.0;
     //s = 1;
@@ -274,22 +274,22 @@ int main(int argc, char **argv)
                 int surfPointsFlatNum = surfPointsFlat->points.size();
 
                 TicToc t_opt;
-                for (size_t opti_counter = 0; opti_counter < 2; ++opti_counter)
+                for (size_t opti_counter = 0; opti_counter < 2; ++opti_counter)     // 两次迭代
                 {
-                    corner_correspondence = 0;
+                    corner_correspondence = 0;              // 记录对应匹配个数
                     plane_correspondence = 0;
 
                     //ceres::LossFunction *loss_function = NULL;
-                    ceres::LossFunction *loss_function = new ceres::HuberLoss(0.1);
+                    ceres::LossFunction *loss_function = new ceres::HuberLoss(0.1);     // 创建损失函数
                     ceres::LocalParameterization *q_parameterization =
                         new ceres::EigenQuaternionParameterization();
-                    ceres::Problem::Options problem_options;
+                    ceres::Problem::Options problem_options;                                // 创建问题
 
                     ceres::Problem problem(problem_options);
-                    problem.AddParameterBlock(para_q, 4, q_parameterization);
+                    problem.AddParameterBlock(para_q, 4, q_parameterization);       // 加入参数
                     problem.AddParameterBlock(para_t, 3);
 
-                    pcl::PointXYZI pointSel;
+                    pcl::PointXYZI pointSel;                        // 定义查找点
                     std::vector<int> pointSearchInd;
                     std::vector<float> pointSearchSqDis;
 
@@ -298,7 +298,11 @@ int main(int argc, char **argv)
                     for (int i = 0; i < cornerPointsSharpNum; ++i)          // 遍历角点，寻找匹配
                     {
                         TransformToStart(&(cornerPointsSharp->points[i]), &pointSel);               // 查询点去畸变     
-                        kdtreeCornerLast->nearestKSearch(pointSel, 1, pointSearchInd, pointSearchSqDis);        // 查询近邻点
+                        kdtreeCornerLast->nearestKSearch(pointSel, 1, pointSearchInd, pointSearchSqDis);        // 查询近邻点       
+                        /*
+                        kdtreeCornerLast->nearestKSearch(pointSel, k, pointSearchInd, pointSearchSqDis); 
+                        kdtreeCornerLast->radiusSearch(pointSel, sqrt(DISTANCE_SQ_THRESHOLD), pointSearchInd, pointSearchSqDis); 
+                        */
 
                         int closestPointInd = -1, minPointInd2 = -1;    // 最近点索引 ：前后两帧、*上下两部分激光线*
                         if (pointSearchSqDis[0] < DISTANCE_SQ_THRESHOLD)        // 距离小于阈值
@@ -359,7 +363,7 @@ int main(int argc, char **argv)
                                 }
                             }
                         }
-                        if (minPointInd2 >= 0) // both closestPointInd and minPointInd2 is valid   // 第三个最近点有效
+                        if (minPointInd2 >= 0) // both closestPointInd and minPointInd2 is valid   // 第2个最近点有效
                         {
                             Eigen::Vector3d curr_point(cornerPointsSharp->points[i].x,
                                                        cornerPointsSharp->points[i].y,
@@ -376,8 +380,8 @@ int main(int argc, char **argv)
                                 s = (cornerPointsSharp->points[i].intensity - int(cornerPointsSharp->points[i].intensity)) / SCAN_PERIOD;
                             else
                                 s = 1.0;
-                            ceres::CostFunction *cost_function = LidarEdgeFactor::Create(curr_point, last_point_a, last_point_b, s);
-                            problem.AddResidualBlock(cost_function, loss_function, para_q, para_t);
+                            ceres::CostFunction *cost_function = LidarEdgeFactor::Create(curr_point, last_point_a, last_point_b, s);        // 代价函数
+                            problem.AddResidualBlock(cost_function, loss_function, para_q, para_t);                 // 加入残差
                             corner_correspondence++;        // 匹配++
                         }
                     }
@@ -489,12 +493,12 @@ int main(int argc, char **argv)
                     }
 
                     TicToc t_solver;
-                    ceres::Solver::Options options;
+                    ceres::Solver::Options options;             // 创建求解器选项
                     options.linear_solver_type = ceres::DENSE_QR;
                     options.max_num_iterations = 4;
                     options.minimizer_progress_to_stdout = false;
                     ceres::Solver::Summary summary;
-                    ceres::Solve(options, &problem, &summary);
+                    ceres::Solve(options, &problem, &summary);          // 求解
                     printf("solver time %f ms \n", t_solver.toc());
                 }
                 printf("optimization twice time %f \n", t_opt.toc());
