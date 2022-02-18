@@ -30,7 +30,7 @@
 
 - **ICP**
   - **ICP 变种**
-  - KD-ICP
+    - KD-ICP
     - 点到点、点到面、面到面
     - Trimmed ICP、distance、normal
   
