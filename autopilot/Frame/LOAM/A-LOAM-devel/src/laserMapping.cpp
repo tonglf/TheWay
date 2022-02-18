@@ -71,18 +71,18 @@ double timeLaserCloudFullRes = 0;
 double timeLaserOdometry = 0;
 
 
-int laserCloudCenWidth = 10;
+int laserCloudCenWidth = 10;		// 栅格 Width 方向中心
 int laserCloudCenHeight = 10;
 int laserCloudCenDepth = 5;
-const int laserCloudWidth = 21;
+const int laserCloudWidth = 21;		// 栅格 Width 方向长度
 const int laserCloudHeight = 21;
 const int laserCloudDepth = 11;
 
 
-const int laserCloudNum = laserCloudWidth * laserCloudHeight * laserCloudDepth; //4851
+const int laserCloudNum = laserCloudWidth * laserCloudHeight * laserCloudDepth; 	// 4851		50 × 50 cm		栅格数量
 
 
-int laserCloudValidInd[125];
+int laserCloudValidInd[125];			// 有效栅格的索引存储数组，大小 5 × 5 × 3 = 75
 int laserCloudSurroundInd[125];
 
 // input: from odom
@@ -93,30 +93,30 @@ pcl::PointCloud<PointType>::Ptr laserCloudSurfLast(new pcl::PointCloud<PointType
 pcl::PointCloud<PointType>::Ptr laserCloudSurround(new pcl::PointCloud<PointType>());
 
 // surround points in map to build tree
-pcl::PointCloud<PointType>::Ptr laserCloudCornerFromMap(new pcl::PointCloud<PointType>());
+pcl::PointCloud<PointType>::Ptr laserCloudCornerFromMap(new pcl::PointCloud<PointType>());		// map 中要配准的 corner 特征
 pcl::PointCloud<PointType>::Ptr laserCloudSurfFromMap(new pcl::PointCloud<PointType>());
 
-//input & output: points in one frame. local --> global
+//input & output: points in one frame. local --> global		// 全部点云：输入 odom 坐标系下的全部点云 	 输出 map 坐标系下的全部点云
 pcl::PointCloud<PointType>::Ptr laserCloudFullRes(new pcl::PointCloud<PointType>());
 
 // points in every cube
-pcl::PointCloud<PointType>::Ptr laserCloudCornerArray[laserCloudNum];
+pcl::PointCloud<PointType>::Ptr laserCloudCornerArray[laserCloudNum];		// corner 位于哪个栅格中
 pcl::PointCloud<PointType>::Ptr laserCloudSurfArray[laserCloudNum];
 
 //kd-tree
-pcl::KdTreeFLANN<PointType>::Ptr kdtreeCornerFromMap(new pcl::KdTreeFLANN<PointType>());
+pcl::KdTreeFLANN<PointType>::Ptr kdtreeCornerFromMap(new pcl::KdTreeFLANN<PointType>());		
 pcl::KdTreeFLANN<PointType>::Ptr kdtreeSurfFromMap(new pcl::KdTreeFLANN<PointType>());
 
 double parameters[7] = {0, 0, 0, 1, 0, 0, 0};
-Eigen::Map<Eigen::Quaterniond> q_w_curr(parameters);
+Eigen::Map<Eigen::Quaterniond> q_w_curr(parameters);		// map 坐标系
 Eigen::Map<Eigen::Vector3d> t_w_curr(parameters + 4);
 
 // wmap_T_odom * odom_T_curr = wmap_T_curr;
 // transformation between odom's world and map's world frame
-Eigen::Quaterniond q_wmap_wodom(1, 0, 0, 0);
+Eigen::Quaterniond q_wmap_wodom(1, 0, 0, 0);				// odom 坐标系转换到 map 坐标系下对应的转换关系
 Eigen::Vector3d t_wmap_wodom(0, 0, 0);
 
-Eigen::Quaterniond q_wodom_curr(1, 0, 0, 0);
+Eigen::Quaterniond q_wodom_curr(1, 0, 0, 0);			// odom 坐标系
 Eigen::Vector3d t_wodom_curr(0, 0, 0);
 
 
@@ -139,19 +139,19 @@ ros::Publisher pubLaserCloudSurround, pubLaserCloudMap, pubLaserCloudFullRes, pu
 nav_msgs::Path laserAfterMappedPath;
 
 // set initial guess
-void transformAssociateToMap()
+void transformAssociateToMap()			// 转换到 map 坐标系下
 {
 	q_w_curr = q_wmap_wodom * q_wodom_curr;
 	t_w_curr = q_wmap_wodom * t_wodom_curr + t_wmap_wodom;
 }
 
-void transformUpdate()
+void transformUpdate()				// 更新 odom 到 map 的旋转
 {
 	q_wmap_wodom = q_w_curr * q_wodom_curr.inverse();
 	t_wmap_wodom = t_w_curr - q_wmap_wodom * t_wodom_curr;
 }
 
-void pointAssociateToMap(PointType const *const pi, PointType *const po)
+void pointAssociateToMap(PointType const *const pi, PointType *const po)		// 讲 点 转换到 map 坐标系下
 {
 	Eigen::Vector3d point_curr(pi->x, pi->y, pi->z);
 	Eigen::Vector3d point_w = q_w_curr * point_curr + t_w_curr;
@@ -309,7 +309,7 @@ void process()
 			transformAssociateToMap();
 
 			TicToc t_shift;
-			int centerCubeI = int((t_w_curr.x() + 25.0) / 50.0) + laserCloudCenWidth;			// 在哪个框内
+			int centerCubeI = int((t_w_curr.x() + 25.0) / 50.0) + laserCloudCenWidth;			// 计算当前帧在 3D 栅格特征地图中的位置
 			int centerCubeJ = int((t_w_curr.y() + 25.0) / 50.0) + laserCloudCenHeight;
 			int centerCubeK = int((t_w_curr.z() + 25.0) / 50.0) + laserCloudCenDepth;
 
@@ -508,7 +508,7 @@ void process()
 
 			int laserCloudValidNum = 0;
 			int laserCloudSurroundNum = 0;
-
+			// 得到激光雷达附近的特征点
 			for (int i = centerCubeI - 2; i <= centerCubeI + 2; i++)
 			{
 				for (int j = centerCubeJ - 2; j <= centerCubeJ + 2; j++)
@@ -519,7 +519,7 @@ void process()
 							j >= 0 && j < laserCloudHeight &&
 							k >= 0 && k < laserCloudDepth)
 						{ 
-							laserCloudValidInd[laserCloudValidNum] = i + laserCloudWidth * j + laserCloudWidth * laserCloudHeight * k;
+							laserCloudValidInd[laserCloudValidNum] = i + laserCloudWidth * j + laserCloudWidth * laserCloudHeight * k;				// 把栅格的索引存储到数组中
 							laserCloudValidNum++;
 							laserCloudSurroundInd[laserCloudSurroundNum] = i + laserCloudWidth * j + laserCloudWidth * laserCloudHeight * k;
 							laserCloudSurroundNum++;
@@ -528,7 +528,7 @@ void process()
 				}
 			}
 
-			laserCloudCornerFromMap->clear();
+			laserCloudCornerFromMap->clear();		// 把 corner 特征点加入 laserCloudCornerFromMap
 			laserCloudSurfFromMap->clear();
 			for (int i = 0; i < laserCloudValidNum; i++)
 			{
@@ -574,7 +574,7 @@ void process()
 					TicToc t_data;
 					int corner_num = 0;
 
-					for (int i = 0; i < laserCloudCornerStackNum; i++)
+					for (int i = 0; i < laserCloudCornerStackNum; i++)			// corner 匹配
 					{
 						pointOri = laserCloudCornerStack->points[i];
 						//double sqrtDis = pointOri.x * pointOri.x + pointOri.y * pointOri.y + pointOri.z * pointOri.z;
@@ -640,7 +640,7 @@ void process()
 					}
 
 					int surf_num = 0;
-					for (int i = 0; i < laserCloudSurfStackNum; i++)
+					for (int i = 0; i < laserCloudSurfStackNum; i++)		 // surf 匹配
 					{
 						pointOri = laserCloudSurfStack->points[i];
 						//double sqrtDis = pointOri.x * pointOri.x + pointOri.y * pointOri.y + pointOri.z * pointOri.z;
@@ -731,10 +731,10 @@ void process()
 			{
 				ROS_WARN("time Map corner and surf num are not enough");
 			}
-			transformUpdate();
+			transformUpdate();		// 更新 odom 坐标系到 map 坐标系的变化关系
 
-			TicToc t_add;
-			for (int i = 0; i < laserCloudCornerStackNum; i++)
+			TicToc t_add;		// 将特征点加入到地图中
+			for (int i = 0; i < laserCloudCornerStackNum; i++)			// 加入 corner 特征点
 			{
 				pointAssociateToMap(&laserCloudCornerStack->points[i], &pointSel);
 
@@ -753,12 +753,12 @@ void process()
 					cubeJ >= 0 && cubeJ < laserCloudHeight &&
 					cubeK >= 0 && cubeK < laserCloudDepth)
 				{
-					int cubeInd = cubeI + laserCloudWidth * cubeJ + laserCloudWidth * laserCloudHeight * cubeK;
+					int cubeInd = cubeI + laserCloudWidth * cubeJ + laserCloudWidth * laserCloudHeight * cubeK;		// 计算栅格索引
 					laserCloudCornerArray[cubeInd]->push_back(pointSel);
 				}
 			}
 
-			for (int i = 0; i < laserCloudSurfStackNum; i++)
+			for (int i = 0; i < laserCloudSurfStackNum; i++)				// 加入 surf 特征点
 			{
 				pointAssociateToMap(&laserCloudSurfStack->points[i], &pointSel);
 
@@ -785,7 +785,7 @@ void process()
 
 			
 			TicToc t_filter;
-			for (int i = 0; i < laserCloudValidNum; i++)
+			for (int i = 0; i < laserCloudValidNum; i++)		// 对加入特征点之后的栅格进行降采样
 			{
 				int ind = laserCloudValidInd[i];
 
@@ -802,7 +802,7 @@ void process()
 			printf("filter time %f ms \n", t_filter.toc());
 			
 			TicToc t_pub;
-			//publish surround map for every 5 frame
+			//publish surround map for every 5 frame			// 每 5 帧发布		局部 Surround
 			if (frameCount % 5 == 0)
 			{
 				laserCloudSurround->clear();
@@ -820,7 +820,7 @@ void process()
 				pubLaserCloudSurround.publish(laserCloudSurround3);
 			}
 
-			if (frameCount % 20 == 0)
+			if (frameCount % 20 == 0)									// 每 20 帧发布		全部 map
 			{
 				pcl::PointCloud<PointType> laserCloudMap;
 				for (int i = 0; i < 4851; i++)
@@ -836,7 +836,7 @@ void process()
 			}
 
 			int laserCloudFullResNum = laserCloudFullRes->points.size();
-			for (int i = 0; i < laserCloudFullResNum; i++)
+			for (int i = 0; i < laserCloudFullResNum; i++)				// 将所有点转换到 map 坐标系下
 			{
 				pointAssociateToMap(&laserCloudFullRes->points[i], &laserCloudFullRes->points[i]);
 			}
@@ -925,7 +925,7 @@ int main(int argc, char **argv)
 
 	pubLaserAfterMappedPath = nh.advertise<nav_msgs::Path>("/aft_mapped_path", 100);
 
-	for (int i = 0; i < laserCloudNum; i++)
+	for (int i = 0; i < laserCloudNum; i++)		// 创建
 	{
 		laserCloudCornerArray[i].reset(new pcl::PointCloud<PointType>());
 		laserCloudSurfArray[i].reset(new pcl::PointCloud<PointType>());
