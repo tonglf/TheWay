@@ -736,7 +736,7 @@ void process()
 			TicToc t_add;		// 将特征点加入到地图中
 			for (int i = 0; i < laserCloudCornerStackNum; i++)			// 加入 corner 特征点
 			{
-				pointAssociateToMap(&laserCloudCornerStack->points[i], &pointSel);
+				pointAssociateToMap(&laserCloudCornerStack->points[i], &pointSel);		// 转换到 map 坐标系下
 
 				int cubeI = int((pointSel.x + 25.0) / 50.0) + laserCloudCenWidth;
 				int cubeJ = int((pointSel.y + 25.0) / 50.0) + laserCloudCenHeight;
