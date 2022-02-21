@@ -268,9 +268,9 @@ int main(int argc, char **argv)
                 systemInited = true;
                 std::cout << "Initialization finished \n";
             }
-            else
+            else        // 匹配
             {
-                int cornerPointsSharpNum = cornerPointsSharp->points.size();
+                int cornerPointsSharpNum = cornerPointsSharp->points.size();    
                 int surfPointsFlatNum = surfPointsFlat->points.size();
 
                 TicToc t_opt;
@@ -503,7 +503,7 @@ int main(int argc, char **argv)
                 }
                 printf("optimization twice time %f \n", t_opt.toc());
 
-                t_w_curr = t_w_curr + q_w_curr * t_last_curr;
+                t_w_curr = t_w_curr + q_w_curr * t_last_curr;       // 更新
                 q_w_curr = q_w_curr * q_last_curr;
             }
 

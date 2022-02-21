@@ -108,7 +108,7 @@ pcl::KdTreeFLANN<PointType>::Ptr kdtreeCornerFromMap(new pcl::KdTreeFLANN<PointT
 pcl::KdTreeFLANN<PointType>::Ptr kdtreeSurfFromMap(new pcl::KdTreeFLANN<PointType>());
 
 double parameters[7] = {0, 0, 0, 1, 0, 0, 0};
-Eigen::Map<Eigen::Quaterniond> q_w_curr(parameters);		// map 坐标系
+Eigen::Map<Eigen::Quaterniond> q_w_curr(parameters);		// map 坐标系（最终要将点云数据转换到当下坐标系）
 Eigen::Map<Eigen::Vector3d> t_w_curr(parameters + 4);
 
 // wmap_T_odom * odom_T_curr = wmap_T_curr;
@@ -116,7 +116,7 @@ Eigen::Map<Eigen::Vector3d> t_w_curr(parameters + 4);
 Eigen::Quaterniond q_wmap_wodom(1, 0, 0, 0);				// odom 坐标系转换到 map 坐标系下对应的转换关系
 Eigen::Vector3d t_wmap_wodom(0, 0, 0);
 
-Eigen::Quaterniond q_wodom_curr(1, 0, 0, 0);			// odom 坐标系
+Eigen::Quaterniond q_wodom_curr(1, 0, 0, 0);			// odom 坐标系（点云数据一来是在当前坐标系下）
 Eigen::Vector3d t_wodom_curr(0, 0, 0);
 
 
