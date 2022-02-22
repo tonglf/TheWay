@@ -503,7 +503,7 @@ int main(int argc, char **argv)
                 }
                 printf("optimization twice time %f \n", t_opt.toc());
 
-                t_w_curr = t_w_curr + q_w_curr * t_last_curr;       // 更新
+                t_w_curr = t_w_curr + q_w_curr * t_last_curr;       // 更新，先更新 t，后更新 q
                 q_w_curr = q_w_curr * q_last_curr;
             }
 

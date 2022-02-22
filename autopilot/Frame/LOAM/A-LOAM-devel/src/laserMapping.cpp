@@ -578,7 +578,7 @@ void process()
 					{
 						pointOri = laserCloudCornerStack->points[i];
 						//double sqrtDis = pointOri.x * pointOri.x + pointOri.y * pointOri.y + pointOri.z * pointOri.z;
-						pointAssociateToMap(&pointOri, &pointSel);
+						pointAssociateToMap(&pointOri, &pointSel);			// 转换到 map 坐标系下
 						kdtreeCornerFromMap->nearestKSearch(pointSel, 5, pointSearchInd, pointSearchSqDis); 
 
 						if (pointSearchSqDis[4] < 1.0)
@@ -731,9 +731,9 @@ void process()
 			{
 				ROS_WARN("time Map corner and surf num are not enough");
 			}
-			transformUpdate();		// 由 q_w_curr 和 q_wodom_curr 更新 odom 坐标系到 map 坐标系的变化关系
+			transformUpdate();		// 由 q_w_curr 和 q_wodom_curr 更新 odom 坐标系到 map 坐标系的转换关系
 
-			TicToc t_add;		// 将特征点加入到地图中
+			TicToc t_add;		// 将特征点加入到栅格的点云中
 			for (int i = 0; i < laserCloudCornerStackNum; i++)			// 加入 corner 特征点
 			{
 				pointAssociateToMap(&laserCloudCornerStack->points[i], &pointSel);		// 转换到 map 坐标系下
