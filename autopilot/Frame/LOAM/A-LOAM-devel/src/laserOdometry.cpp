@@ -553,7 +553,7 @@ int main(int argc, char **argv)
                 }
             }
 
-            pcl::PointCloud<PointType>::Ptr laserCloudTemp = cornerPointsLessSharp;         // 点云匹配集合
+            pcl::PointCloud<PointType>::Ptr laserCloudTemp = cornerPointsLessSharp;         // 点云匹配集合交换
             cornerPointsLessSharp = laserCloudCornerLast;               // 当前角点 与 上一帧 cornerPointsLessSharp 匹配
             laserCloudCornerLast = laserCloudTemp;
 
