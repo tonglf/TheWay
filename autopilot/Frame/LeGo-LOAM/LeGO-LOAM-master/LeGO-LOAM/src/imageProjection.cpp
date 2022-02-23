@@ -180,19 +180,19 @@ public:
     
     void cloudHandler(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg){
 
-        // 1. Convert ros message to pcl point cloud
+        // 1. Convert ros message to pcl point cloud    // 将ros消息转换为pcl点云
         copyPointCloud(laserCloudMsg);
-        // 2. Start and end angle of a scan
+        // 2. Start and end angle of a scan             // 扫描的开始和结束角度
         findStartEndAngle();
-        // 3. Range image projection
+        // 3. Range image projection                        // 深度图像投影
         projectPointCloud();
-        // 4. Mark ground points
+        // 4. Mark ground points                               // 标记地面点
         groundRemoval();
-        // 5. Point cloud segmentation
+        // 5. Point cloud segmentation                  // 点云分割
         cloudSegmentation();
-        // 6. Publish all clouds
+        // 6. Publish all clouds                                // 发布所有点云
         publishCloud();
-        // 7. Reset parameters for next iteration
+        // 7. Reset parameters for next iteration       // 为下一次迭代重置参数
         resetParameters();
     }
 
@@ -221,7 +221,7 @@ public:
             thisPoint.x = laserCloudIn->points[i].x;
             thisPoint.y = laserCloudIn->points[i].y;
             thisPoint.z = laserCloudIn->points[i].z;
-            // find the row and column index in the iamge for this point
+            // find the row and column index in the iamge for this point            // 找到该点在图像中的行和列索引
             if (useCloudRing == true){
                 rowIdn = laserCloudInRing->points[i].ring;
             }
