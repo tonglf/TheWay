@@ -180,7 +180,7 @@ public:
     
     void cloudHandler(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg){
 
-        // 1. Convert ros message to pcl point cloud    // 将ros消息转换为pcl点云
+        // 1. Convert ros message to pcl point cloud    // 将 ros 消息转换为 pcl 点云
         copyPointCloud(laserCloudMsg);
         // 2. Start and end angle of a scan             // 扫描的开始和结束角度
         findStartEndAngle();
