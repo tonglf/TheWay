@@ -263,7 +263,7 @@ public:
         // groundMat
         // -1, no valid info to check if ground of not
         //  0, initial value, after validation, means not ground            // 0 非地面点
-        //  1, ground                                                                                               // 1 地面点
+        //  1, ground                                                       // 1 地面点
         for (size_t j = 0; j < Horizon_SCAN; ++j){
             for (size_t i = 0; i < groundScanInd; ++i){             // 7
 
