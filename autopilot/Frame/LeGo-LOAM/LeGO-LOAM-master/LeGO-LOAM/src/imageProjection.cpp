@@ -216,7 +216,7 @@ public:
 
         cloudSize = laserCloudIn->points.size();
 
-        for (size_t i = 0; i < cloudSize; ++i){
+        for (size_t i = 0; i < cloudSize; ++i){             // 将收到的一帧点云投影到一副 16 × 1800 的图像上（16线lidar，水平精度0.2, 360/2.0）
 
             thisPoint.x = laserCloudIn->points[i].x;
             thisPoint.y = laserCloudIn->points[i].y;
@@ -229,7 +229,7 @@ public:
                 verticalAngle = atan2(thisPoint.z, sqrt(thisPoint.x * thisPoint.x + thisPoint.y * thisPoint.y)) * 180 / M_PI;
                 rowIdn = (verticalAngle + ang_bottom) / ang_res_y;
             }
-            if (rowIdn < 0 || rowIdn >= N_SCAN)
+            if (rowIdn < 0 || rowIdn >= N_SCAN)         // N_SCAN = 16
                 continue;
 
             horizonAngle = atan2(thisPoint.x, thisPoint.y) * 180 / M_PI;
@@ -238,14 +238,14 @@ public:
             if (columnIdn >= Horizon_SCAN)
                 columnIdn -= Horizon_SCAN;
 
-            if (columnIdn < 0 || columnIdn >= Horizon_SCAN)
+            if (columnIdn < 0 || columnIdn >= Horizon_SCAN)    // Horizon_SCAN = 1800
                 continue;
 
-            range = sqrt(thisPoint.x * thisPoint.x + thisPoint.y * thisPoint.y + thisPoint.z * thisPoint.z);
+            range = sqrt(thisPoint.x * thisPoint.x + thisPoint.y * thisPoint.y + thisPoint.z * thisPoint.z);        // 像素的值表示点至lidar的欧式距离
             if (range < sensorMinimumRange)
                 continue;
             
-            rangeMat.at<float>(rowIdn, columnIdn) = range;
+            rangeMat.at<float>(rowIdn, columnIdn) = range;          // 16 * 1800
 
             thisPoint.intensity = (float)rowIdn + (float)columnIdn / 10000.0;
 
@@ -262,10 +262,10 @@ public:
         float diffX, diffY, diffZ, angle;
         // groundMat
         // -1, no valid info to check if ground of not
-        //  0, initial value, after validation, means not ground
-        //  1, ground
+        //  0, initial value, after validation, means not ground            // 0 非地面点
+        //  1, ground                                                                                               // 1 地面点
         for (size_t j = 0; j < Horizon_SCAN; ++j){
-            for (size_t i = 0; i < groundScanInd; ++i){
+            for (size_t i = 0; i < groundScanInd; ++i){             // 7
 
                 lowerInd = j + ( i )*Horizon_SCAN;
                 upperInd = j + (i+1)*Horizon_SCAN;
@@ -283,14 +283,14 @@ public:
 
                 angle = atan2(diffZ, sqrt(diffX*diffX + diffY*diffY) ) * 180 / M_PI;
 
-                if (abs(angle - sensorMountAngle) <= 10){
+                if (abs(angle - sensorMountAngle) <= 10){               // 小于阈值， 为地面点
                     groundMat.at<int8_t>(i,j) = 1;
                     groundMat.at<int8_t>(i+1,j) = 1;
                 }
             }
         }
-        // extract ground cloud (groundMat == 1)
-        // mark entry that doesn't need to label (ground and invalid point) for segmentation
+        // extract ground cloud (groundMat == 1)            // 提取地面点
+        // mark entry that doesn't need to label (ground and invalid point) for segmentation       // 为了分割，标记不需要标记的条目（地面和无效点）
         // note that ground remove is from 0~N_SCAN-1, need rangeMat for mark label matrix for the 16th scan
         for (size_t i = 0; i < N_SCAN; ++i){
             for (size_t j = 0; j < Horizon_SCAN; ++j){
@@ -303,7 +303,7 @@ public:
             for (size_t i = 0; i <= groundScanInd; ++i){
                 for (size_t j = 0; j < Horizon_SCAN; ++j){
                     if (groundMat.at<int8_t>(i,j) == 1)
-                        groundCloud->push_back(fullCloud->points[j + i*Horizon_SCAN]);
+                        groundCloud->push_back(fullCloud->points[j + i*Horizon_SCAN]);          // 地面点云
                 }
             }
         }
