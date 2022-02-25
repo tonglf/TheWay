@@ -9,18 +9,18 @@
   - **局部参数化** 在许多情况下，一些参数位于欧几里得空间以外的流形上，例如旋转矩阵。在这种情况下，用户可以通过指定 LocalParameterization 对象来指定局部切线空间的几何形状。
 
 - **求解器选择** 根据大小、稀疏结构、时间和内存预算以及求解质量要求，不同的优化算法将满足不同的需求。为此，Ceres Solver 自带了多种优化算法： 
-  - **Trust Region Solvers** - Ceres 支持 Levenberg-Marquardt、Powell 的 Dogleg 和 Subspace dogleg 方法。所有这些方法的关键计算成本是线性系统的解。为此，Ceres 提供了多种线性求解器 - 用于密集问题的密集 QR 和密集 Cholesky 分解（使用 Eigen 或 LAPACK），用于大型稀疏问题的稀疏 Cholesky 分解（SuiteSparse、CXSparse 或 Eigen），基于自定义 Schur 补码的密集、稀疏，以及用于束调整问题的迭代线性求解器。
+  - **Trust Region Solvers** Ceres 支持 Levenberg-Marquardt、Powell 的 Dogleg 和 Subspace dogleg 方法。所有这些方法的关键计算成本是线性系统的解。为此，Ceres 提供了多种线性求解器 - 用于密集问题的密集 QR 和密集 Cholesky 分解（使用 Eigen 或 LAPACK），用于大型稀疏问题的稀疏 Cholesky 分解（SuiteSparse、CXSparse 或 Eigen），基于自定义 Schur 补码的密集、稀疏，以及用于束调整问题的迭代线性求解器。
   - **线搜索求解器** - 当问题规模如此之大以至于无法存储和分解雅可比行列式或需要廉价的低精度解决方案时，Ceres 提供了许多基于线搜索的算法。这包括非线性共轭梯度、BFGS 和 LBFGS 的许多变体。
 
-- **速度** - Ceres Solver 已经过广泛优化，包括 C++ 模板、手写线性代数例程和基于 OpenMP 或现代 C++ 线程的 Jacobian 评估和线性求解器的多线程。
+- **速度** Ceres Solver 已经过广泛优化，包括 C++ 模板、手写线性代数例程和基于 OpenMP 或现代 C++ 线程的 Jacobian 评估和线性求解器的多线程。
 
 - **解决方案质量** Ceres 是 Mondragon 和 Borchers 用于对非线性最小二乘求解器进行基准测试的 NIST 问题集上性能最好的求解器。
 
-- **协方差估计** - 通过评估全部或部分协方差矩阵来评估解决方案的敏感性/不确定性。 Ceres 是少数允许您进行大规模分析的求解器之一。
+- **协方差估计** 通过评估全部或部分协方差矩阵来评估解决方案的敏感性/不确定性。 Ceres 是少数允许您进行大规模分析的求解器之一。
 
 - **社区** 自作为开源软件发布以来，Ceres 开发了一个活跃的开发者社区，提供新功能、错误修复和支持。
 
-- **便携性** - 在 Linux、Windows、Mac OS X、Android 和 iOS 上运行。
+- **便携性** 在 Linux、Windows、Mac OS X、Android 和 iOS 上运行。
 
 - **BSD** 许可 BSD 许可提供了发布您的应用程序的灵活性
 
