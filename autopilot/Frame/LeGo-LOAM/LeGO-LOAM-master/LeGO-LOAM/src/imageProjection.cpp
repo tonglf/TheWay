@@ -195,7 +195,7 @@ public:
         // 7. Reset parameters for next iteration       // 为下一次迭代重置参数
         resetParameters();
     }
-
+    // 扫描的开始和结束角度
     void findStartEndAngle(){
         // start and end orientation of this cloud
         segMsg.startOrientation = -atan2(laserCloudIn->points[0].y, laserCloudIn->points[0].x);
@@ -207,7 +207,7 @@ public:
             segMsg.endOrientation += 2 * M_PI;
         segMsg.orientationDiff = segMsg.endOrientation - segMsg.startOrientation;
     }
-
+    // 深度图像投影
     void projectPointCloud(){
         // range image projection
         float verticalAngle, horizonAngle, range;
@@ -256,7 +256,7 @@ public:
         }
     }
 
-
+     // 标记地面点
     void groundRemoval(){
         size_t lowerInd, upperInd;
         float diffX, diffY, diffZ, angle;
@@ -308,7 +308,7 @@ public:
             }
         }
     }
-
+    // 点云分割
     void cloudSegmentation(){
         // segmentation process
         for (size_t i = 0; i < N_SCAN; ++i)
@@ -459,7 +459,7 @@ public:
         }
     }
 
-    
+    // 发布所有点云
     void publishCloud(){
         // 1. Publish Seg Cloud Info
         segMsg.header = cloudHeader;
