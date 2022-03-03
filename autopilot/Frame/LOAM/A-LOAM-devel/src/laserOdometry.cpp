@@ -107,7 +107,7 @@ std::queue<sensor_msgs::PointCloud2ConstPtr> surfLessFlatBuf;
 std::queue<sensor_msgs::PointCloud2ConstPtr> fullPointsBuf;
 std::mutex mBuf;
 
-// undistort lidar point            假设激光雷达匀速运动，利用上一帧的激光里程计帧间相对位姿，插值去除点云畸变
+// undistort lidar point            // 假设激光雷达匀速运动，利用上一帧的激光里程计帧间相对位姿，插值去除点云畸变
 void TransformToStart(PointType const *const pi, PointType *const po)
 {
     //interpolation ratio
