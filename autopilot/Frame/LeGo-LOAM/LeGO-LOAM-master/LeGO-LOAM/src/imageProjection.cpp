@@ -184,13 +184,13 @@ public:
         copyPointCloud(laserCloudMsg);
         // 2. Start and end angle of a scan             // 扫描的开始和结束角度
         findStartEndAngle();
-        // 3. Range image projection                        // 深度图像投影
+        // 3. Range image projection                    // 深度图像投影
         projectPointCloud();
-        // 4. Mark ground points                               // 标记地面点
+        // 4. Mark ground points                        // 标记地面点
         groundRemoval();
         // 5. Point cloud segmentation                  // 点云分割
         cloudSegmentation();
-        // 6. Publish all clouds                                // 发布所有点云
+        // 6. Publish all clouds                        // 发布所有点云
         publishCloud();
         // 7. Reset parameters for next iteration       // 为下一次迭代重置参数
         resetParameters();
