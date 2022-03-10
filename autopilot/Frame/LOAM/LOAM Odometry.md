@@ -48,7 +48,7 @@
 
 <img src="data/舭部-1.png" alt="image-20220216112028893" style="zoom:50%;" />
 
-<img src="舭部-2.png" alt="image-20220216112045971" style="zoom:50%;" />
+<img src="data/舭部-2.png" alt="image-20220216112045971" style="zoom:50%;" />
 
 ## 粗配准
 
