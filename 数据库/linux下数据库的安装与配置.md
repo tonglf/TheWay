@@ -36,6 +36,6 @@ sudo apt-get install redis-server
 ### 启动
 
 ```shell 
-r
+redis-server
 ```
 
